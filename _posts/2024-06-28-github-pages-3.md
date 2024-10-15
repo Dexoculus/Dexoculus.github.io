@@ -144,6 +144,6 @@ Add following tags to head.html code.
 Now, you can include inline math like this: $ E = mc^2 $.
 
 And you can include block math like this:<br>
-\\[
+$$
 \displaystyle \int_0^\infty e^{-x} \, dx = 1
-\\]
+$$

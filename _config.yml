@@ -1,35 +1,36 @@
-### Site Settings ###
-title               : Dexter Oculus
-description         : >-
-                      Studying Mathematics, Data Science, Machine Learing and Computer Science.
-baseurl             : #"Dexoculus.github.io"                     # Change to empty quotes if you are hosting your site at <your-username>.github.io directly
-repository          : Dexoculus/Dexoculus.github.io     # Change to <your-username>/<your-username>.github.io (or remove it if you don't need remote projects)
-remote_theme        : YoussefRaafatNasry/portfolYOU
-open_new_tab        : true                             # Opens external URLs in new tab (works for posts, projects and navbar only)
+# Site Settings
+title: "Dexter Oculus"
+description: "Studying Mathematics, Data Science, Machine Learning and Computer Science."
+baseurl: ""
+repository: "Dexoculus/Dexoculus.github.io"
+remote_theme: "YoussefRaafatNasry/portfolYOU"
+open_new_tab: true
 
-
-### Plugins ###
+# Plugins
 plugins:
   - jemoji
-  - jekyll-toc
 
-
-### Navbar Settings ###
-nav_exclude:                                            # The following paths are excluded from navbar
+# Navbar Settings
+nav_exclude:
   - pages/tags.html
   - pages/404.html
   - pages/index.md
 
+# Author Info
+author:
+  name: "Dexoculus"
+  image: "https://avatars.githubusercontent.com/u/34956179?v=4"
+  github: "Dexoculus"
 
 ### Author Info ###
 author:
-  name              : Dexoculus
-  image             : https://avatars.githubusercontent.com/u/34956179?v=4
+  name: "Dexoculus"
+  image: "https://avatars.githubusercontent.com/u/34956179?v=4"
+  github: "Dexoculus"
 # behance           : your_username
 # dribbble          : your_username
 # email             : username@domain.com
 # facebook          : your_username
-  github            : Dexoculus
 # gitlab            : your_username
 # instagram         : your_username
 # kaggle            : your_username
@@ -46,54 +47,45 @@ author:
 # keybase           : your_username
 
 
-### Posts ###
-permalink: /blog/:title
-
-
-### Collections ###
+# Collections
 collections:
   projects:
     output: true
     permalink: /projects/:name
 
-
-### Disqus ###
+# Disqus
 disqus:
-  shortname: Dexoculus                     # Your website Shortname on disqus
+  shortname: "Dexoculus"
 
-
-### Analytics ###
+# Analytics
 analytics:
-  enabled: false                                        # Set true to enable analytics
+  enabled: false
   google:
-    tracking_id: your-google-tracking-id
+    tracking_id: "your-google-tracking-id"
 
-
-### Buy me a coffee ###
-# See https://www.buymeacoffee.com/
+# Buy me a coffee
 buymeacoffee:
   enabled: false
-  username: Dexoculus
+  username: "Dexoculus"
   color: "#007bff"
-  message: "Thank you for visiting."                    # Message to be displayed aside from the button for a few seconds.
+  message: "Thank you for visiting."
   description: "Support me on Buy me a coffee!"
 
-
-### Defaults for collections ###
+#### Defaults for collections ###
 defaults:
   - scope:
       path: ""
       type: "projects"
     values:
       layout: "page"
+
   - scope:
       path: ""
       type: "posts"
     values:
       comments: false                                   # Set to true to enable disqus comments
 
-
-### Exclude from processing ###
+# Exclude from processing
 exclude:
   - README.md
   - CONTRIBUTING.md

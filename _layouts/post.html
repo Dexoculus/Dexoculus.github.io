@@ -2,102 +2,36 @@
 layout: page
 ---
 
-<div class="container">
-  <div class="row">
-    <main class="col-12">
-      <h1 class="post-title"><b>{{ page.title }}</b></h1>
+<h1><b>{{ page.title }}</b></h1>
 
-      <p class="post-metadata text-muted">
-        {{ page.date | date_to_long_string }} -  
-        <b>
-        {%- assign words = content | number_of_words -%}
-        {%- if words < 360 -%}
-          less than 1 min read time
-        {%- else -%}
-          {{ words | divided_by: 180 }} mins read time
-        {%- endif -%}
-        </b>
+<p class="post-metadata text-muted">
+  {{ page.date | date_to_long_string }} -  
+  <b>
+  {%- assign words = content | number_of_words -%}
+  {%- if words < 360 -%}
+    less than 1 min read time
+  {%- else -%}
+    {{ words | divided_by: 180 }} mins read time
+  {%- endif -%}
+  </b>
 
-        <br>
+  <br>
 
-        {%- if page.tags != empty -%}
-          Tags: 
-          {% for tag in page.tags %}
-          <a class="text-decoration-none no-underline" href="{{ tag | slugify | prepend:'/blog/tags#' | relative_url }}">
-            <span class="tag badge badge-pill text-primary border border-primary">{{ tag }}</span>
-          </a>
-          {% endfor %}
-        {%- endif -%}
-      </p>
+  {%- if page.tags != empty -%}
+    Tags: 
+    {% for tag in page.tags %}
+    <a class="text-decoration-none no-underline" href="{{ tag | slugify | prepend:'/blog/tags#' | relative_url }}">
+      <span class="tag badge badge-pill text-primary border border-primary">{{ tag }}</span>
+    </a>
+    {% endfor %}
+  {%- endif -%}
 
-      <article class="post-article">
-        {{ content }}
-      </article>
+</p>
 
-      {% if page.comments %}
-      <div class="pt-5">
-        {% include blog/disqus.html %}
-      </div>
-      {% endif %}
-    </main>
-  </div>
+{{ content }}
+
+{% if page.comments %}
+<div class="pt-5">
+  {% include blog/disqus.html %}
 </div>
-
-<aside id="toc">
-  <div class="list-group sticky-top">
-    <a href="#" class="list-group-item list-group-item-action">&lt;Top&gt;</a>
-    {% include toc.html html=content %}
-  </div>
-</aside>
-
-<script>
-  function getTOCNodes(master) {
-    return Array.from(master.getElementsByTagName("A"));
-  }
-  function getHeaderNodes(master) {
-    return Array.from(master.querySelectorAll("h1, h2, h3, h4, h5, h6"));
-  }
-
-  document.addEventListener("DOMContentLoaded", function() {
-    var article = document.querySelector(".post-article");
-    var toc = document.querySelector("#toc .list-group");
-
-    var articleY = window.pageYOffset + article.getBoundingClientRect().top;
-
-    var headerNodes = getHeaderNodes(article);
-    var tocNodes = getTOCNodes(toc);
-
-    var before = undefined;
-
-    document.addEventListener('scroll', function(e) {
-      var current = headerNodes.filter(function(header) {
-        var headerY = window.pageYOffset + header.getBoundingClientRect().top;
-        return window.scrollY >= headerY - 60;
-      });
-
-      if (current.length > 0) {
-        current = current[current.length - 1];
-
-        var currentA = tocNodes.filter(function(tocNode) {
-          return tocNode.innerHTML === current.innerHTML;
-        });
-
-        currentA = currentA[0];
-        if (currentA) {
-          if (!before) before = currentA;
-
-          if (before !== currentA) {
-            before.classList.remove("toc-active");
-            before = currentA;
-          }
-
-          currentA.classList.add("toc-active");
-        } else {
-          if (before) before.classList.remove("toc-active");
-        }
-      } else {
-        if (before) before.classList.remove("toc-active");
-      }
-    }, false);
-  });
-</script>
+{% endif %}
