@@ -6,11 +6,9 @@ weight: 3
 ---
 
 # **About Me**
-An aspiring Computer Scientist, Mathematician, Data Scientist, and AI Engineer.<br>
-I am currently a member of the [Intelligence & Computation Lab][1], working as an undergraduate research student under [Prof. Jo][2], since October 2023.
+[GitHub][3] | [ORCID][4]
+Currently a member of the [Intelligence & Computation Lab][1], working as an undergraduate research student under [Prof. Jo][2], since October 2023.
 <br>
-[GitHub][3]
-[ORCID][4]
 
 ## **Research Interests**
 
@@ -33,7 +31,7 @@ I am currently a member of the [Intelligence & Computation Lab][1], working as a
   "*GRU-based algorithm for predicting closed quotient rate*" (poster)
 
 ## **Honors and Awards**
-- Excellence Award at the 2024 Hanyang University SWICTAI Comprehensive Academic Conference
+- Excellence Award at the 2024 Hanyang University SWICTAI Comprehensive Academic Conference (2024 한양대학교 SWICTAI 종합학술대회 우수상)
 
 <!-- Lincense & Certificate -->
 
