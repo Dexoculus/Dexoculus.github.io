@@ -1,0 +1,93 @@
+# Site Settings
+title: "Dexter Oculus"
+description: "Studying Mathematics, Data Science, Machine Learning and Computer Science."
+baseurl: ""
+repository: "Dexoculus/Dexoculus.github.io"
+remote_theme: "YoussefRaafatNasry/portfolYOU"
+open_new_tab: true
+
+# Plugins
+plugins:
+  - jemoji
+
+# Navbar Settings
+nav_exclude:
+  - pages/tags.html
+  - pages/404.html
+  - pages/index.md
+
+# Author Info
+author:
+  name: "Dexoculus"
+  image: "https://avatars.githubusercontent.com/u/34956179?v=4"
+  github: "Dexoculus"
+
+### Author Info ###
+author:
+  name: "Dexoculus"
+  image: "https://avatars.githubusercontent.com/u/34956179?v=4"
+  github: "Dexoculus"
+# behance           : your_username
+# dribbble          : your_username
+# email             : username@domain.com
+# facebook          : your_username
+# gitlab            : your_username
+# instagram         : your_username
+# kaggle            : your_username
+# linkedin          : your_username
+# medium            : your_username
+# soundcloud        : your_username
+# spotify           : your_username
+# stackoverflow     : your_user_id
+# tumblr            : your_username.tumblr.com
+# twitch            : your_username
+# twitter           : your_username
+# vimeo             : your_username
+# youtube           : your_channel_name
+# keybase           : your_username
+
+
+# Collections
+collections:
+  projects:
+    output: true
+    permalink: /projects/:name
+
+# Disqus
+disqus:
+  shortname: "Dexoculus"
+
+# Analytics
+analytics:
+  enabled: false
+  google:
+    tracking_id: "your-google-tracking-id"
+
+# Buy me a coffee
+buymeacoffee:
+  enabled: false
+  username: "Dexoculus"
+  color: "#007bff"
+  message: "Thank you for visiting."
+  description: "Support me on Buy me a coffee!"
+
+#### Defaults for collections ###
+defaults:
+  - scope:
+      path: ""
+      type: "projects"
+    values:
+      layout: "page"
+
+  - scope:
+      path: ""
+      type: "posts"
+    values:
+      comments: false                                   # Set to true to enable disqus comments
+
+# Exclude from processing
+exclude:
+  - README.md
+  - CONTRIBUTING.md
+  - LICENSE
+  - "*.log"

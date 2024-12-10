@@ -1,0 +1,7 @@
+- name: Blender
+  percentage: 70
+  color: info
+
+- name: Fusion 360
+  percentage: 90
+  color: success
