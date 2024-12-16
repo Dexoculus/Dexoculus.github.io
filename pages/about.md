@@ -6,8 +6,8 @@ weight: 3
 ---
 
 # **About Me**
-[GitHub][3] | [ORCID][4] <br>
-Currently a member of the [Intelligence & Computation Lab][1], working as an undergraduate research student under [Prof. Jo][2], since October 2023.
+[GitHub][1] | [ORCID][2] <!--[LinkedIn][3] | [Kaggle][4] | [PyPI][5] | --><br>
+Currently a member of the [Intelligence & Computation Lab][3], working as an undergraduate research student under [Prof. Jo][4], since October 2023.
 <br>
 
 ## **Research Interests**
@@ -48,10 +48,13 @@ The Projects section showcases my personal projects, highlighting my hands-on ex
 The Blog section is dedicated to organizing and sharing my knowledge in areas such as mathematics, computer science, and more. Here, I document my learning journey, insights, tutorials on various topics, and reviews of research papers.
 
 <!-- References -->
-[1]: https://sites.google.com/view/gwanghyunjo/home
-[2]: https://scholar.google.com/citations?hl=ko&user=8BN1dJ7aXgMC&view_op=list_works&sortby=pubdate
-[3]: https://github.com/Dexoculus
-[4]: https://orcid.org/0009-0007-4713-5892
+[1]: https://github.com/Dexoculus
+[2]: https://orcid.org/0009-0007-4713-5892
+[3]: https://www.linkedin.com/in/hyeonbin-han-869312279/
+[4]: https://www.kaggle.com/dexoculus
+[5]: https://pypi.org/user/dexoculus/
+[6]: https://sites.google.com/view/gwanghyunjo/home
+[7]: https://scholar.google.com/citations?hl=ko&user=8BN1dJ7aXgMC&view_op=list_works&sortby=pubdate
 ***
 
 <!--
