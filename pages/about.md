@@ -6,7 +6,7 @@ weight: 3
 ---
 
 # **About Me**
-[GitHub][1] | [ORCID][2] <!--[LinkedIn][3] | [Kaggle][4] | [PyPI][5] | --><br>
+[GitHub][1] | [ORCID][2] | [PyPI][5] <!--[LinkedIn][3] | [Kaggle][4] --><br>
 Currently a member of the [Intelligence & Computation Lab][6], working as an undergraduate research student under [Prof. Jo][7], since October 2023.
 <br>
 
