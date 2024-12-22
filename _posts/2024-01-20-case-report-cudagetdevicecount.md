@@ -37,42 +37,41 @@ The easiest solution in such cases is a system reboot. However, since the server
 ### Steps to Resolve
 
 1. **Terminate Processes Using NVIDIA Driver Modules**  
-Use the following command to identify processes utilizing the NVIDIA driver:
-```bash
-sudo lsof /dev/nvidia*
-```
-
-In my case, the display server was using the driver. To stop the display server, I executed:
-```bash
-sudo systemctl stop gdm
-sudo systemctl stop lightdm
-```
-Adapt these steps based on the processes identified in your system.
+    Use the following command to identify processes utilizing the NVIDIA driver:
+    ```bash
+    sudo lsof /dev/nvidia*
+    ```
+    In my case, the display server was using the driver. To stop the display server, I executed:
+    ```bash
+    sudo systemctl stop gdm
+    sudo systemctl stop lightdm
+    ```
+    Adapt these steps based on the processes identified in your system.
 
 2. **Unload NVIDIA Driver Modules**
-Run the following commands in sequence to unload the NVIDIA driver modules:
-```bash
-sudo rmmod nvidia_uvm
-sudo rmmod nvidia_drm
-sudo rmmod nvidia_modeset
-sudo rmmod nvidia
-```
+    Run the following commands in sequence to unload the NVIDIA driver modules:
+    ```bash
+    sudo rmmod nvidia_uvm
+    sudo rmmod nvidia_drm
+    sudo rmmod nvidia_modeset
+    sudo rmmod nvidia
+    ```
 
 3. **Reload NVIDIA Driver Modules**
-Reload the modules using the following commands:
-```bash
-sudo modprobe nvidia
-sudo modprobe nvidia_modeset
-sudo modprobe nvidia_drm
-sudo modprobe nvidia_uvm
-```
+    Reload the modules using the following commands:
+    ```bash
+    sudo modprobe nvidia
+    sudo modprobe nvidia_modeset
+    sudo modprobe nvidia_drm
+    sudo modprobe nvidia_uvm
+    ```
 
 4. **Restart the Display Server**
-Finally, restart the display server using:
-```bash
-sudo systemctl start gdm
-sudo systemctl start lightdm
-```
+    Finally, restart the display server using:
+    ```bash
+    sudo systemctl start gdm
+    sudo systemctl start lightdm
+    ```
 
 ## Outcome
 Following these steps, the error was resolved, and I was able to successfully run the training code again.
