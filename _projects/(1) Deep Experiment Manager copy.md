@@ -1,5 +1,5 @@
 ---
-name: PyTorch Experiment Manager
+name: Deep Experiment Manager
 tools: [ML, Python, PyTorch]
 image:
 description: 
