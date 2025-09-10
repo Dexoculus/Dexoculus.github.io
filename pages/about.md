@@ -21,7 +21,6 @@ Currently a member of the [Intelligence & Computation Lab][6], working as an und
 ## **Publications**
 
 - "*Prediction of closed quotient during vocal phonation using GRU-type neural network with audio signals*," JICCE (2024).
-- "Development of CQ prediction based on XGBoost Algorithm," JKIICE, (2025).
 
 ## **Conference Presentations**
 
