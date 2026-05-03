@@ -68,4 +68,4 @@ Currently a member of the [Intelligence & Computation Lab][6], working as an und
 {% include about/timeline.html %}
 </div>
 
-
+
