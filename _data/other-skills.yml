@@ -1,7 +1,23 @@
-- name: Blender
+- name: Computer Vision
+  percentage: 70
+  color: success
+
+- name: Robotics
+  percentage: 20
+  color: warning
+
+- name: Docker & Linux
   percentage: 70
   color: info
 
-- name: Fusion 360
-  percentage: 90
+- name: MLOps (Git, Cloudflare)
+  percentage: 70
+  color: secondary
+
+- name: 3D Perception (Blender)
+  percentage: 60
   color: success
+
+- name: Streamlit
+  percentage: 70
+  color: danger
