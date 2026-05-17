@@ -8,7 +8,11 @@ weight: 3
 
 # **About Me**
 [![GitHub](https://a11ybadges.com/badge?logo=github)][1][![ORCID](https://a11ybadges.com/badge?logo=orcid)][2][![PyPI](https://a11ybadges.com/badge?logo=pypi)][5] <!--[![LinkedIn](https://a11ybadges.com/badge?logo=linkedin)][3] | [![Kaggle](https://a11ybadges.com/badge?logo=kaggle)][4] --><br>
-Currently a member of the [Intelligence & Computation Lab][6], working as an undergraduate research student under [Prof. Jo][7], since October 2023.
+
+Hi, I'm Hyeonbin Han.
+I am an undergraduate student in the Department of Mathematical Data Science at Hanyang University ERICA.
+
+Currently, I am working as a Junior Research Assistant in the Robot Intelligence Team (Humanoid TF) at CMES Robotics.
 <br>
 
 ## EDUCATION
