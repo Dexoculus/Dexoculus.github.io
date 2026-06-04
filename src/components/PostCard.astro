@@ -10,7 +10,7 @@ const href = post.externalUrl || `/blog/${post.slug}/`;
 const isExternal = Boolean(post.externalUrl);
 ---
 
-<article class="note-card" data-note-card data-search={`${post.title} ${post.description} ${post.tags.join(" ")}`.toLowerCase()}>
+<article class="note-card" data-note-card data-tags={post.tags.map((tag) => tag.toLowerCase()).join("|")} data-search={`${post.title} ${post.description} ${post.tags.join(" ")}`.toLowerCase()}>
   <a href={href} target={isExternal ? "_blank" : undefined} rel={isExternal ? "noreferrer" : undefined}>
     <div class="card-kicker">{formatDate(post.date)} / {post.readingMinutes} min read</div>
     <h3>{post.title}</h3>

@@ -1,32 +1,82 @@
 ---
+import PostCard from "@/components/PostCard.astro";
 import BaseLayout from "@/layouts/BaseLayout.astro";
-import { formatDate, posts } from "@/lib/content";
+import { posts } from "@/lib/content";
 
 const tags = Array.from(new Set(posts.flatMap((post) => post.tags))).sort();
+const tagCounts = tags.map((tag) => ({
+  tag,
+  id: tag.toLowerCase().replace(/[^a-z0-9]+/g, "-"),
+  count: posts.filter((post) => post.tags.includes(tag)).length
+}));
 ---
 
-<BaseLayout title="Tags | Dexter Oculus" description="Tagged technical notes.">
+<BaseLayout title="Tags | Dexter Oculus" description="Filter technical notes by tag.">
   <section class="page-hero shell">
     <p class="section-kicker">NOTE INDEX</p>
     <h1>Tags</h1>
-    <p>Grouped index of the technical notes archive.</p>
+    <p>Select a tag to filter the notes archive without repeating the same article across multiple sections.</p>
   </section>
 
-  <section class="shell tag-index">
-    {
-      tags.map((tag) => {
-        const taggedPosts = posts.filter((post) => post.tags.includes(tag));
-        const id = tag.toLowerCase().replace(/[^a-z0-9]+/g, "-");
-        return (
-          <article class="info-panel" id={id}>
-            <p class="section-kicker">{tag}</p>
-            <h2>{taggedPosts.length} notes</h2>
-            <ul class="plain-list">
-              {taggedPosts.map((post) => <li><a href={post.externalUrl || `/blog/${post.slug}/`}>{post.title}</a> <span>{formatDate(post.date)}</span></li>)}
-            </ul>
-          </article>
-        );
-      })
-    }
+  <section class="shell tag-filter-panel" aria-label="Filter notes by tag">
+    <div class="tag-filter-head">
+      <div>
+        <p class="section-kicker">FILTER</p>
+        <h2>Tags</h2>
+      </div>
+      <span id="tag-filter-count">{posts.length} notes</span>
+    </div>
+    <div class="tag-filter-list">
+      <button class="active" type="button" data-tag-filter="all" aria-pressed="true">All <span>{posts.length}</span></button>
+      {tagCounts.map(({ tag, id, count }) => <button type="button" data-tag-filter={tag.toLowerCase()} data-tag-id={id} aria-pressed="false">{tag} <span>{count}</span></button>)}
+    </div>
   </section>
+
+  <section class="shell note-grid archive tag-filter-results">
+    {posts.map((post) => <PostCard post={post} />)}
+  </section>
+
+  <script>
+    const buttons = Array.from(document.querySelectorAll<HTMLButtonElement>("[data-tag-filter]"));
+    const cards = Array.from(document.querySelectorAll<HTMLElement>("[data-note-card]"));
+    const count = document.querySelector("#tag-filter-count");
+
+    function normalizeTag(value: string) {
+      return value.trim().toLowerCase();
+    }
+
+    function applyTagFilter(tag: string, updateHash = true) {
+      const selected = normalizeTag(tag || "all");
+      let visible = 0;
+
+      for (const button of buttons) {
+        const isActive = normalizeTag(button.dataset.tagFilter || "all") === selected;
+        button.classList.toggle("active", isActive);
+        button.setAttribute("aria-pressed", String(isActive));
+      }
+
+      for (const card of cards) {
+        const tags = (card.dataset.tags || "").split("|");
+        const isVisible = selected === "all" || tags.includes(selected);
+        card.hidden = !isVisible;
+        if (isVisible) visible += 1;
+      }
+
+      if (count) count.textContent = `${visible} ${visible === 1 ? "note" : "notes"}`;
+
+      if (updateHash) {
+        const activeButton = buttons.find((button) => normalizeTag(button.dataset.tagFilter || "all") === selected);
+        const id = activeButton?.dataset.tagId;
+        history.replaceState(null, "", selected === "all" || !id ? location.pathname : `#${id}`);
+      }
+    }
+
+    buttons.forEach((button) => {
+      button.addEventListener("click", () => applyTagFilter(button.dataset.tagFilter || "all"));
+    });
+
+    const hash = decodeURIComponent(location.hash.replace(/^#/, ""));
+    const initial = buttons.find((button) => button.dataset.tagId === hash)?.dataset.tagFilter || "all";
+    applyTagFilter(initial, false);
+  </script>
 </BaseLayout>

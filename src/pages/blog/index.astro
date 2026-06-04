@@ -1,14 +1,14 @@
 ---
 import PostCard from "@/components/PostCard.astro";
 import BaseLayout from "@/layouts/BaseLayout.astro";
-import { formatDate, posts } from "@/lib/content";
+import { posts } from "@/lib/content";
 
 const tags = Array.from(new Set(posts.flatMap((post) => post.tags))).sort();
 const postsByTag = tags.map((tag) => ({
   tag,
-  id: tag.toLowerCase().replace(/[^a-z0-9]+/g, "-"),
   posts: posts.filter((post) => post.tags.includes(tag))
 }));
+const tagCounts = postsByTag.map(({ tag, posts }) => ({ tag, count: posts.length }));
 ---
 
 <BaseLayout title="Notes | Dexter Oculus" description="Technical notes and research logs by Hyeonbin Han.">
@@ -16,9 +16,6 @@ const postsByTag = tags.map((tag) => ({
     <p class="section-kicker">NOTES</p>
     <h1>Notes</h1>
     <p>Technical notes, case reports, and research logs.</p>
-    <div class="tag-row large">
-      {postsByTag.map(({ tag, id }) => <a href={`#${id}`}>{tag}</a>)}
-    </div>
   </section>
 
   <section class="shell search-panel" aria-label="Filter notes">
@@ -27,50 +24,60 @@ const postsByTag = tags.map((tag) => ({
     <span id="note-search-count">{posts.length} notes</span>
   </section>
 
-  <section class="shell note-grid archive">
-    {posts.map((post) => <PostCard post={post} />)}
-  </section>
-
-  <section class="shell section-grid">
-    <div class="section-head wide">
+  <section class="shell tag-filter-panel compact" aria-label="Filter notes by tag">
+    <div class="tag-filter-head">
       <div>
-        <p class="section-kicker">INDEX</p>
+        <p class="section-kicker">FILTER</p>
         <h2>Tags</h2>
       </div>
       <a class="button text" href="/blog/tags/">Tag archive</a>
     </div>
-    <div class="tag-index note-tag-index">
-      {
-        postsByTag.map(({ tag, id, posts: taggedPosts }) => (
-          <article class="info-panel" id={id}>
-            <p class="section-kicker">{tag}</p>
-            <h2>{taggedPosts.length} notes</h2>
-            <ul class="plain-list">
-              {taggedPosts.map((post) => <li><a href={post.externalUrl || `/blog/${post.slug}/`}>{post.title}</a> <span>{formatDate(post.date)}</span></li>)}
-            </ul>
-          </article>
-        ))
-      }
+    <div class="tag-filter-list">
+      <button class="active" type="button" data-tag-filter="all" aria-pressed="true">All <span>{posts.length}</span></button>
+      {tagCounts.map(({ tag, count }) => <button type="button" data-tag-filter={tag.toLowerCase()} aria-pressed="false">{tag} <span>{count}</span></button>)}
     </div>
+  </section>
+
+  <section class="shell note-grid archive">
+    {posts.map((post) => <PostCard post={post} />)}
   </section>
 
   <script>
     const input = document.querySelector<HTMLInputElement>("#note-search");
     const count = document.querySelector("#note-search-count");
+    const buttons = Array.from(document.querySelectorAll<HTMLButtonElement>("[data-tag-filter]"));
     const cards = Array.from(document.querySelectorAll<HTMLElement>("[data-note-card]"));
+    let selectedTag = "all";
 
-    input?.addEventListener("input", () => {
-      const query = input.value.trim().toLowerCase();
+    function applyFilters() {
+      const query = input?.value.trim().toLowerCase() || "";
       let visible = 0;
+
+      for (const button of buttons) {
+        const isActive = (button.dataset.tagFilter || "all") === selectedTag;
+        button.classList.toggle("active", isActive);
+        button.setAttribute("aria-pressed", String(isActive));
+      }
 
       for (const card of cards) {
         const haystack = card.dataset.search || "";
-        const isVisible = !query || haystack.includes(query);
+        const tags = (card.dataset.tags || "").split("|");
+        const matchesSearch = !query || haystack.includes(query);
+        const matchesTag = selectedTag === "all" || tags.includes(selectedTag);
+        const isVisible = matchesSearch && matchesTag;
         card.hidden = !isVisible;
         if (isVisible) visible += 1;
       }
 
       if (count) count.textContent = `${visible} ${visible === 1 ? "note" : "notes"}`;
+    }
+
+    input?.addEventListener("input", applyFilters);
+    buttons.forEach((button) => {
+      button.addEventListener("click", () => {
+        selectedTag = button.dataset.tagFilter || "all";
+        applyFilters();
+      });
     });
   </script>
 </BaseLayout>

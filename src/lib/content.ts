@@ -24,10 +24,15 @@ type TimelineItem = {
   description: string;
 };
 
+export type ProjectMediaType = "image" | "video";
+
 export type Project = {
   name: string;
   tools: string[];
   image?: string;
+  video?: string;
+  mediaUrl?: string;
+  mediaType: ProjectMediaType;
   description: string;
   externalUrl?: string;
   slug: string;
@@ -91,6 +96,16 @@ function asStringArray(value: unknown) {
   }
 
   return [];
+}
+
+function normalizeMediaType(value: unknown): ProjectMediaType | undefined {
+  const normalized = asString(value).toLowerCase();
+  return normalized === "video" || normalized === "image" ? normalized : undefined;
+}
+
+function inferMediaType(url: string | undefined): ProjectMediaType {
+  const cleanUrl = (url || "").split("?")[0].toLowerCase();
+  return /\.(mp4|webm|mov|m4v|ogv|ogg)$/.test(cleanUrl) ? "video" : "image";
 }
 
 function fileBase(path: string) {
@@ -201,7 +216,13 @@ export const profile = {
     "Undergraduate student in Mathematical Data Science at Hanyang University ERICA, with project experience in computer vision, robotics, and machine learning.",
   focus: ["Computer Vision", "Robotics", "Data Science", "Imitation Learning", "Vision-Language-Action (VLA)"],
   researchInterests: ["Computer Vision", "Robotics", "Data Science", "Imitation Learning", "Vision-Language-Action (VLA)", "Anomaly Detection"],
-  stack: ["Python", "C++", "PyTorch", "Docker", "Linux", "Git", "Astro"],
+  skillGroups: [
+    { label: "Languages", scope: "programming", items: ["Python", "C++", "SQL", "JavaScript / TypeScript"] },
+    { label: "ML / Robotics", scope: "research stack", items: ["PyTorch", "ROS 2", "LeRobot", "ACT", "Diffusion Policy", "YOLOv8"] },
+    { label: "Data Science", scope: "analysis", items: ["NumPy", "Pandas", "Scikit-learn", "Matplotlib", "Streamlit"] },
+    { label: "Systems / Web", scope: "deployment", items: ["Linux", "Docker", "Git", "Astro", "Cloudflare Tunnels"] }
+  ],
+  stack: ["Python", "C++", "SQL", "JavaScript / TypeScript", "PyTorch", "ROS 2", "LeRobot", "ACT", "Diffusion Policy", "YOLOv8", "NumPy", "Pandas", "Scikit-learn", "Matplotlib", "Streamlit", "Linux", "Docker", "Git", "Astro", "Cloudflare Tunnels"],
   links: [
     { label: "GitHub", href: "https://github.com/Dexoculus" },
     { label: "ORCID", href: "https://orcid.org/0009-0007-4713-5892" },
@@ -260,12 +281,20 @@ export const projects: Project[] = Object.entries(projectModules)
     const base = fileBase(path);
     const name = asString(module.frontmatter.name, base.replace(/^\(\d+\)\s*/, ""));
     const externalUrl = asString(module.frontmatter.external_url) || undefined;
+    const image = asString(module.frontmatter.image) || undefined;
+    const video = asString(module.frontmatter.video) || undefined;
+    const media = asString(module.frontmatter.media) || undefined;
+    const mediaUrl = video || media || image;
+    const mediaType = video ? "video" : normalizeMediaType(module.frontmatter.media_type) || inferMediaType(mediaUrl);
     const source = module.rawContent?.() ?? "";
 
     return {
       name,
       tools: asStringArray(module.frontmatter.tools),
-      image: asString(module.frontmatter.image) || undefined,
+      image,
+      video,
+      mediaUrl,
+      mediaType,
       description: asString(module.frontmatter.description, "Project note"),
       externalUrl,
       slug: slugify(name || base),

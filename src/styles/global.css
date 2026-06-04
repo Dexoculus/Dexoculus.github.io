@@ -1,19 +1,29 @@
 :root {
   color-scheme: light dark;
-  --black: #111111;
-  --black-deep: #08080a;
-  --white: #fdfdfd;
-  --white-pure: #fefefe;
+  --decagram-white: #fefefe;
+  --decagram-field: #fdfdfd;
+  --decagram-soft-line: #e1e2e4;
+  --decagram-pale-yellow: #fbef73;
+  --decagram-core-gold: #febb0c;
+  --endfield-black: #111111;
+  --endfield-deep: #08080a;
+  --endfield-panel: #1c1c1c;
+  --endfield-panel-2: #272727;
+  --endfield-yellow: #ffef01;
+  --black: var(--endfield-black);
+  --black-deep: var(--endfield-deep);
+  --white: var(--decagram-field);
+  --white-pure: var(--decagram-white);
   --gray-950: #1c1c1c;
   --gray-900: #272727;
   --gray-700: #505050;
   --gray-600: #66656b;
   --gray-500: #808080;
   --gray-400: #909090;
-  --gray-100: #e1e2e4;
-  --focus: #ffef01;
-  --focus-soft: #fbef73;
-  --core-gold: #febb0c;
+  --gray-100: var(--decagram-soft-line);
+  --focus: var(--endfield-yellow);
+  --focus-soft: var(--decagram-pale-yellow);
+  --core-gold: var(--decagram-core-gold);
   --warn: #e42525;
   --power: #ff7000;
   --state: #1288f8;
@@ -68,7 +78,7 @@ body {
   background:
     radial-gradient(circle at 80% 14%, rgba(255, 239, 1, 0.1), transparent 24%),
     radial-gradient(circle at 14% 18%, rgba(0, 214, 250, 0.055), transparent 22%),
-    linear-gradient(135deg, #fefefe 0%, #eef2f5 46%, #fdfdfd 100%);
+    linear-gradient(135deg, var(--decagram-white) 0%, #eef2f5 46%, var(--decagram-field) 100%);
   background-size: 100% 100%, 100% 100%, 100% 100%;
 }
 
@@ -76,7 +86,7 @@ body {
   background:
     radial-gradient(circle at 82% 12%, rgba(255, 239, 1, 0.08), transparent 25%),
     radial-gradient(circle at 14% 20%, rgba(0, 214, 250, 0.075), transparent 24%),
-    linear-gradient(135deg, #08080a 0%, #15171a 54%, #0e0f12 100%);
+    linear-gradient(135deg, var(--endfield-deep) 0%, #15171a 54%, #0e0f12 100%);
 }
 
 button,
@@ -629,9 +639,9 @@ main {
   height: 104px;
   pointer-events: none;
   content: "";
-  background-image: radial-gradient(circle, rgba(17, 17, 17, 0.24) 1px, transparent 1.55px);
+  background-image: radial-gradient(circle, rgba(17, 17, 17, 0.34) 1.05px, transparent 1.68px);
   background-size: 14px 14px;
-  opacity: 0.34;
+  opacity: 0.46;
   -webkit-mask-image: linear-gradient(135deg, transparent 0 12%, #000 42%, #000 100%);
   mask-image: linear-gradient(135deg, transparent 0 12%, #000 42%, #000 100%);
 }
@@ -645,7 +655,7 @@ main {
   bottom: auto;
   width: min(260px, 34%);
   height: 132px;
-  opacity: 0.28;
+  opacity: 0.38;
 }
 
 :root[data-theme="dark"] .hero-copy::after,
@@ -991,10 +1001,21 @@ main {
   background: #18191d;
 }
 
-.project-media img {
+.project-media img,
+.project-media video {
+  display: block;
   width: 100%;
   height: 100%;
   object-fit: cover;
+}
+
+.project-media video {
+  background: var(--black-deep);
+}
+
+.project-media.large {
+  aspect-ratio: 16 / 11;
+  border-radius: var(--radius);
 }
 
 .project-media span {
@@ -1095,6 +1116,73 @@ main {
 .tag-row.large a {
   min-height: 32px;
   font-size: 0.74rem;
+}
+
+.skill-categories {
+  display: grid;
+  gap: 18px;
+  margin-top: 22px;
+}
+
+.skill-group {
+  position: relative;
+  overflow: hidden;
+  padding-top: 14px;
+  border-top: 1px solid var(--line);
+}
+
+.skill-group:first-child {
+  border-top: 2px solid var(--core-gold);
+}
+
+.skill-group::after {
+  position: absolute;
+  top: 12px;
+  right: 0;
+  width: 92px;
+  height: 52px;
+  pointer-events: none;
+  content: "";
+  background-image: radial-gradient(circle, rgba(17, 17, 17, 0.32) 1.05px, transparent 1.68px);
+  background-size: 12px 12px;
+  opacity: 0.36;
+  -webkit-mask-image: linear-gradient(90deg, transparent, #000 36%, #000 100%);
+  mask-image: linear-gradient(90deg, transparent, #000 36%, #000 100%);
+}
+
+:root[data-theme="dark"] .skill-group::after {
+  background-image: radial-gradient(circle, rgba(253, 253, 253, 0.18) 1px, transparent 1.55px);
+  opacity: 0.18;
+}
+
+.skill-group header {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 12px;
+  align-items: baseline;
+  justify-content: space-between;
+}
+
+.skill-group h3 {
+  margin: 0;
+  font-family: var(--font-mono);
+  font-size: 0.84rem;
+  text-transform: uppercase;
+}
+
+.skill-group header span {
+  color: var(--text-muted);
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+  text-transform: uppercase;
+}
+
+.skill-group .chip-grid {
+  position: relative;
+  z-index: 1;
+  margin-top: 10px;
 }
 
 .split-section,
@@ -1317,10 +1405,9 @@ main {
   padding: clamp(24px, 5vw, 48px);
 }
 
-.detail-hero img {
+.detail-hero .project-media {
   width: 100%;
   aspect-ratio: 16 / 11;
-  object-fit: cover;
   border-radius: var(--radius);
 }
 
@@ -1587,6 +1674,77 @@ main {
   font: inherit;
 }
 
+.tag-filter-panel {
+  margin-top: 24px;
+  padding: 18px;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+}
+
+.tag-filter-panel.compact {
+  margin-top: 14px;
+}
+
+.tag-filter-head {
+  display: flex;
+  gap: 16px;
+  align-items: end;
+  justify-content: space-between;
+  margin-bottom: 14px;
+}
+
+.tag-filter-head h2 {
+  margin: 0;
+  font-size: clamp(1.35rem, 2.2vw, 2.2rem);
+}
+
+.tag-filter-head > span {
+  color: var(--text-muted);
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  font-weight: 800;
+  text-transform: uppercase;
+}
+
+.tag-filter-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.tag-filter-list button {
+  display: inline-flex;
+  gap: 8px;
+  align-items: center;
+  min-height: 34px;
+  padding: 0 12px;
+  color: var(--text-soft);
+  background: var(--surface-strong);
+  border: 1px solid var(--line);
+  border-radius: var(--pill);
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  font-weight: 800;
+  text-transform: uppercase;
+}
+
+.tag-filter-list button span {
+  color: var(--text-muted);
+}
+
+.tag-filter-list button.active {
+  color: var(--black);
+  background: var(--focus);
+  border-color: var(--focus);
+  box-shadow: 0 10px 24px var(--focus-glow);
+}
+
+.tag-filter-list button.active span {
+  color: rgba(17, 17, 17, 0.68);
+}
+
 .not-found {
   min-height: 58vh;
 }
@@ -1780,7 +1938,7 @@ main {
   .note-card a::after {
     width: 128px;
     height: 78px;
-    opacity: 0.18;
+    opacity: 0.30;
   }
 
   .hero-summary,
@@ -1836,6 +1994,7 @@ main {
   }
 
   .section-head,
+  .tag-filter-head,
   .footer {
     align-items: flex-start;
     flex-direction: column;

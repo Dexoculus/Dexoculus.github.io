@@ -1,6 +1,7 @@
 ---
 import BaseLayout from "@/layouts/BaseLayout.astro";
 import ArticleToc from "@/components/ArticleToc.astro";
+import ProjectMedia from "@/components/ProjectMedia.astro";
 import { projects } from "@/lib/content";
 import { absoluteUrl } from "@/lib/seo";
 
@@ -37,7 +38,7 @@ const projectJsonLd = {
           {project.tools.map((tool) => <span>{tool}</span>)}
         </div>
       </div>
-      {project.image ? <img src={project.image} alt="" /> : <div class="generated-project-art large" aria-hidden="true"></div>}
+      <ProjectMedia project={project} large />
     </header>
     <div class="article-body">
       <ArticleToc headings={project.headings} />

@@ -1,5 +1,6 @@
 ---
 import type { Project } from "@/lib/content";
+import ProjectMedia from "@/components/ProjectMedia.astro";
 
 type Props = {
   project: Project;
@@ -13,10 +14,7 @@ const isExternal = Boolean(project.externalUrl);
 
 <article class:list={["project-card", { compact }]}>
   <a href={href} target={isExternal ? "_blank" : undefined} rel={isExternal ? "noreferrer" : undefined}>
-    <div class="project-media">
-      {project.image ? <img src={project.image} alt="" loading="lazy" /> : <div class="generated-project-art" aria-hidden="true"></div>}
-      <span>{String(project.sequence).padStart(2, "0")}</span>
-    </div>
+    <ProjectMedia project={project} badge={String(project.sequence).padStart(2, "0")} />
     <div class="project-body">
       <div class="card-kicker">{isExternal ? "External project" : "Project file"}</div>
       <h3>{project.name}</h3>

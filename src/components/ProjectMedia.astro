@@ -1,0 +1,81 @@
+---
+import type { Project } from "@/lib/content";
+
+type Props = {
+  project: Project;
+  badge?: string;
+  large?: boolean;
+};
+
+const { project, badge, large = false } = Astro.props;
+const mediaUrl = project.mediaUrl || project.image;
+const isVideo = project.mediaType === "video";
+const canVideoFallback = Boolean(mediaUrl && !isVideo && mediaUrl.includes("github.com/user-attachments/assets/"));
+const poster = isVideo ? project.image : undefined;
+---
+
+<div class:list={["project-media", { large }]}>
+  {
+    mediaUrl ? (
+      isVideo ? (
+        <video
+          src={mediaUrl}
+          aria-label={`${project.name} video preview`}
+          autoplay={!large}
+          controls={large}
+          loop
+          muted
+          playsinline
+          preload="metadata"
+          poster={poster}
+        />
+      ) : (
+        <>
+          <img src={mediaUrl} alt="" loading={large ? undefined : "lazy"} data-video-fallback={canVideoFallback ? "github-attachment" : undefined} />
+          {
+            canVideoFallback && (
+              <video
+                class="project-media-fallback"
+                src={mediaUrl}
+                aria-label={`${project.name} video preview`}
+                autoplay={!large}
+                controls={large}
+                hidden
+                loop
+                muted
+                playsinline
+                preload="metadata"
+                poster={project.image}
+              />
+            )
+          }
+        </>
+      )
+    ) : (
+      <div class:list={["generated-project-art", { large }]} aria-hidden="true"></div>
+    )
+  }
+  {badge && <span>{badge}</span>}
+</div>
+
+<script>
+  function bindProjectMediaFallbacks() {
+    document.querySelectorAll<HTMLImageElement>("img[data-video-fallback]:not([data-fallback-bound])").forEach((image) => {
+      image.dataset.fallbackBound = "true";
+      image.addEventListener(
+        "error",
+        () => {
+          const fallback = image.nextElementSibling;
+          if (!(fallback instanceof HTMLVideoElement)) return;
+          image.hidden = true;
+          fallback.hidden = false;
+          fallback.play().catch(() => undefined);
+        },
+        { once: true }
+      );
+    });
+  }
+
+  bindProjectMediaFallbacks();
+  document.addEventListener("astro:page-load", bindProjectMediaFallbacks);
+</script>

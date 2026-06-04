@@ -13,7 +13,7 @@ import { profile, timeline } from "@/lib/content";
       <div class="link-row">
         {profile.links.map((link) => <a href={link.href} target="_blank" rel="noreferrer">{link.label}</a>)}
         <a href={`mailto:${profile.email}`}>Email</a>
-        <button class="button secondary print-button" type="button" onclick="window.print()">Print CV</button>
+        <a class="button secondary" href="/assets/CV.pdf" download>Download CV</a>
       </div>
     </div>
   </section>
@@ -82,8 +82,20 @@ import { profile, timeline } from "@/lib/content";
     <div class="info-panel">
       <p class="section-kicker">SKILLS</p>
       <h2>Stack</h2>
-      <div class="chip-grid">
-        {profile.stack.map((item) => <span>{item}</span>)}
+      <div class="skill-categories">
+        {
+          profile.skillGroups.map((group) => (
+            <section class="skill-group">
+              <header>
+                <h3>{group.label}</h3>
+                <span>{group.scope}</span>
+              </header>
+              <div class="chip-grid">
+                {group.items.map((item) => <span>{item}</span>)}
+              </div>
+            </section>
+          ))
+        }
       </div>
     </div>
   </section>
