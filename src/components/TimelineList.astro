@@ -1,0 +1,45 @@
+---
+type Item = {
+  title: string;
+  linkText?: string;
+  url?: string;
+  from: number;
+  to: number;
+  description: string;
+};
+
+type Props = {
+  items: Item[];
+};
+
+const { items } = Astro.props;
+---
+
+<ol class="timeline-list">
+  {
+    items.map((item) => {
+      const linkText = item.linkText || item.title;
+      const linkIndex = item.url ? item.title.indexOf(linkText) : -1;
+
+      return (
+        <li>
+          <span>{item.from} - {item.to}</span>
+          <div>
+            <h3>
+              {item.url && linkIndex >= 0 ? (
+                <>
+                  {item.title.slice(0, linkIndex)}
+                  <a class="inline-link" href={item.url} target="_blank" rel="noreferrer">{linkText}</a>
+                  {item.title.slice(linkIndex + linkText.length)}
+                </>
+              ) : (
+                item.title
+              )}
+            </h3>
+            <p>{item.description}</p>
+          </div>
+        </li>
+      );
+    })
+  }
+</ol>

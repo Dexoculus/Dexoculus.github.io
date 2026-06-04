@@ -1,0 +1,24 @@
+---
+import type { Heading } from "@/lib/content";
+
+type Props = {
+  headings: Heading[];
+};
+
+const { headings } = Astro.props;
+---
+
+{
+  headings.length > 0 && (
+    <aside class="article-toc" aria-label="Table of contents">
+      <strong>ON THIS PAGE</strong>
+      <nav>
+        {headings.map((heading) => (
+          <a class={`depth-${heading.depth}`} href={`#${heading.slug}`}>
+            {heading.text}
+          </a>
+        ))}
+      </nav>
+    </aside>
+  )
+}

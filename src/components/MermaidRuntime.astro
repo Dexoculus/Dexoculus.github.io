@@ -1,0 +1,56 @@
+<script is:inline type="module">
+  const diagramBlocks = Array.from(document.querySelectorAll("pre > code.language-mermaid"));
+
+  if (diagramBlocks.length > 0) {
+    const cdn = "https://cdn.jsdelivr.net/npm/mermaid@11.15.0/dist/mermaid.min.js";
+
+    function loadMermaid() {
+      if (window.mermaid) return Promise.resolve(window.mermaid.default || window.mermaid);
+
+      return new Promise((resolve, reject) => {
+        const script = document.createElement("script");
+        script.src = cdn;
+        script.async = true;
+        script.crossOrigin = "anonymous";
+        script.onload = () => resolve(window.mermaid?.default || window.mermaid);
+        script.onerror = () => reject(new Error(`Failed to load ${cdn}`));
+        document.head.append(script);
+      });
+    }
+
+    for (const [index, code] of diagramBlocks.entries()) {
+      const pre = code.parentElement;
+      if (!pre) continue;
+
+      const diagram = document.createElement("div");
+      diagram.className = "mermaid";
+      diagram.dataset.diagramIndex = String(index);
+      diagram.textContent = code.textContent || "";
+      pre.replaceWith(diagram);
+    }
+
+    const isDark = document.documentElement.dataset.theme === "dark";
+    const mermaid = await loadMermaid();
+
+    mermaid.initialize({
+      startOnLoad: false,
+      securityLevel: "strict",
+      theme: "base",
+      themeVariables: {
+        background: "transparent",
+        primaryColor: isDark ? "#1c1c1c" : "#fdfdfd",
+        primaryTextColor: isDark ? "#f5f5f2" : "#111111",
+        primaryBorderColor: "#febb0c",
+        lineColor: isDark ? "#a5a8ad" : "#505050",
+        secondaryColor: isDark ? "#272727" : "#e1e2e4",
+        tertiaryColor: isDark ? "#08080a" : "#fefefe",
+        fontFamily: 'Pretendard, "Segoe UI", Arial, sans-serif',
+        nodeBorder: "#febb0c",
+        clusterBkg: isDark ? "#111111" : "#fefefe",
+        clusterBorder: "#505050"
+      }
+    });
+
+    mermaid.run({ querySelector: ".mermaid" });
+  }
+</script>

@@ -1,0 +1,93 @@
+---
+import BaseLayout from "@/layouts/BaseLayout.astro";
+import ProjectCard from "@/components/ProjectCard.astro";
+import TimelineList from "@/components/TimelineList.astro";
+import { posts, profile, projects, timeline } from "@/lib/content";
+
+const featuredProjects = projects.slice(0, 4);
+const recentPosts = posts.slice(0, 3);
+---
+
+<BaseLayout title="Hyeonbin Han | Dexter Oculus" description={profile.summary}>
+  <section class="hero shell">
+    <div class="hero-copy">
+      <p class="section-kicker">CV / PORTFOLIO</p>
+      <h1>{profile.name}</h1>
+      <p class="hero-role">{profile.role}</p>
+      <p class="hero-summary">{profile.summary}</p>
+      <div class="hero-actions">
+        <a class="button primary" href="/about/">View CV</a>
+        <a class="button secondary" href="/projects/">Projects</a>
+      </div>
+      <dl class="signal-grid">
+        <div>
+          <dt>Current</dt>
+          <dd>
+            <a class="inline-link" href="https://www.cmesrobotics.ai/" target="_blank" rel="noreferrer">CMES Robotics</a>
+            {" / Humanoid TF"}
+          </dd>
+        </div>
+        <div>
+          <dt>Education</dt>
+          <dd>Hanyang ERICA / Math Data Science</dd>
+        </div>
+        <div>
+          <dt>Research</dt>
+          <dd>{profile.focus.slice(0, 3).join(" / ")}</dd>
+        </div>
+      </dl>
+    </div>
+    <aside class="ops-panel halo-orbit">
+      <div class="ops-header">
+        <span>PROFILE</span>
+        <strong>CV</strong>
+      </div>
+      <div class="avatar-orbit">
+        <img src={profile.avatar} alt="Hyeonbin Han" />
+      </div>
+      <div class="status-stack">
+        <div><span>Projects</span><strong>{projects.length}</strong></div>
+        <div><span>Notes</span><strong>{posts.length}</strong></div>
+        <div><span>GPA</span><strong>3.51</strong></div>
+      </div>
+    </aside>
+  </section>
+
+  <section class="shell section-grid">
+    <div class="section-head wide">
+      <div>
+        <p class="section-kicker">PROJECTS</p>
+        <h2>Selected Projects</h2>
+      </div>
+      <a class="button text" href="/projects/">All projects</a>
+    </div>
+    <div class="project-grid">
+      {featuredProjects.map((project) => <ProjectCard project={project} compact />)}
+    </div>
+  </section>
+
+  <section class="shell section-grid">
+    <div class="section-head wide">
+      <div>
+        <p class="section-kicker">EXPERIENCE</p>
+        <h2>Timeline</h2>
+      </div>
+    </div>
+    <div class="info-panel">
+      <TimelineList items={timeline} />
+    </div>
+  </section>
+
+  <section class="shell section-grid">
+    <div class="section-head wide">
+      <div>
+        <p class="section-kicker">WRITING</p>
+        <h2>Notes</h2>
+      </div>
+      <a class="button text" href="/blog/">All notes</a>
+    </div>
+    <div class="note-grid">
+      {recentPosts.map((post) => <article class="note-card"><a href={post.externalUrl || `/blog/${post.slug}/`}><div class="card-kicker">{post.tags[0] || "Note"}</div><h3>{post.title}</h3><p>{post.description}</p></a></article>)}
+    </div>
+  </section>
+</BaseLayout>

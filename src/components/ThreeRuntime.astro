@@ -1,0 +1,126 @@
+<script is:inline type="module">
+  const sceneBlocks = Array.from(document.querySelectorAll("pre > code.language-three"));
+
+  if (sceneBlocks.length > 0) {
+    const THREE = await import("https://cdn.jsdelivr.net/npm/three@0.184.0/build/three.module.js");
+    const prefersReducedMotion = window.matchMedia?.("(prefers-reduced-motion: reduce)").matches;
+    const renderers = [];
+
+    function makeGeometry(spec) {
+      switch (spec.shape) {
+        case "sphere":
+          return new THREE.SphereGeometry(Number(spec.radius) || 1, 48, 28);
+        case "torus":
+          return new THREE.TorusGeometry(Number(spec.radius) || 1, Number(spec.tube) || 0.28, 32, 96);
+        case "cylinder":
+          return new THREE.CylinderGeometry(Number(spec.radius) || 0.8, Number(spec.radiusTop) || Number(spec.radius) || 0.8, Number(spec.height) || 1.8, 48);
+        case "plane":
+          return new THREE.PlaneGeometry(Number(spec.width) || 2.4, Number(spec.height) || 2.4, 16, 16);
+        case "cube":
+        default:
+          return new THREE.BoxGeometry(Number(spec.width) || 1.6, Number(spec.height) || 1.6, Number(spec.depth) || 1.6);
+      }
+    }
+
+    function asVector(value, fallback) {
+      return Array.isArray(value) && value.length >= 3
+        ? [Number(value[0]) || fallback[0], Number(value[1]) || fallback[1], Number(value[2]) || fallback[2]]
+        : fallback;
+    }
+
+    for (const [index, code] of sceneBlocks.entries()) {
+      const pre = code.parentElement;
+      if (!pre) continue;
+
+      const frame = document.createElement("figure");
+      const canvas = document.createElement("canvas");
+      frame.className = "three-frame";
+      frame.append(canvas);
+      pre.replaceWith(frame);
+
+      try {
+        const spec = JSON.parse(code.textContent || "{}");
+        const scene = new THREE.Scene();
+        const camera = new THREE.PerspectiveCamera(45, 1, 0.1, 100);
+        const renderer = new THREE.WebGLRenderer({ canvas, alpha: true, antialias: true });
+        const [cameraX, cameraY, cameraZ] = asVector(spec.camera, [3, 2.2, 4]);
+        const [targetX, targetY, targetZ] = asVector(spec.target, [0, 0, 0]);
+
+        camera.position.set(cameraX, cameraY, cameraZ);
+        camera.lookAt(targetX, targetY, targetZ);
+        renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+        renderer.setClearColor(0x000000, 0);
+
+        const ambient = new THREE.AmbientLight(0xffffff, 0.8);
+        const key = new THREE.DirectionalLight(0xffef01, 1.2);
+        const fill = new THREE.DirectionalLight(0x00d6fa, 0.8);
+        key.position.set(3, 4, 5);
+        fill.position.set(-4, 2, -3);
+        scene.add(ambient, key, fill);
+
+        const grid = new THREE.GridHelper(Number(spec.gridSize) || 5, Number(spec.gridDivisions) || 10, 0xfebb0c, 0x505050);
+        grid.material.transparent = true;
+        grid.material.opacity = 0.3;
+        scene.add(grid);
+
+        if (spec.axes !== false) {
+          scene.add(new THREE.AxesHelper(Number(spec.axesSize) || 2.4));
+        }
+
+        if (spec.shape !== "axes") {
+          const geometry = makeGeometry(spec);
+          const material = new THREE.MeshStandardMaterial({
+            color: spec.color || "#febb0c",
+            roughness: 0.55,
+            metalness: 0.18,
+            wireframe: Boolean(spec.wireframe)
+          });
+          const mesh = new THREE.Mesh(geometry, material);
+          const [rotX, rotY, rotZ] = asVector(spec.rotation, [0.35, 0.55, 0]);
+          mesh.rotation.set(rotX, rotY, rotZ);
+          scene.add(mesh);
+
+          renderers.push({ frame, renderer, camera, scene, mesh, rotate: spec.animate !== false && !prefersReducedMotion });
+        } else {
+          renderers.push({ frame, renderer, camera, scene, mesh: null, rotate: false });
+        }
+      } catch (error) {
+        frame.classList.add("three-error");
+        frame.textContent = error instanceof Error ? error.message : "Unable to render 3D scene.";
+      }
+    }
+
+    function resize(item) {
+      const width = item.frame.clientWidth || 640;
+      const height = Math.max(260, Math.min(520, Math.round(width * 0.56)));
+      item.renderer.setSize(width, height, false);
+      item.camera.aspect = width / height;
+      item.camera.updateProjectionMatrix();
+    }
+
+    const observer = new ResizeObserver((entries) => {
+      for (const entry of entries) {
+        const item = renderers.find((candidate) => candidate.frame === entry.target);
+        if (item) resize(item);
+      }
+    });
+
+    for (const item of renderers) {
+      observer.observe(item.frame);
+      resize(item);
+    }
+
+    function animate() {
+      for (const item of renderers) {
+        if (item.rotate && item.mesh) {
+          item.mesh.rotation.y += 0.006;
+          item.mesh.rotation.x += 0.002;
+        }
+        item.renderer.render(item.scene, item.camera);
+      }
+      requestAnimationFrame(animate);
+    }
+
+    animate();
+  }
+</script>

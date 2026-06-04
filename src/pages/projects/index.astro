@@ -1,0 +1,22 @@
+---
+import ProjectCard from "@/components/ProjectCard.astro";
+import BaseLayout from "@/layouts/BaseLayout.astro";
+import { projects } from "@/lib/content";
+
+const tools = Array.from(new Set(projects.flatMap((project) => project.tools))).sort();
+---
+
+<BaseLayout title="Projects | Dexter Oculus" description="Project portfolio for robotics, computer vision, and machine learning work.">
+  <section class="page-hero shell">
+    <p class="section-kicker">PROJECTS</p>
+    <h1>Selected Projects</h1>
+    <p>Project work in robotics, computer vision, anomaly detection, transformer implementation, and data science.</p>
+    <div class="tag-row large">
+      {tools.slice(0, 14).map((tool) => <span>{tool}</span>)}
+    </div>
+  </section>
+
+  <section class="shell project-grid archive">
+    {projects.map((project) => <ProjectCard project={project} />)}
+  </section>
+</BaseLayout>

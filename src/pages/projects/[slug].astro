@@ -1,0 +1,53 @@
+---
+import BaseLayout from "@/layouts/BaseLayout.astro";
+import ArticleToc from "@/components/ArticleToc.astro";
+import { projects } from "@/lib/content";
+import { absoluteUrl } from "@/lib/seo";
+
+export function getStaticPaths() {
+  return projects.map((project) => ({ params: { slug: project.slug } }));
+}
+
+const project = projects.find((item) => item.slug === Astro.params.slug);
+if (!project) throw new Error(`Project not found: ${Astro.params.slug}`);
+const Content = project.Content;
+const MathStyles = project.richFeatures.math ? (await import("@/components/MathStyles.astro")).default : null;
+const ChartRuntime = project.richFeatures.chart ? (await import("@/components/ChartRuntime.astro")).default : null;
+const ThreeRuntime = project.richFeatures.three ? (await import("@/components/ThreeRuntime.astro")).default : null;
+const MermaidRuntime = project.richFeatures.mermaid ? (await import("@/components/MermaidRuntime.astro")).default : null;
+const projectJsonLd = {
+  "@context": "https://schema.org",
+  "@type": "CreativeWork",
+  name: project.name,
+  description: project.description,
+  url: absoluteUrl(`/projects/${project.slug}/`),
+  sameAs: project.externalUrl
+};
+---
+
+<BaseLayout title={`${project.name} | Dexter Oculus`} description={project.description} type="article" image={project.image} jsonLd={projectJsonLd}>
+  {MathStyles && <MathStyles slot="head" />}
+  <article class="shell detail-layout">
+    <header class="detail-hero">
+      <div>
+        <p class="section-kicker">PROJECT {String(project.sequence).padStart(2, "0")}</p>
+        <h1>{project.name}</h1>
+        <p>{project.description}</p>
+        <div class="tag-row large">
+          {project.tools.map((tool) => <span>{tool}</span>)}
+        </div>
+      </div>
+      {project.image ? <img src={project.image} alt="" /> : <div class="generated-project-art large" aria-hidden="true"></div>}
+    </header>
+    <div class="article-body">
+      <ArticleToc headings={project.headings} />
+      <div class="markdown-panel">
+        {typeof Content === "function" ? <Content /> : <p>{project.description}</p>}
+        {project.externalUrl && <p><a class="button primary" href={project.externalUrl} target="_blank" rel="noreferrer">Open project</a></p>}
+      </div>
+    </div>
+  </article>
+  {ChartRuntime && <ChartRuntime slot="runtimes" />}
+  {ThreeRuntime && <ThreeRuntime slot="runtimes" />}
+  {MermaidRuntime && <MermaidRuntime slot="runtimes" />}
+</BaseLayout>

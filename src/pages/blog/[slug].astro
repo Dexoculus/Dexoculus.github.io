@@ -1,0 +1,54 @@
+---
+import BaseLayout from "@/layouts/BaseLayout.astro";
+import ArticleToc from "@/components/ArticleToc.astro";
+import { formatDate, posts } from "@/lib/content";
+import { absoluteUrl } from "@/lib/seo";
+
+export function getStaticPaths() {
+  return posts.map((post) => ({ params: { slug: post.slug } }));
+}
+
+const post = posts.find((item) => item.slug === Astro.params.slug);
+if (!post) throw new Error(`Post not found: ${Astro.params.slug}`);
+const Content = post.Content;
+const MathStyles = post.richFeatures.math ? (await import("@/components/MathStyles.astro")).default : null;
+const ChartRuntime = post.richFeatures.chart ? (await import("@/components/ChartRuntime.astro")).default : null;
+const ThreeRuntime = post.richFeatures.three ? (await import("@/components/ThreeRuntime.astro")).default : null;
+const MermaidRuntime = post.richFeatures.mermaid ? (await import("@/components/MermaidRuntime.astro")).default : null;
+const articleJsonLd = {
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  headline: post.title,
+  description: post.description,
+  datePublished: post.date?.toISOString(),
+  author: {
+    "@type": "Person",
+    name: "Hyeonbin Han",
+    url: absoluteUrl("/")
+  },
+  mainEntityOfPage: absoluteUrl(`/blog/${post.slug}/`)
+};
+---
+
+<BaseLayout title={`${post.title} | Dexter Oculus`} description={post.description} type="article" jsonLd={articleJsonLd}>
+  {MathStyles && <MathStyles slot="head" />}
+  <article class="shell article-layout">
+    <header class="article-header">
+      <p class="section-kicker">{formatDate(post.date)} / {post.readingMinutes} min read</p>
+      <h1>{post.title}</h1>
+      <p>{post.description}</p>
+      <div class="tag-row large">
+        {post.tags.map((tag) => <span>{tag}</span>)}
+      </div>
+    </header>
+    <div class="article-body">
+      <ArticleToc headings={post.headings} />
+      <div class="markdown-panel">
+        {typeof Content === "function" ? <Content /> : <p>{post.description}</p>}
+      </div>
+    </div>
+  </article>
+  {ChartRuntime && <ChartRuntime slot="runtimes" />}
+  {ThreeRuntime && <ThreeRuntime slot="runtimes" />}
+  {MermaidRuntime && <MermaidRuntime slot="runtimes" />}
+</BaseLayout>

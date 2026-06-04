@@ -1,0 +1,107 @@
+---
+import BaseLayout from "@/layouts/BaseLayout.astro";
+import TimelineList from "@/components/TimelineList.astro";
+import { profile, timeline } from "@/lib/content";
+---
+
+<BaseLayout title="About | Dexter Oculus" description="CV and profile for Hyeonbin Han.">
+  <section class="page-hero cv-hero shell">
+    <div class="cv-hero-content">
+      <p class="section-kicker">CURRICULUM VITAE</p>
+      <h1>{profile.name}</h1>
+      <p>{profile.summary}</p>
+      <div class="link-row">
+        {profile.links.map((link) => <a href={link.href} target="_blank" rel="noreferrer">{link.label}</a>)}
+        <a href={`mailto:${profile.email}`}>Email</a>
+        <button class="button secondary print-button" type="button" onclick="window.print()">Print CV</button>
+      </div>
+    </div>
+  </section>
+
+  <section class="shell cv-grid">
+    <article class="info-panel">
+      <p class="section-kicker">EDUCATION</p>
+      <h2>{profile.education.school}</h2>
+      <p>{profile.education.program}</p>
+      <dl class="detail-list">
+        <div><dt>Period</dt><dd>{profile.education.period}</dd></div>
+        <div><dt>Record</dt><dd>{profile.education.detail}</dd></div>
+      </dl>
+    </article>
+
+    <article class="dark-panel">
+      <p class="section-kicker">FOCUS</p>
+      <h2>Research interests</h2>
+      <div class="chip-grid">
+        {profile.researchInterests.map((item) => <span>{item}</span>)}
+      </div>
+    </article>
+  </section>
+
+  <section class="shell resume-section">
+    <div class="section-head">
+      <div>
+        <p class="section-kicker">EXPERIENCE</p>
+        <h2>Research and project experience</h2>
+      </div>
+    </div>
+    <div class="experience-stack">
+      {
+        profile.experience.map((item) => (
+          <article class="resume-item">
+            <div>
+              <span>{item.period}</span>
+              <h3>
+                {
+                  item.organizationUrl ? (
+                    <a class="inline-link" href={item.organizationUrl} target="_blank" rel="noreferrer">
+                      {item.organization}
+                    </a>
+                  ) : (
+                    item.organization
+                  )
+                }
+              </h3>
+              <p>{item.role}</p>
+            </div>
+            <ul>
+              {item.bullets.map((bullet) => <li>{bullet}</li>)}
+            </ul>
+          </article>
+        ))
+      }
+    </div>
+  </section>
+
+  <section class="shell split-section">
+    <div class="info-panel">
+      <p class="section-kicker">TIMELINE</p>
+      <h2>Milestones</h2>
+      <TimelineList items={timeline} />
+    </div>
+    <div class="info-panel">
+      <p class="section-kicker">SKILLS</p>
+      <h2>Stack</h2>
+      <div class="chip-grid">
+        {profile.stack.map((item) => <span>{item}</span>)}
+      </div>
+    </div>
+  </section>
+
+  <section class="shell cv-grid">
+    <article class="info-panel">
+      <p class="section-kicker">PUBLICATION</p>
+      <h2>Research output</h2>
+      <ul class="plain-list">
+        {profile.publications.map((item) => <li>{item}</li>)}
+      </ul>
+    </article>
+    <article class="info-panel">
+      <p class="section-kicker">HONORS</p>
+      <h2>Awards</h2>
+      <ul class="plain-list">
+        {profile.awards.map((item) => <li>{item}</li>)}
+      </ul>
+    </article>
+  </section>
+</BaseLayout>

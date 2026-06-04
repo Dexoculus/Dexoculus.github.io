@@ -1,0 +1,76 @@
+---
+import PostCard from "@/components/PostCard.astro";
+import BaseLayout from "@/layouts/BaseLayout.astro";
+import { formatDate, posts } from "@/lib/content";
+
+const tags = Array.from(new Set(posts.flatMap((post) => post.tags))).sort();
+const postsByTag = tags.map((tag) => ({
+  tag,
+  id: tag.toLowerCase().replace(/[^a-z0-9]+/g, "-"),
+  posts: posts.filter((post) => post.tags.includes(tag))
+}));
+---
+
+<BaseLayout title="Notes | Dexter Oculus" description="Technical notes and research logs by Hyeonbin Han.">
+  <section class="page-hero shell">
+    <p class="section-kicker">NOTES</p>
+    <h1>Notes</h1>
+    <p>Technical notes, case reports, and research logs.</p>
+    <div class="tag-row large">
+      {postsByTag.map(({ tag, id }) => <a href={`#${id}`}>{tag}</a>)}
+    </div>
+  </section>
+
+  <section class="shell search-panel" aria-label="Filter notes">
+    <label for="note-search">Search notes</label>
+    <input id="note-search" type="search" placeholder="Search by title, tag, or keyword" autocomplete="off" />
+    <span id="note-search-count">{posts.length} notes</span>
+  </section>
+
+  <section class="shell note-grid archive">
+    {posts.map((post) => <PostCard post={post} />)}
+  </section>
+
+  <section class="shell section-grid">
+    <div class="section-head wide">
+      <div>
+        <p class="section-kicker">INDEX</p>
+        <h2>Tags</h2>
+      </div>
+      <a class="button text" href="/blog/tags/">Tag archive</a>
+    </div>
+    <div class="tag-index note-tag-index">
+      {
+        postsByTag.map(({ tag, id, posts: taggedPosts }) => (
+          <article class="info-panel" id={id}>
+            <p class="section-kicker">{tag}</p>
+            <h2>{taggedPosts.length} notes</h2>
+            <ul class="plain-list">
+              {taggedPosts.map((post) => <li><a href={post.externalUrl || `/blog/${post.slug}/`}>{post.title}</a> <span>{formatDate(post.date)}</span></li>)}
+            </ul>
+          </article>
+        ))
+      }
+    </div>
+  </section>
+
+  <script>
+    const input = document.querySelector<HTMLInputElement>("#note-search");
+    const count = document.querySelector("#note-search-count");
+    const cards = Array.from(document.querySelectorAll<HTMLElement>("[data-note-card]"));
+
+    input?.addEventListener("input", () => {
+      const query = input.value.trim().toLowerCase();
+      let visible = 0;
+
+      for (const card of cards) {
+        const haystack = card.dataset.search || "";
+        const isVisible = !query || haystack.includes(query);
+        card.hidden = !isVisible;
+        if (isVisible) visible += 1;
+      }
+
+      if (count) count.textContent = `${visible} ${visible === 1 ? "note" : "notes"}`;
+    });
+  </script>
+</BaseLayout>

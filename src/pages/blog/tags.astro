@@ -1,0 +1,32 @@
+---
+import BaseLayout from "@/layouts/BaseLayout.astro";
+import { formatDate, posts } from "@/lib/content";
+
+const tags = Array.from(new Set(posts.flatMap((post) => post.tags))).sort();
+---
+
+<BaseLayout title="Tags | Dexter Oculus" description="Tagged technical notes.">
+  <section class="page-hero shell">
+    <p class="section-kicker">NOTE INDEX</p>
+    <h1>Tags</h1>
+    <p>Grouped index of the technical notes archive.</p>
+  </section>
+
+  <section class="shell tag-index">
+    {
+      tags.map((tag) => {
+        const taggedPosts = posts.filter((post) => post.tags.includes(tag));
+        const id = tag.toLowerCase().replace(/[^a-z0-9]+/g, "-");
+        return (
+          <article class="info-panel" id={id}>
+            <p class="section-kicker">{tag}</p>
+            <h2>{taggedPosts.length} notes</h2>
+            <ul class="plain-list">
+              {taggedPosts.map((post) => <li><a href={post.externalUrl || `/blog/${post.slug}/`}>{post.title}</a> <span>{formatDate(post.date)}</span></li>)}
+            </ul>
+          </article>
+        );
+      })
+    }
+  </section>
+</BaseLayout>

@@ -1,0 +1,686 @@
+<script is:inline type="module">
+  const chartBlocks = Array.from(
+    document.querySelectorAll("pre > code.language-chart, pre > code.language-plot")
+  );
+
+  if (chartBlocks.length > 0) {
+    const palette = ["#febb0c", "#1288f8", "#00d6fa", "#e42525", "#7cdb5a", "#b967ff"];
+
+    function escapeText(value) {
+      return String(value ?? "").replace(/[&<>"']/g, (char) => ({
+        "&": "&amp;",
+        "<": "&lt;",
+        ">": "&gt;",
+        "\"": "&quot;",
+        "'": "&#39;"
+      })[char]);
+    }
+
+    function asNumber(value) {
+      const number = Number(value);
+      return Number.isFinite(number) ? number : null;
+    }
+
+    function asArray(value) {
+      return Array.isArray(value) ? value : [];
+    }
+
+    function normalizeOptions(options) {
+      if (typeof options === "string") return { label: options };
+      return options && typeof options === "object" && !Array.isArray(options) ? options : {};
+    }
+
+    function makeBaseSpec() {
+      return {
+        title: "",
+        xLabel: "",
+        yLabel: "",
+        xlim: null,
+        ylim: null,
+        grid: true,
+        legend: true,
+        traces: [],
+        params: {}
+      };
+    }
+
+    function createNp() {
+      const unary = (fn) => (value) => Array.isArray(value) ? value.map((item) => fn(Number(item))) : fn(Number(value));
+      const binary = (fn) => (left, right) => {
+        if (Array.isArray(left)) {
+          return left.map((value, index) => fn(Number(value), Number(Array.isArray(right) ? right[index] : right)));
+        }
+        return fn(Number(left), Number(Array.isArray(right) ? right[0] : right));
+      };
+
+      return {
+        pi: Math.PI,
+        e: Math.E,
+        linspace(start, end, count = 100) {
+          const length = Math.max(2, Math.floor(Number(count) || 100));
+          return Array.from({ length }, (_, index) => Number(start) + ((Number(end) - Number(start)) * index) / (length - 1));
+        },
+        arange(start, end, step = 1) {
+          const values = [];
+          const stride = Number(step) || 1;
+          for (let value = Number(start); stride > 0 ? value < Number(end) : value > Number(end); value += stride) {
+            values.push(value);
+          }
+          return values;
+        },
+        abs: unary(Math.abs),
+        sin: unary(Math.sin),
+        cos: unary(Math.cos),
+        tan: unary(Math.tan),
+        exp: unary(Math.exp),
+        log: unary(Math.log),
+        sqrt: unary(Math.sqrt),
+        pow: binary(Math.pow),
+        add: binary((left, right) => left + right),
+        sub: binary((left, right) => left - right),
+        mul: binary((left, right) => left * right),
+        div: binary((left, right) => left / right)
+      };
+    }
+
+    function createPlotApi() {
+      const spec = makeBaseSpec();
+      const plt = {
+        title(value) {
+          spec.title = String(value ?? "");
+          return plt;
+        },
+        xlabel(value) {
+          spec.xLabel = String(value ?? "");
+          return plt;
+        },
+        ylabel(value) {
+          spec.yLabel = String(value ?? "");
+          return plt;
+        },
+        xlim(min, max) {
+          spec.xlim = [Number(min), Number(max)];
+          return plt;
+        },
+        ylim(min, max) {
+          spec.ylim = [Number(min), Number(max)];
+          return plt;
+        },
+        grid(value = true) {
+          spec.grid = Boolean(value);
+          return plt;
+        },
+        legend(value = true) {
+          spec.legend = Boolean(value);
+          return plt;
+        },
+        param(name, first, max, step, value) {
+          const id = String(name);
+          const config = first && typeof first === "object"
+            ? first
+            : { min: first, max, step, value };
+          const minValue = Number(config.min ?? 0);
+          const maxValue = Number(config.max ?? 1);
+          spec.params[id] = {
+            min: minValue,
+            max: maxValue,
+            step: Number(config.step ?? Math.max((maxValue - minValue) / 100, 0.01)),
+            value: Number(config.value ?? config.default ?? minValue)
+          };
+          return plt;
+        },
+        plot(x, y, options = {}) {
+          const config = normalizeOptions(options);
+          const hasY = Array.isArray(y);
+          spec.traces.push({
+            type: "line",
+            x: hasY ? asArray(x) : asArray(x).map((_, index) => index),
+            y: hasY ? asArray(y) : asArray(x),
+            ...config
+          });
+          return plt;
+        },
+        scatter(x, y, options = {}) {
+          const config = normalizeOptions(options);
+          const hasY = Array.isArray(y);
+          spec.traces.push({
+            type: "scatter",
+            x: hasY ? asArray(x) : asArray(x).map((_, index) => index),
+            y: hasY ? asArray(y) : asArray(x),
+            ...config
+          });
+          return plt;
+        },
+        bar(x, y, options = {}) {
+          const config = normalizeOptions(options);
+          spec.traces.push({ type: "bar", x: asArray(x), y: asArray(y), ...config });
+          return plt;
+        },
+        hist(values, options = {}) {
+          const config = { bins: 10, ...normalizeOptions(options) };
+          const data = asArray(values).map(Number).filter(Number.isFinite);
+          if (data.length === 0) return plt;
+
+          const min = Math.min(...data);
+          const max = Math.max(...data);
+          const bins = Math.max(1, Math.floor(Number(config.bins) || 10));
+          const width = max === min ? 1 : (max - min) / bins;
+          const counts = Array.from({ length: bins }, () => 0);
+          const labels = Array.from({ length: bins }, (_, index) => {
+            const start = min + width * index;
+            const end = start + width;
+            return `${formatTick(start)}-${formatTick(end)}`;
+          });
+
+          for (const value of data) {
+            const index = Math.min(bins - 1, Math.max(0, Math.floor((value - min) / width)));
+            counts[index] += 1;
+          }
+
+          spec.traces.push({ type: "bar", x: labels, y: counts, ...config });
+          return plt;
+        },
+        boxplot(groups, options = {}) {
+          const config = normalizeOptions(options);
+          let normalized = [];
+          if (Array.isArray(groups) && groups.every(Array.isArray)) {
+            const labels = Array.isArray(config.labels) ? config.labels : [];
+            normalized = groups.map((values, index) => ({ name: labels[index] ?? String(index + 1), y: values }));
+          } else if (Array.isArray(groups)) {
+            normalized = [{ name: config.label || "values", y: groups }];
+          } else if (groups && typeof groups === "object") {
+            normalized = Object.entries(groups).map(([name, values]) => ({ name, y: asArray(values) }));
+          }
+          spec.traces.push({ type: "box", groups: normalized, ...config });
+          return plt;
+        },
+        func(expression, options = {}) {
+          const config = normalizeOptions(options);
+          if (config.params && typeof config.params === "object") {
+            for (const [name, paramConfig] of Object.entries(config.params)) {
+              plt.param(name, paramConfig);
+            }
+          }
+          spec.traces.push({
+            type: "function",
+            expression: String(expression),
+            domain: config.domain,
+            samples: config.samples,
+            ...config
+          });
+          return plt;
+        },
+        fplot(expression, options = {}) {
+          return plt.func(expression, options);
+        }
+      };
+
+      return { spec, plt, np: createNp() };
+    }
+
+    function parsePlotDsl(source) {
+      const { spec, plt, np } = createPlotApi();
+      const run = new Function("plt", "np", "Math", `"use strict";\n${source}`);
+      run(plt, np, Math);
+      return spec;
+    }
+
+    function axisTitle(value) {
+      if (typeof value === "string") return value;
+      if (value && typeof value === "object" && "text" in value) return String(value.text ?? "");
+      return "";
+    }
+
+    function normalizeJsonSpec(raw) {
+      const spec = makeBaseSpec();
+      spec.title = raw.title || axisTitle(raw.layout?.title) || "";
+      spec.xLabel = raw.xLabel || raw.xlabel || axisTitle(raw.layout?.xaxis?.title) || "";
+      spec.yLabel = raw.yLabel || raw.ylabel || axisTitle(raw.layout?.yaxis?.title) || "";
+      spec.xlim = raw.xlim || raw.domain || null;
+      spec.ylim = raw.ylim || null;
+      spec.grid = raw.grid ?? true;
+      spec.legend = raw.legend ?? true;
+      spec.params = raw.params || {};
+
+      if (Array.isArray(raw.traces)) {
+        spec.traces = raw.traces.map((trace) => {
+          const mode = String(trace.mode || "");
+          const type = trace.type === "bar" || trace.kind === "bar"
+            ? "bar"
+            : trace.type === "box" || trace.kind === "box"
+              ? "box"
+              : mode.includes("markers") && !mode.includes("lines")
+                ? "scatter"
+                : "line";
+          return {
+            type,
+            x: asArray(trace.x),
+            y: asArray(trace.y),
+            groups: trace.groups,
+            label: trace.name || trace.label,
+            color: trace.color || trace.marker?.color || trace.line?.color
+          };
+        });
+        return spec;
+      }
+
+      if (raw.kind === "function") {
+        spec.traces.push({
+          type: "function",
+          expression: raw.expression,
+          domain: raw.domain,
+          samples: raw.samples,
+          label: raw.label || raw.expression,
+          color: raw.color
+        });
+        return spec;
+      }
+
+      if (raw.kind === "box") {
+        const groups = raw.groups && typeof raw.groups === "object"
+          ? Object.entries(raw.groups).map(([name, values]) => ({ name, y: asArray(values) }))
+          : [{ name: raw.title || "values", y: asArray(raw.y) }];
+        spec.traces.push({ type: "box", groups, label: raw.label, color: raw.color });
+        return spec;
+      }
+
+      spec.traces.push({
+        type: raw.kind === "scatter" ? "scatter" : raw.kind === "line" ? "line" : "bar",
+        x: asArray(raw.x),
+        y: asArray(raw.y),
+        label: raw.label || raw.title,
+        color: raw.color
+      });
+      return spec;
+    }
+
+    function parseSpec(source, isPlotBlock) {
+      if (!isPlotBlock) {
+        try {
+          return normalizeJsonSpec(JSON.parse(source || "{}"));
+        } catch {
+          return parsePlotDsl(source);
+        }
+      }
+      return parsePlotDsl(source);
+    }
+
+    function compileExpression(expression) {
+      const jsExpression = String(expression || "0").replace(/\^/g, "**");
+      return new Function("scope", `with (Math) { with (scope) { return (${jsExpression}); } }`);
+    }
+
+    function evaluateExpression(compiled, x, params) {
+      try {
+        const value = Number(compiled({ x, ...params }));
+        return Number.isFinite(value) ? value : null;
+      } catch {
+        return null;
+      }
+    }
+
+    function traceColor(trace, index) {
+      return trace.color || palette[index % palette.length];
+    }
+
+    function prepareTraces(spec, params) {
+      return spec.traces.flatMap((trace, index) => {
+        if (trace.type !== "function") {
+          return [{ ...trace, color: traceColor(trace, index) }];
+        }
+
+        const domain = Array.isArray(trace.domain) && trace.domain.length === 2
+          ? trace.domain
+          : Array.isArray(spec.xlim) && spec.xlim.length === 2
+            ? spec.xlim
+            : [-10, 10];
+        const samples = Math.max(32, Math.min(2000, Number(trace.samples) || 300));
+        const compiled = compileExpression(trace.expression);
+        const x = [];
+        const y = [];
+
+        for (let sample = 0; sample < samples; sample += 1) {
+          const value = Number(domain[0]) + ((Number(domain[1]) - Number(domain[0])) * sample) / (samples - 1);
+          const result = evaluateExpression(compiled, value, params);
+          if (result !== null) {
+            x.push(value);
+            y.push(result);
+          }
+        }
+
+        return [{
+          ...trace,
+          type: "line",
+          label: trace.label || trace.expression,
+          x,
+          y,
+          color: traceColor(trace, index)
+        }];
+      });
+    }
+
+    function formatTick(value) {
+      const number = Number(value);
+      if (!Number.isFinite(number)) return String(value);
+      if (number === 0) return "0";
+      const abs = Math.abs(number);
+      if (abs >= 10000 || abs < 0.001) return number.toExponential(1);
+      return Number(number.toPrecision(4)).toString();
+    }
+
+    function niceTicks(min, max, count = 5) {
+      if (!Number.isFinite(min) || !Number.isFinite(max) || min === max) return [min || 0];
+      const span = max - min;
+      const rawStep = span / Math.max(1, count - 1);
+      const power = 10 ** Math.floor(Math.log10(rawStep));
+      const error = rawStep / power;
+      const factor = error >= 7.5 ? 10 : error >= 3.5 ? 5 : error >= 1.5 ? 2 : 1;
+      const step = factor * power;
+      const ticks = [];
+      for (let tick = Math.ceil(min / step) * step; tick <= max + step / 2; tick += step) {
+        ticks.push(Number(tick.toPrecision(12)));
+      }
+      return ticks;
+    }
+
+    function extent(values, fallback = [0, 1]) {
+      const numeric = values.map(Number).filter(Number.isFinite);
+      if (numeric.length === 0) return fallback;
+      let min = Math.min(...numeric);
+      let max = Math.max(...numeric);
+      if (min === max) {
+        const pad = Math.abs(min || 1) * 0.2;
+        min -= pad;
+        max += pad;
+      }
+      return [min, max];
+    }
+
+    function paddedExtent(values, explicit, fallback = [0, 1]) {
+      if (Array.isArray(explicit) && explicit.length === 2) {
+        return [Number(explicit[0]), Number(explicit[1])];
+      }
+      const [min, max] = extent(values, fallback);
+      const pad = (max - min) * 0.08;
+      return [min - pad, max + pad];
+    }
+
+    function quantile(sorted, q) {
+      if (sorted.length === 0) return 0;
+      const position = (sorted.length - 1) * q;
+      const base = Math.floor(position);
+      const rest = position - base;
+      return sorted[base + 1] === undefined ? sorted[base] : sorted[base] + rest * (sorted[base + 1] - sorted[base]);
+    }
+
+    function boxStats(values) {
+      const sorted = values.map(Number).filter(Number.isFinite).sort((left, right) => left - right);
+      return {
+        min: sorted[0] ?? 0,
+        q1: quantile(sorted, 0.25),
+        median: quantile(sorted, 0.5),
+        q3: quantile(sorted, 0.75),
+        max: sorted[sorted.length - 1] ?? 0
+      };
+    }
+
+    function buildSvg(spec, traces, params) {
+      const isDark = document.documentElement.dataset.theme === "dark";
+      const colors = {
+        text: isDark ? "#f5f5f2" : "#111111",
+        muted: isDark ? "#a5a8ad" : "#66656b",
+        grid: isDark ? "rgba(253,253,253,.12)" : "rgba(17,17,17,.12)",
+        axis: isDark ? "#f5f5f2" : "#111111",
+        surface: "rgba(0,0,0,0)"
+      };
+      const width = 860;
+      const height = 500;
+      const legendHeight = spec.legend === false ? 0 : 34;
+      const margin = {
+        top: spec.title ? 58 : 28,
+        right: 28,
+        bottom: spec.xLabel ? 82 : 62,
+        left: 70
+      };
+      const plot = {
+        left: margin.left,
+        top: margin.top,
+        right: width - margin.right,
+        bottom: height - margin.bottom - legendHeight
+      };
+      plot.width = plot.right - plot.left;
+      plot.height = plot.bottom - plot.top;
+
+      const hasCategories = traces.some((trace) =>
+        trace.type === "bar" ||
+        trace.type === "box" ||
+        asArray(trace.x).some((value) => asNumber(value) === null)
+      );
+      const categories = [];
+      const addCategory = (value) => {
+        const label = String(value);
+        if (!categories.includes(label)) categories.push(label);
+      };
+
+      const xValues = [];
+      const yValues = [0];
+
+      for (const trace of traces) {
+        if (trace.type === "box") {
+          for (const group of asArray(trace.groups)) {
+            addCategory(group.name);
+            yValues.push(...asArray(group.y));
+          }
+          continue;
+        }
+
+        for (const value of asArray(trace.x)) {
+          hasCategories ? addCategory(value) : xValues.push(value);
+        }
+        yValues.push(...asArray(trace.y));
+      }
+
+      if (categories.length === 0 && hasCategories) {
+        const maxLength = Math.max(1, ...traces.map((trace) => asArray(trace.y).length));
+        for (let index = 0; index < maxLength; index += 1) addCategory(index + 1);
+      }
+
+      const [xMin, xMax] = hasCategories ? [0, Math.max(1, categories.length - 1)] : paddedExtent(xValues, spec.xlim, [0, 1]);
+      const [yMin, yMax] = paddedExtent(yValues, spec.ylim, [0, 1]);
+      const xScale = (value) => {
+        if (hasCategories) {
+          const index = Math.max(0, categories.indexOf(String(value)));
+          const band = plot.width / Math.max(1, categories.length);
+          return plot.left + band * (index + 0.5);
+        }
+        return plot.left + ((Number(value) - xMin) / (xMax - xMin)) * plot.width;
+      };
+      const yScale = (value) => plot.bottom - ((Number(value) - yMin) / (yMax - yMin)) * plot.height;
+      const band = hasCategories ? plot.width / Math.max(1, categories.length) : 0;
+      const yTicks = niceTicks(yMin, yMax, 6);
+      const xTicks = hasCategories ? categories : niceTicks(xMin, xMax, 7);
+      const barTraces = traces.filter((trace) => trace.type === "bar");
+      const boxTraces = traces.filter((trace) => trace.type === "box");
+      let svg = `<svg class="plot-svg" role="img" viewBox="0 0 ${width} ${height}" aria-label="${escapeText(spec.title || "Chart")}">`;
+      svg += `<rect width="${width}" height="${height}" fill="${colors.surface}"/>`;
+
+      if (spec.title) {
+        svg += `<text x="${width / 2}" y="28" text-anchor="middle" fill="${colors.text}" font-size="22" font-weight="800">${escapeText(spec.title)}</text>`;
+      }
+
+      if (spec.grid !== false) {
+        for (const tick of yTicks) {
+          const y = yScale(tick);
+          svg += `<line x1="${plot.left}" y1="${y}" x2="${plot.right}" y2="${y}" stroke="${colors.grid}" stroke-width="1"/>`;
+        }
+        for (const [index, tick] of xTicks.entries()) {
+          if (hasCategories && index % Math.ceil(Math.max(1, categories.length / 8)) !== 0) continue;
+          const x = hasCategories ? xScale(tick) : xScale(tick);
+          svg += `<line x1="${x}" y1="${plot.top}" x2="${x}" y2="${plot.bottom}" stroke="${colors.grid}" stroke-width="1"/>`;
+        }
+      }
+
+      svg += `<line x1="${plot.left}" y1="${plot.bottom}" x2="${plot.right}" y2="${plot.bottom}" stroke="${colors.axis}" stroke-width="1.4"/>`;
+      svg += `<line x1="${plot.left}" y1="${plot.top}" x2="${plot.left}" y2="${plot.bottom}" stroke="${colors.axis}" stroke-width="1.4"/>`;
+
+      for (const tick of yTicks) {
+        const y = yScale(tick);
+        svg += `<text x="${plot.left - 12}" y="${y + 4}" text-anchor="end" fill="${colors.muted}" font-size="12">${escapeText(formatTick(tick))}</text>`;
+      }
+
+      for (const [index, tick] of xTicks.entries()) {
+        if (hasCategories && index % Math.ceil(Math.max(1, categories.length / 8)) !== 0) continue;
+        const x = hasCategories ? xScale(tick) : xScale(tick);
+        svg += `<text x="${x}" y="${plot.bottom + 22}" text-anchor="middle" fill="${colors.muted}" font-size="12">${escapeText(hasCategories ? tick : formatTick(tick))}</text>`;
+      }
+
+      if (spec.xLabel) {
+        svg += `<text x="${plot.left + plot.width / 2}" y="${height - legendHeight - 24}" text-anchor="middle" fill="${colors.text}" font-size="13" font-weight="700">${escapeText(spec.xLabel)}</text>`;
+      }
+      if (spec.yLabel) {
+        svg += `<text transform="translate(20 ${plot.top + plot.height / 2}) rotate(-90)" text-anchor="middle" fill="${colors.text}" font-size="13" font-weight="700">${escapeText(spec.yLabel)}</text>`;
+      }
+
+      for (const [traceIndex, trace] of barTraces.entries()) {
+        const barWidth = Math.max(4, (band * 0.72) / Math.max(1, barTraces.length));
+        const offset = (traceIndex - (barTraces.length - 1) / 2) * barWidth;
+        for (let index = 0; index < asArray(trace.y).length; index += 1) {
+          const rawX = asArray(trace.x)[index] ?? index + 1;
+          const value = Number(asArray(trace.y)[index]);
+          if (!Number.isFinite(value)) continue;
+          const base = Math.max(yMin, Math.min(yMax, 0));
+          const x = xScale(rawX) + offset - barWidth / 2;
+          const y = yScale(Math.max(value, base));
+          const barHeight = Math.abs(yScale(value) - yScale(base));
+          svg += `<rect x="${x}" y="${y}" width="${barWidth}" height="${barHeight}" fill="${trace.color}" opacity="0.86"/>`;
+        }
+      }
+
+      for (const [traceIndex, trace] of boxTraces.entries()) {
+        const boxWidth = Math.max(12, (band * 0.52) / Math.max(1, boxTraces.length));
+        const offset = (traceIndex - (boxTraces.length - 1) / 2) * boxWidth;
+        for (const group of asArray(trace.groups)) {
+          const stats = boxStats(asArray(group.y));
+          const x = xScale(group.name) + offset;
+          const q1 = yScale(stats.q1);
+          const q3 = yScale(stats.q3);
+          const min = yScale(stats.min);
+          const max = yScale(stats.max);
+          const median = yScale(stats.median);
+          svg += `<line x1="${x}" y1="${min}" x2="${x}" y2="${max}" stroke="${trace.color}" stroke-width="2"/>`;
+          svg += `<line x1="${x - boxWidth / 3}" y1="${min}" x2="${x + boxWidth / 3}" y2="${min}" stroke="${trace.color}" stroke-width="2"/>`;
+          svg += `<line x1="${x - boxWidth / 3}" y1="${max}" x2="${x + boxWidth / 3}" y2="${max}" stroke="${trace.color}" stroke-width="2"/>`;
+          svg += `<rect x="${x - boxWidth / 2}" y="${Math.min(q1, q3)}" width="${boxWidth}" height="${Math.abs(q3 - q1)}" fill="${trace.color}" opacity="0.28" stroke="${trace.color}" stroke-width="2"/>`;
+          svg += `<line x1="${x - boxWidth / 2}" y1="${median}" x2="${x + boxWidth / 2}" y2="${median}" stroke="${trace.color}" stroke-width="2.4"/>`;
+        }
+      }
+
+      for (const trace of traces.filter((candidate) => candidate.type === "line")) {
+        const points = asArray(trace.y).map((value, index) => {
+          const xValue = asArray(trace.x)[index] ?? index;
+          const yValue = Number(value);
+          return Number.isFinite(yValue) ? [xScale(xValue), yScale(yValue)] : null;
+        }).filter(Boolean);
+        if (points.length === 0) continue;
+        const path = points.map(([x, y], index) => `${index === 0 ? "M" : "L"}${x.toFixed(2)} ${y.toFixed(2)}`).join(" ");
+        svg += `<path d="${path}" fill="none" stroke="${trace.color}" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>`;
+      }
+
+      for (const trace of traces.filter((candidate) => candidate.type === "scatter")) {
+        for (let index = 0; index < asArray(trace.y).length; index += 1) {
+          const xValue = asArray(trace.x)[index] ?? index;
+          const yValue = Number(asArray(trace.y)[index]);
+          if (!Number.isFinite(yValue)) continue;
+          svg += `<circle cx="${xScale(xValue)}" cy="${yScale(yValue)}" r="4.4" fill="${trace.color}" stroke="${colors.axis}" stroke-width="1"/>`;
+        }
+      }
+
+      const legendItems = spec.legend === false
+        ? []
+        : traces.filter((trace) => trace.label || trace.name || trace.expression);
+      if (legendItems.length > 0) {
+        let cursor = plot.left;
+        const y = height - 18;
+        for (const trace of legendItems.slice(0, 8)) {
+          const label = trace.label || trace.name || trace.expression;
+          svg += `<line x1="${cursor}" y1="${y - 4}" x2="${cursor + 18}" y2="${y - 4}" stroke="${trace.color}" stroke-width="3"/>`;
+          svg += `<text x="${cursor + 24}" y="${y}" fill="${colors.muted}" font-size="12" font-weight="700">${escapeText(label)}</text>`;
+          cursor += Math.min(170, 34 + String(label).length * 7);
+        }
+      }
+
+      svg += "</svg>";
+      return svg;
+    }
+
+    function renderControls(frame, spec, params, update) {
+      const entries = Object.entries(spec.params || {});
+      if (entries.length === 0) return;
+
+      const controls = document.createElement("div");
+      controls.className = "plot-controls";
+
+      for (const [name, config] of entries) {
+        const row = document.createElement("label");
+        const caption = document.createElement("span");
+        const input = document.createElement("input");
+        const output = document.createElement("output");
+        caption.textContent = name;
+        input.type = "range";
+        input.min = String(config.min ?? 0);
+        input.max = String(config.max ?? 1);
+        input.step = String(config.step ?? 0.01);
+        input.value = String(params[name]);
+        output.textContent = formatTick(params[name]);
+        row.className = "plot-control";
+        input.addEventListener("input", () => {
+          params[name] = Number(input.value);
+          output.textContent = formatTick(params[name]);
+          update();
+        });
+        row.append(caption, input, output);
+        controls.append(row);
+      }
+
+      frame.prepend(controls);
+    }
+
+    function renderChart(frame, canvas, spec) {
+      const params = {};
+      for (const [name, config] of Object.entries(spec.params || {})) {
+        const min = Number(config.min ?? 0);
+        params[name] = Number(config.value ?? config.default ?? min);
+      }
+
+      const update = () => {
+        const traces = prepareTraces(spec, params);
+        canvas.innerHTML = buildSvg(spec, traces, params);
+      };
+
+      renderControls(frame, spec, params, update);
+      update();
+    }
+
+    for (const [index, code] of chartBlocks.entries()) {
+      const pre = code.parentElement;
+      if (!pre) continue;
+
+      const frame = document.createElement("figure");
+      const canvas = document.createElement("div");
+      frame.className = "plot-frame";
+      canvas.className = "plot-canvas";
+      canvas.id = `plot-${index}`;
+      frame.append(canvas);
+      pre.replaceWith(frame);
+
+      try {
+        const isPlotBlock = code.classList.contains("language-plot");
+        const spec = parseSpec(code.textContent || "", isPlotBlock);
+        renderChart(frame, canvas, spec);
+      } catch (error) {
+        frame.classList.add("plot-error");
+        canvas.textContent = error instanceof Error ? error.message : "Unable to render chart.";
+      }
+    }
+  }
+</script>

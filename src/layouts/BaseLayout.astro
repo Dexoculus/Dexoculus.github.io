@@ -1,0 +1,187 @@
+---
+import TopoBackground from "@/components/TopoBackground.astro";
+import { absoluteUrl, personJsonLd } from "@/lib/seo";
+import "@/styles/global.css";
+
+type Props = {
+  title?: string;
+  description?: string;
+  image?: string;
+  type?: "website" | "article" | "profile";
+  jsonLd?: Record<string, unknown>;
+};
+
+const {
+  title = "Dexter Oculus",
+  description = "Portfolio and technical notes for Hyeonbin Han.",
+  image = "https://avatars.githubusercontent.com/u/34956179?v=4",
+  type = "website",
+  jsonLd
+} = Astro.props;
+
+const pathname = Astro.url.pathname;
+const canonical = absoluteUrl(pathname);
+const structuredData = jsonLd ?? personJsonLd;
+const navItems = [
+  { href: "/", label: "CV" },
+  { href: "/projects/", label: "Projects" },
+  { href: "/blog/", label: "Notes" },
+  { href: "/about/", label: "About" }
+];
+
+function isActive(href: string) {
+  if (href === "/") return pathname === "/";
+  return pathname.startsWith(href);
+}
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="color-scheme" content="light dark" />
+    <meta name="description" content={description} />
+    <meta name="theme-color" content="#111111" />
+    <meta name="robots" content="index, follow" />
+    <link rel="canonical" href={canonical} />
+    <link rel="alternate" type="application/rss+xml" title="Dexter Oculus Notes" href={absoluteUrl("/rss.xml")} />
+    <meta property="og:site_name" content="Dexter Oculus" />
+    <meta property="og:type" content={type} />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={canonical} />
+    <meta property="og:image" content={image} />
+    <meta name="twitter:card" content="summary" />
+    <meta name="twitter:title" content={title} />
+    <meta name="twitter:description" content={description} />
+    <meta name="twitter:image" content={image} />
+    <title>{title}</title>
+    <link rel="icon" href="/favicon.ico" />
+    <slot name="head" />
+    <script type="application/ld+json" set:html={JSON.stringify(structuredData)} />
+    <script is:inline>
+      (() => {
+        const params = new URLSearchParams(window.location.search);
+        const explicitTheme = params.get("theme");
+        const media = window.matchMedia ? window.matchMedia("(prefers-color-scheme: dark)") : null;
+        const storageKey = "branding-theme";
+        const getStoredTheme = () => {
+          try {
+            const storedTheme = localStorage.getItem(storageKey);
+            return storedTheme === "dark" || storedTheme === "light" ? storedTheme : null;
+          } catch {
+            return null;
+          }
+        };
+        const resolveTheme = () => {
+          if (explicitTheme === "dark" || explicitTheme === "light") return explicitTheme;
+          const storedTheme = getStoredTheme();
+          if (storedTheme) return storedTheme;
+          return media && media.matches ? "dark" : "light";
+        };
+
+        document.documentElement.dataset.theme = resolveTheme();
+
+        if (media && media.addEventListener && explicitTheme !== "dark" && explicitTheme !== "light") {
+          media.addEventListener("change", () => {
+            if (!getStoredTheme()) document.documentElement.dataset.theme = resolveTheme();
+          });
+        }
+      })();
+    </script>
+  </head>
+  <body>
+    <TopoBackground />
+    <header class="topbar">
+      <a class="brand-lockup" href="/" aria-label="Dexter Oculus home">
+        <span class="brand-orbit"></span>
+        <span>
+          <strong>Dexter Oculus</strong>
+          <small>robotics / vision / data</small>
+        </span>
+      </a>
+      <nav class="nav" aria-label="Primary navigation">
+        {
+          navItems.map((item) => (
+            <a class:list={{ "active-tab": isActive(item.href) }} href={item.href} aria-current={isActive(item.href) ? "page" : undefined}>
+              <span class="nav-marker" aria-hidden="true"></span>
+              <span>{item.label}</span>
+            </a>
+          ))
+        }
+      </nav>
+      <button class="theme-toggle" type="button" aria-label="Switch theme" aria-pressed="false">
+        <i aria-hidden="true"></i>
+        <span>DARK</span>
+      </button>
+    </header>
+    <main>
+      <slot />
+    </main>
+    <footer class="footer shell">
+      <span>DEXTER OCULUS</span>
+      <span>Astro static portfolio / GitHub Pages / guideline-aligned UI</span>
+    </footer>
+    <slot name="runtimes" />
+    <script is:inline>
+      const themeToggle = document.querySelector(".theme-toggle");
+      const themeToggleLabel = themeToggle?.querySelector("span");
+      const themeStorageKey = "branding-theme";
+      const motionQuery = window.matchMedia ? window.matchMedia("(prefers-reduced-motion: reduce)") : null;
+
+      function updateThemeToggle() {
+        if (!themeToggle || !themeToggleLabel) return;
+        const isDark = document.documentElement.dataset.theme === "dark";
+        themeToggleLabel.textContent = isDark ? "LIGHT" : "DARK";
+        themeToggle.setAttribute("aria-pressed", String(isDark));
+        themeToggle.setAttribute("aria-label", isDark ? "Switch to light mode" : "Switch to dark mode");
+        themeToggle.title = isDark ? "Switch to light mode" : "Switch to dark mode";
+      }
+
+      function setTheme(theme, shouldStore = false) {
+        document.documentElement.dataset.theme = theme;
+        if (shouldStore) {
+          try {
+            localStorage.setItem(themeStorageKey, theme);
+          } catch {
+          }
+        }
+        updateThemeToggle();
+      }
+
+      themeToggle?.addEventListener("click", () => {
+        const nextTheme = document.documentElement.dataset.theme === "dark" ? "light" : "dark";
+        setTheme(nextTheme, true);
+      });
+
+      updateThemeToggle();
+
+      document.querySelectorAll(".halo-orbit").forEach((orbit) => {
+        const resetOrbit = () => {
+          orbit.style.setProperty("--orbit-x", "0px");
+          orbit.style.setProperty("--orbit-y", "0px");
+          orbit.style.setProperty("--orbit-x-half", "0px");
+          orbit.style.setProperty("--orbit-y-half", "0px");
+        };
+
+        orbit.addEventListener("pointermove", (event) => {
+          if (motionQuery && motionQuery.matches) return;
+          const rect = orbit.getBoundingClientRect();
+          const normalizedX = (event.clientX - rect.left) / rect.width - 0.5;
+          const normalizedY = (event.clientY - rect.top) / rect.height - 0.5;
+          const x = Math.max(-8, Math.min(8, normalizedX * 16));
+          const y = Math.max(-6, Math.min(6, normalizedY * 12));
+
+          orbit.style.setProperty("--orbit-x", `${x.toFixed(2)}px`);
+          orbit.style.setProperty("--orbit-y", `${y.toFixed(2)}px`);
+          orbit.style.setProperty("--orbit-x-half", `${(x * 0.55).toFixed(2)}px`);
+          orbit.style.setProperty("--orbit-y-half", `${(y * 0.55).toFixed(2)}px`);
+        });
+
+        orbit.addEventListener("pointerleave", resetOrbit);
+        orbit.addEventListener("pointercancel", resetOrbit);
+      });
+    </script>
+  </body>
+</html>

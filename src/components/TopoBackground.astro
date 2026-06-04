@@ -1,0 +1,78 @@
+<div class="tactical-field" aria-hidden="true">
+  <svg class="tactical-map" viewBox="0 0 1600 900" preserveAspectRatio="xMidYMid slice">
+    <defs>
+      <pattern id="tactical-hatch" width="8" height="8" patternUnits="userSpaceOnUse" patternTransform="rotate(135)">
+        <line class="hatch-stroke" x1="0" y1="0" x2="0" y2="8" />
+      </pattern>
+      <pattern id="tactical-dot-matrix" width="18" height="18" patternUnits="userSpaceOnUse">
+        <circle class="dot-stroke" cx="2" cy="2" r="1.05" />
+      </pattern>
+      <linearGradient id="tactical-fade" x1="0" x2="1" y1="0" y2="0">
+        <stop class="fade-stop-edge" offset="0" />
+        <stop class="fade-stop-mid" offset="0.36" />
+        <stop class="fade-stop-mid" offset="0.64" />
+        <stop class="fade-stop-edge" offset="1" />
+      </linearGradient>
+    </defs>
+
+    <rect class="tactical-sheet" x="0" y="0" width="1600" height="900" />
+
+    <g class="tactical-bands">
+      <path class="tactical-band tactical-band-top" d="M0 0 H1600 V306 H1450 L1414 272 H1186 L1138 238 H836 L792 204 H0 Z" />
+      <path class="tactical-band tactical-band-bottom" d="M0 654 H1600 V900 H0 Z" />
+      <path class="tactical-band-cut" d="M0 306 H1600" />
+      <path class="tactical-band-cut" d="M0 654 H1600" />
+      <rect class="tactical-hatch-fill" x="-80" y="-24" width="360" height="332" fill="url(#tactical-hatch)" />
+      <rect class="tactical-hatch-fill" x="1320" y="-24" width="360" height="332" fill="url(#tactical-hatch)" />
+      <rect class="tactical-hatch-fill tactical-hatch-muted" x="-80" y="654" width="360" height="282" fill="url(#tactical-hatch)" />
+      <rect class="tactical-hatch-fill tactical-hatch-muted" x="1320" y="654" width="360" height="282" fill="url(#tactical-hatch)" />
+    </g>
+
+    <g class="blueprint-grid">
+      <g class="grid-sector grid-sector-top-left">
+        <path class="grid-line grid-line-major" d="M64 0 V306 M304 0 V306 M448 0 V306" />
+        <path class="grid-line" d="M112 0 V306 M160 0 V306 M208 0 V306 M256 0 V306 M352 0 V306 M400 0 V306" />
+        <path class="grid-row" d="M64 92 H448 M64 184 H448 M64 276 H448" />
+      </g>
+      <g class="grid-sector grid-sector-top-right">
+        <path class="grid-line grid-line-major" d="M1152 0 V306 M1296 0 V306 M1536 0 V306" />
+        <path class="grid-line" d="M1200 0 V306 M1248 0 V306 M1344 0 V306 M1392 0 V306 M1440 0 V306 M1488 0 V306" />
+        <path class="grid-row" d="M1152 92 H1536 M1152 184 H1536 M1152 276 H1536" />
+      </g>
+      <g class="grid-sector grid-sector-mid-left">
+        <path class="grid-line grid-line-major" d="M72 336 V640 M240 336 V640" />
+        <path class="grid-line" d="M120 336 V640 M168 336 V640 M288 336 V640" />
+        <path class="grid-row grid-row-soft" d="M72 420 H336 M72 504 H336 M72 588 H336" />
+      </g>
+      <g class="grid-sector grid-sector-mid-right">
+        <path class="grid-line grid-line-major" d="M1360 336 V640 M1528 336 V640" />
+        <path class="grid-line" d="M1312 336 V640 M1408 336 V640 M1456 336 V640 M1504 336 V640" />
+        <path class="grid-row grid-row-soft" d="M1264 420 H1528 M1264 504 H1528 M1264 588 H1528" />
+      </g>
+      <g class="grid-sector grid-sector-bottom-left">
+        <path class="grid-line grid-line-major" d="M96 654 V900 M320 654 V900" />
+        <path class="grid-line" d="M144 654 V900 M192 654 V900 M240 654 V900 M368 654 V900" />
+        <path class="grid-row grid-row-soft" d="M96 742 H416 M96 830 H416" />
+      </g>
+      <g class="grid-sector grid-sector-bottom-right">
+        <path class="grid-line grid-line-major" d="M1280 654 V900 M1504 654 V900" />
+        <path class="grid-line" d="M1232 654 V900 M1360 654 V900 M1408 654 V900 M1456 654 V900" />
+        <path class="grid-row grid-row-soft" d="M1184 742 H1504 M1184 830 H1504" />
+      </g>
+    </g>
+
+    <g class="dot-matrix-layer">
+      <rect class="dot-matrix" x="58" y="344" width="244" height="150" fill="url(#tactical-dot-matrix)" />
+      <rect class="dot-matrix" x="1298" y="344" width="244" height="150" fill="url(#tactical-dot-matrix)" />
+      <rect class="dot-matrix dot-matrix-soft" x="96" y="722" width="292" height="118" fill="url(#tactical-dot-matrix)" />
+      <rect class="dot-matrix dot-matrix-soft" x="1212" y="722" width="292" height="118" fill="url(#tactical-dot-matrix)" />
+    </g>
+
+    <rect class="tactical-vignette" x="0" y="0" width="1600" height="900" fill="url(#tactical-fade)" />
+  </svg>
+</div>
+
+<div class="ambient-backdrop" aria-hidden="true">
+  <span></span>
+  <span></span>
+</div>
