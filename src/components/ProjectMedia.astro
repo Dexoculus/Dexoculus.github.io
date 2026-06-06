@@ -1,13 +1,14 @@
 ---
-import type { Project } from "@/lib/content";
+import type { Post, Project } from "@/lib/content";
 
 type Props = {
-  project: Project;
+  project: Project | Post;
   badge?: string;
   large?: boolean;
 };
 
 const { project, badge, large = false } = Astro.props;
+const mediaLabel = "name" in project ? project.name : project.title;
 const mediaUrl = project.mediaUrl || project.image;
 const isVideo = project.mediaType === "video";
 const canVideoFallback = Boolean(mediaUrl && !isVideo && mediaUrl.includes("github.com/user-attachments/assets/"));
@@ -20,7 +21,7 @@ const poster = isVideo ? project.image : undefined;
       isVideo ? (
         <video
           src={mediaUrl}
-          aria-label={`${project.name} video preview`}
+          aria-label={`${mediaLabel} video preview`}
           autoplay={!large}
           controls={large}
           loop
@@ -37,7 +38,7 @@ const poster = isVideo ? project.image : undefined;
               <video
                 class="project-media-fallback"
                 src={mediaUrl}
-                aria-label={`${project.name} video preview`}
+                aria-label={`${mediaLabel} video preview`}
                 autoplay={!large}
                 controls={large}
                 hidden

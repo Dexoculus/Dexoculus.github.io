@@ -1,8 +1,6 @@
 ---
 title: "Case Report: cudaGetDeviceCount()"
 tags: [Case Report, Linux]
-style: fill
-color: warning
 description: "Case Report of RuntimeError: Unexpected error from cudaGetDeviceCount()."
 external_url:
 ---

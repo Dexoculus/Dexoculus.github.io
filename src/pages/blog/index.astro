@@ -38,7 +38,7 @@ const tagCounts = postsByTag.map(({ tag, posts }) => ({ tag, count: posts.length
     </div>
   </section>
 
-  <section class="shell note-grid archive">
+  <section class="shell note-grid archive note-archive-grid">
     {posts.map((post) => <PostCard post={post} />)}
   </section>
 

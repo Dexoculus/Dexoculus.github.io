@@ -1,5 +1,6 @@
 ---
 import { formatDate, type Post } from "@/lib/content";
+import ProjectMedia from "@/components/ProjectMedia.astro";
 
 type Props = {
   post: Post;
@@ -8,15 +9,19 @@ type Props = {
 const { post } = Astro.props;
 const href = post.externalUrl || `/blog/${post.slug}/`;
 const isExternal = Boolean(post.externalUrl);
+const metadata = [post.date ? formatDate(post.date) : "", `${post.readingMinutes} min read`].filter(Boolean).join(" / ");
 ---
 
 <article class="note-card" data-note-card data-tags={post.tags.map((tag) => tag.toLowerCase()).join("|")} data-search={`${post.title} ${post.description} ${post.tags.join(" ")}`.toLowerCase()}>
   <a href={href} target={isExternal ? "_blank" : undefined} rel={isExternal ? "noreferrer" : undefined}>
-    <div class="card-kicker">{formatDate(post.date)} / {post.readingMinutes} min read</div>
-    <h3>{post.title}</h3>
-    <p>{post.description}</p>
-    <div class="tag-row">
-      {post.tags.map((tag) => <span>{tag}</span>)}
+    {post.mediaUrl && <ProjectMedia project={post} />}
+    <div class="note-body">
+      <div class="card-kicker">{metadata}</div>
+      <h3>{post.title}</h3>
+      <p>{post.description}</p>
+      <div class="tag-row">
+        {post.tags.map((tag) => <span>{tag}</span>)}
+      </div>
     </div>
   </a>
 </article>

@@ -23,10 +23,10 @@ const pathname = Astro.url.pathname;
 const canonical = absoluteUrl(pathname);
 const structuredData = jsonLd ?? personJsonLd;
 const navItems = [
-  { href: "/", label: "CV" },
+  { href: "/", label: "Home" },
   { href: "/projects/", label: "Projects" },
   { href: "/blog/", label: "Notes" },
-  { href: "/about/", label: "About" }
+  { href: "/about/", label: "CV" }
 ];
 
 function isActive(href: string) {

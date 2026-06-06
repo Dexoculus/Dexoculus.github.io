@@ -1,6 +1,7 @@
 ---
 import BaseLayout from "@/layouts/BaseLayout.astro";
 import ArticleToc from "@/components/ArticleToc.astro";
+import CodeCopyRuntime from "@/components/CodeCopyRuntime.astro";
 import ProjectMedia from "@/components/ProjectMedia.astro";
 import { projects } from "@/lib/content";
 import { absoluteUrl } from "@/lib/seo";
@@ -51,4 +52,5 @@ const projectJsonLd = {
   {ChartRuntime && <ChartRuntime slot="runtimes" />}
   {ThreeRuntime && <ThreeRuntime slot="runtimes" />}
   {MermaidRuntime && <MermaidRuntime slot="runtimes" />}
+  <CodeCopyRuntime slot="runtimes" />
 </BaseLayout>

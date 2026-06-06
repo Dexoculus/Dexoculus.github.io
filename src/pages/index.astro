@@ -1,54 +1,70 @@
 ---
 import BaseLayout from "@/layouts/BaseLayout.astro";
+import PostCard from "@/components/PostCard.astro";
 import ProjectCard from "@/components/ProjectCard.astro";
-import TimelineList from "@/components/TimelineList.astro";
-import { posts, profile, projects, timeline } from "@/lib/content";
+import { posts, profile, projects } from "@/lib/content";
 
-const featuredProjects = projects.slice(0, 4);
+const featuredProjects = projects.slice(0, 3);
 const recentPosts = posts.slice(0, 3);
 ---
 
-<BaseLayout title="Hyeonbin Han | Dexter Oculus" description={profile.summary}>
-  <section class="hero shell">
-    <div class="hero-copy">
-      <p class="section-kicker">CV / PORTFOLIO</p>
-      <h1>{profile.name}</h1>
-      <p class="hero-role">{profile.role}</p>
-      <p class="hero-summary">{profile.summary}</p>
+<BaseLayout
+  title="Dexter Oculus | Robotics, Vision, and Data"
+  description="Research projects, engineering work, and technical notes in robotics, computer vision, physical AI, and data science."
+>
+  <section class="hero site-hero shell">
+    <div class="hero-copy site-intro">
+      <p class="section-kicker">RESEARCH / ENGINEERING / NOTES</p>
+      <h1>Dexter Oculus</h1>
+      <p class="hero-role">Robotics, computer vision, physical AI, and data science.</p>
+      <p class="hero-summary">
+        A working archive of selected systems, research output, implementation notes, and technical experiments maintained by {profile.name}.
+      </p>
       <div class="hero-actions">
-        <a class="button primary" href="/about/">View CV</a>
-        <a class="button secondary" href="/projects/">Projects</a>
+        <a class="button primary" href="/projects/">Explore projects</a>
+        <a class="button secondary" href="/blog/">Read notes</a>
       </div>
       <dl class="signal-grid">
         <div>
-          <dt>Current</dt>
-          <dd>
-            <a class="inline-link" href="https://www.cmesrobotics.ai/" target="_blank" rel="noreferrer">CMES Robotics</a>
-            {" / Humanoid TF"}
-          </dd>
+          <dt>Projects</dt>
+          <dd>{projects.length} documented systems</dd>
         </div>
         <div>
-          <dt>Education</dt>
-          <dd>Hanyang ERICA / Math Data Science</dd>
+          <dt>Notes</dt>
+          <dd>{posts.length} technical entries</dd>
         </div>
         <div>
-          <dt>Research</dt>
-          <dd>{profile.focus.slice(0, 3).join(" / ")}</dd>
+          <dt>Profile</dt>
+          <dd><a class="inline-link" href="/about/">CV and research record</a></dd>
         </div>
       </dl>
     </div>
-    <aside class="ops-panel halo-orbit">
+    <aside class="ops-panel site-directory">
       <div class="ops-header">
-        <span>PROFILE</span>
-        <strong>CV</strong>
+        <span>SITE INDEX</span>
+        <strong>001</strong>
       </div>
-      <div class="avatar-orbit">
-        <img src={profile.avatar} alt="Hyeonbin Han" />
-      </div>
-      <div class="status-stack">
-        <div><span>Projects</span><strong>{projects.length}</strong></div>
-        <div><span>Notes</span><strong>{posts.length}</strong></div>
-        <div><span>GPA</span><strong>3.51</strong></div>
+      <nav class="directory-list" aria-label="Site sections">
+        <a href="/projects/">
+          <span>01</span>
+          <strong>Projects</strong>
+          <small>Robotics, vision, ML, and deployed systems</small>
+        </a>
+        <a href="/blog/">
+          <span>02</span>
+          <strong>Notes</strong>
+          <small>Research logs, case reports, and implementation guides</small>
+        </a>
+        <a href="/about/">
+          <span>03</span>
+          <strong>CV</strong>
+          <small>Education, experience, publications, and awards</small>
+        </a>
+      </nav>
+      <div class="site-owner">
+        <span>Maintained by</span>
+        <strong>{profile.name}</strong>
+        <small>{profile.location}</small>
       </div>
     </aside>
   </section>
@@ -61,20 +77,8 @@ const recentPosts = posts.slice(0, 3);
       </div>
       <a class="button text" href="/projects/">All projects</a>
     </div>
-    <div class="project-grid">
+    <div class="project-grid home-feature-grid">
       {featuredProjects.map((project) => <ProjectCard project={project} compact />)}
-    </div>
-  </section>
-
-  <section class="shell section-grid">
-    <div class="section-head wide">
-      <div>
-        <p class="section-kicker">EXPERIENCE</p>
-        <h2>Timeline</h2>
-      </div>
-    </div>
-    <div class="info-panel">
-      <TimelineList items={timeline} />
     </div>
   </section>
 
@@ -86,8 +90,8 @@ const recentPosts = posts.slice(0, 3);
       </div>
       <a class="button text" href="/blog/">All notes</a>
     </div>
-    <div class="note-grid">
-      {recentPosts.map((post) => <article class="note-card"><a href={post.externalUrl || `/blog/${post.slug}/`}><div class="card-kicker">{post.tags[0] || "Note"}</div><h3>{post.title}</h3><p>{post.description}</p></a></article>)}
+    <div class="note-grid home-feature-grid">
+      {recentPosts.map((post) => <PostCard post={post} />)}
     </div>
   </section>
 </BaseLayout>

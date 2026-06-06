@@ -1,19 +1,20 @@
 ---
 import BaseLayout from "@/layouts/BaseLayout.astro";
-import TimelineList from "@/components/TimelineList.astro";
-import { profile, timeline } from "@/lib/content";
+import { profile } from "@/lib/content";
 ---
 
-<BaseLayout title="About | Dexter Oculus" description="CV and profile for Hyeonbin Han.">
+<BaseLayout title="CV | Dexter Oculus" description="Curriculum vitae and research profile for Hyeonbin Han.">
   <section class="page-hero cv-hero shell">
     <div class="cv-hero-content">
       <p class="section-kicker">CURRICULUM VITAE</p>
       <h1>{profile.name}</h1>
+      <p class="cv-role">{profile.role}</p>
       <p>{profile.summary}</p>
+      <p class="cv-location">{profile.location}</p>
       <div class="link-row">
         {profile.links.map((link) => <a href={link.href} target="_blank" rel="noreferrer">{link.label}</a>)}
         <a href={`mailto:${profile.email}`}>Email</a>
-        <a class="button secondary" href="/assets/CV.pdf" download>Download CV</a>
+        <a class="button secondary print-button" href="/assets/CV.pdf" download>Download CV</a>
       </div>
     </div>
   </section>
@@ -26,6 +27,7 @@ import { profile, timeline } from "@/lib/content";
       <dl class="detail-list">
         <div><dt>Period</dt><dd>{profile.education.period}</dd></div>
         <div><dt>Record</dt><dd>{profile.education.detail}</dd></div>
+        <div><dt>Location</dt><dd>{profile.education.location}</dd></div>
       </dl>
     </article>
 
@@ -42,7 +44,7 @@ import { profile, timeline } from "@/lib/content";
     <div class="section-head">
       <div>
         <p class="section-kicker">EXPERIENCE</p>
-        <h2>Research and project experience</h2>
+        <h2>Research experience</h2>
       </div>
     </div>
     <div class="experience-stack">
@@ -63,6 +65,7 @@ import { profile, timeline } from "@/lib/content";
                 }
               </h3>
               <p>{item.role}</p>
+              <p class="resume-location">{item.location}</p>
             </div>
             <ul>
               {item.bullets.map((bullet) => <li>{bullet}</li>)}
@@ -73,15 +76,39 @@ import { profile, timeline } from "@/lib/content";
     </div>
   </section>
 
-  <section class="shell split-section">
-    <div class="info-panel">
-      <p class="section-kicker">TIMELINE</p>
-      <h2>Milestones</h2>
-      <TimelineList items={timeline} />
+  <section class="shell cv-output-grid">
+    <article class="info-panel">
+      <p class="section-kicker">PUBLICATION</p>
+      <h2>Journal article</h2>
+      <ul class="plain-list">
+        {profile.publications.map((item) => <li>{item}</li>)}
+      </ul>
+    </article>
+    <article class="info-panel">
+      <p class="section-kicker">CONFERENCES</p>
+      <h2>Presentations</h2>
+      <ul class="plain-list">
+        {profile.presentations.map((item) => <li>{item}</li>)}
+      </ul>
+    </article>
+    <article class="info-panel">
+      <p class="section-kicker">HONORS</p>
+      <h2>Awards</h2>
+      <ul class="plain-list">
+        {profile.awards.map((item) => <li>{item}</li>)}
+      </ul>
+    </article>
+  </section>
+
+  <section class="shell resume-section">
+    <div class="section-head">
+      <div>
+        <p class="section-kicker">TECHNICAL SKILLS</p>
+        <h2>Research and engineering stack</h2>
+      </div>
     </div>
-    <div class="info-panel">
+    <div class="info-panel cv-skills-panel">
       <p class="section-kicker">SKILLS</p>
-      <h2>Stack</h2>
       <div class="skill-categories">
         {
           profile.skillGroups.map((group) => (
@@ -100,20 +127,12 @@ import { profile, timeline } from "@/lib/content";
     </div>
   </section>
 
-  <section class="shell cv-grid">
-    <article class="info-panel">
-      <p class="section-kicker">PUBLICATION</p>
-      <h2>Research output</h2>
-      <ul class="plain-list">
-        {profile.publications.map((item) => <li>{item}</li>)}
-      </ul>
-    </article>
-    <article class="info-panel">
-      <p class="section-kicker">HONORS</p>
-      <h2>Awards</h2>
-      <ul class="plain-list">
-        {profile.awards.map((item) => <li>{item}</li>)}
-      </ul>
-    </article>
+  <section class="shell cv-project-route">
+    <div>
+      <p class="section-kicker">PROJECT RECORD</p>
+      <h2>Project work is maintained separately.</h2>
+      <p>Detailed systems, implementation notes, media, and deployment results are collected in the Projects archive.</p>
+    </div>
+    <a class="button primary" href="/projects/">Open projects</a>
   </section>
 </BaseLayout>

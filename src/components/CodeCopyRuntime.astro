@@ -1,0 +1,58 @@
+<script>
+  const excludedLanguages = ["language-chart", "language-plot", "language-mermaid", "language-three"];
+
+  function fallbackCopy(text) {
+    const textarea = document.createElement("textarea");
+    textarea.value = text;
+    textarea.setAttribute("readonly", "");
+    textarea.style.position = "fixed";
+    textarea.style.opacity = "0";
+    document.body.append(textarea);
+    textarea.select();
+    const copied = document.execCommand("copy");
+    textarea.remove();
+    return copied;
+  }
+
+  async function copyText(text) {
+    if (navigator.clipboard?.writeText) {
+      try {
+        await navigator.clipboard.writeText(text);
+        return true;
+      } catch {
+      }
+    }
+
+    return fallbackCopy(text);
+  }
+
+  document.querySelectorAll(".markdown-panel pre").forEach((pre) => {
+    const code = pre.querySelector("code");
+    if (!code || excludedLanguages.some((className) => code.classList.contains(className))) return;
+    if (pre.parentElement?.classList.contains("code-frame")) return;
+
+    const frame = document.createElement("div");
+    frame.className = "code-frame";
+
+    const button = document.createElement("button");
+    button.className = "code-copy-button";
+    button.type = "button";
+    button.textContent = "COPY";
+    button.setAttribute("aria-label", "Copy code");
+    button.setAttribute("aria-live", "polite");
+
+    pre.before(frame);
+    frame.append(pre, button);
+
+    button.addEventListener("click", async () => {
+      const copied = await copyText(code.textContent || "");
+      button.textContent = copied ? "COPIED" : "FAILED";
+      button.dataset.state = copied ? "copied" : "failed";
+
+      window.setTimeout(() => {
+        button.textContent = "COPY";
+        delete button.dataset.state;
+      }, 1600);
+    });
+  });
+</script>

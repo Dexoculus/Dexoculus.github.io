@@ -5,13 +5,13 @@ export function GET() {
   const items = posts
     .map((post) => {
       const url = absoluteUrl(`/blog/${post.slug}/`);
-      const pubDate = post.date ? post.date.toUTCString() : new Date().toUTCString();
+      const pubDate = post.date ? `
+  <pubDate>${escapeXml(post.date.toUTCString())}</pubDate>` : "";
 
       return `<item>
   <title>${escapeXml(post.title)}</title>
   <link>${escapeXml(url)}</link>
-  <guid>${escapeXml(url)}</guid>
-  <pubDate>${escapeXml(pubDate)}</pubDate>
+  <guid>${escapeXml(url)}</guid>${pubDate}
   <description>${escapeXml(post.description)}</description>
 </item>`;
     })

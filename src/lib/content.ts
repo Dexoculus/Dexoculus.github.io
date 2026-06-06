@@ -58,6 +58,10 @@ export type Heading = {
 export type Post = {
   title: string;
   tags: string[];
+  image?: string;
+  video?: string;
+  mediaUrl?: string;
+  mediaType: ProjectMediaType;
   description: string;
   externalUrl?: string;
   slug: string;
@@ -98,6 +102,20 @@ function asStringArray(value: unknown) {
   return [];
 }
 
+function asDate(value: unknown) {
+  if (value instanceof Date) {
+    return Number.isNaN(value.getTime()) ? undefined : value;
+  }
+
+  if (typeof value !== "string" && typeof value !== "number") return undefined;
+
+  const source = typeof value === "string" && /^\d{4}-\d{2}-\d{2}$/.test(value.trim())
+    ? `${value.trim()}T00:00:00`
+    : value;
+  const date = new Date(source);
+  return Number.isNaN(date.getTime()) ? undefined : date;
+}
+
 function normalizeMediaType(value: unknown): ProjectMediaType | undefined {
   const normalized = asString(value).toLowerCase();
   return normalized === "video" || normalized === "image" ? normalized : undefined;
@@ -106,6 +124,30 @@ function normalizeMediaType(value: unknown): ProjectMediaType | undefined {
 function inferMediaType(url: string | undefined): ProjectMediaType {
   const cleanUrl = (url || "").split("?")[0].toLowerCase();
   return /\.(mp4|webm|mov|m4v|ogv|ogg)$/.test(cleanUrl) ? "video" : "image";
+}
+
+function extractFirstMedia(source = "") {
+  const prose = stripFencedBlocks(source);
+  const candidates: { index: number; url: string; type: ProjectMediaType }[] = [];
+  const collect = (pattern: RegExp, urlGroup: number, forcedType?: ProjectMediaType) => {
+    for (const match of prose.matchAll(pattern)) {
+      const url = match[urlGroup]?.trim().replace(/^<|>$/g, "");
+      if (!url) continue;
+      candidates.push({
+        index: match.index ?? Number.MAX_SAFE_INTEGER,
+        url,
+        type: forcedType || inferMediaType(url)
+      });
+    }
+  };
+
+  collect(/!\[[^\]]*]\(\s*(<[^>]+>|[^\s)]+)(?:\s+["'][^"']*["'])?\s*\)/g, 1);
+  collect(/<img\b[^>]*\bsrc=["']([^"']+)["'][^>]*>/gi, 1, "image");
+  collect(/<(?:video|source)\b[^>]*\bsrc=["']([^"']+)["'][^>]*>/gi, 1, "video");
+  collect(/\[[^\]]+]\(\s*(https?:\/\/github\.com\/user-attachments\/assets\/[^)\s]+)\s*\)/gi, 1);
+  collect(/\[[^\]]+]\(\s*(<?[^)\s>]+\.(?:mp4|webm|mov|m4v|ogv|ogg)(?:\?[^)\s>]*)?>?)\s*\)/gi, 1, "video");
+
+  return candidates.sort((a, b) => a.index - b.index)[0];
 }
 
 function fileBase(path: string) {
@@ -208,19 +250,41 @@ export const profile = {
   siteTitle: "Dexter Oculus",
   name: "Hyeonbin Han",
   handle: "Dexoculus",
-  role: "B.S. candidate in Mathematical Data Science; robotics and machine learning projects",
-  location: "Hanyang University ERICA / Seoul, Korea",
+  role: "Undergraduate researcher in Mathematical Data Science",
+  location: "Republic of Korea",
   email: "hyeonbin@hanyang.ac.kr",
   avatar: "https://avatars.githubusercontent.com/u/34956179?v=4",
   summary:
-    "Undergraduate student in Mathematical Data Science at Hanyang University ERICA, with project experience in computer vision, robotics, and machine learning.",
+    "Undergraduate researcher working across robot intelligence, computer vision, physical AI, distributed learning, and machine learning systems.",
   focus: ["Computer Vision", "Robotics", "Data Science", "Imitation Learning", "Vision-Language-Action (VLA)"],
   researchInterests: ["Computer Vision", "Robotics", "Data Science", "Imitation Learning", "Vision-Language-Action (VLA)", "Anomaly Detection"],
   skillGroups: [
     { label: "Languages", scope: "programming", items: ["Python", "C++", "SQL", "JavaScript / TypeScript"] },
-    { label: "ML / Robotics", scope: "research stack", items: ["PyTorch", "ROS 2", "LeRobot", "ACT", "Diffusion Policy", "YOLOv8"] },
-    { label: "Data Science", scope: "analysis", items: ["NumPy", "Pandas", "Scikit-learn", "Matplotlib", "Streamlit"] },
-    { label: "Systems / Web", scope: "deployment", items: ["Linux", "Docker", "Git", "Astro", "Cloudflare Tunnels"] }
+    {
+      label: "AI / Machine Learning",
+      scope: "research stack",
+      items: ["PyTorch", "Flower", "Hugging Face LeRobot", "ACT", "Diffusion Policy", "YOLOv8", "PatchCore", "EfficientNet"]
+    },
+    {
+      label: "Robotics / Hardware",
+      scope: "physical systems",
+      items: ["ROS 2", "Raspberry Pi", "RB-Y1", "UR5", "Robotis FFW-SG2"]
+    },
+    {
+      label: "Data / Applications",
+      scope: "analysis",
+      items: ["NumPy", "Pandas", "Scikit-learn", "Matplotlib", "Streamlit"]
+    },
+    {
+      label: "Infrastructure",
+      scope: "deployment",
+      items: ["Linux (Ubuntu)", "Docker", "Git", "Cloudflare Tunnels", "Astro"]
+    },
+    {
+      label: "Fabrication / 3D",
+      scope: "prototyping",
+      items: ["Fusion 360", "FreeCAD", "Blender", "3D Printing"]
+    }
   ],
   stack: ["Python", "C++", "SQL", "JavaScript / TypeScript", "PyTorch", "ROS 2", "LeRobot", "ACT", "Diffusion Policy", "YOLOv8", "NumPy", "Pandas", "Scikit-learn", "Matplotlib", "Streamlit", "Linux", "Docker", "Git", "Astro", "Cloudflare Tunnels"],
   links: [
@@ -232,43 +296,46 @@ export const profile = {
   education: {
     school: "Hanyang University ERICA",
     program: "B.S. in Mathematical Data Science",
-    period: "Expected February 2027",
-    detail: "GPA 3.51 / 4.5"
+    period: "Expected graduation: February 2027",
+    detail: "GPA 3.51 / 4.5",
+    location: "Ansan, Korea"
   },
   experience: [
     {
       organization: "CMES Robotics",
       organizationUrl: "https://www.cmesrobotics.ai/",
+      location: "Seoul, Korea",
       role: "Junior Research Assistant, Robot Intelligence Team (Humanoid TF)",
       period: "Mar 2026 - Jun 2026",
       bullets: [
-        "Architected a scalable data acquisition and curation platform for the RB-Y1 humanoid robot.",
-        "Deployed the Gello teleoperation framework for UR5 manipulators and supported ACT policy training and deployment."
+        "Architected a scalable data acquisition and curation platform for the RB-Y1 humanoid robot and standardized the teleoperation environment for high-fidelity data collection.",
+        "Deployed the Gello teleoperation framework for UR5 manipulators and streamlined the pipeline from data curation to ACT policy training and physical deployment."
       ]
     },
     {
       organization: "Intelligence & Computation Lab, Hanyang University ERICA",
+      location: "Ansan, Korea",
       role: "Undergraduate Researcher",
       period: "Oct 2023 - Jan 2026",
       bullets: [
-        "Administered GPU training infrastructure for deep learning workloads.",
-        "Engineered preprocessing pipelines for heterogeneous healthcare and behavioral datasets."
+        "Administered and optimized GPU training infrastructure, maintaining availability and efficient resource allocation for deep learning workloads.",
+        "Engineered robust preprocessing pipelines for heterogeneous healthcare datasets, including mobile addiction metrics, and converted raw signals into machine-learning-ready formats."
       ]
     }
   ],
   publications: [
-    "Prediction of Closed Quotient During Vocal Phonation using GRU-type Neural Network with Audio Signals. Journal of Information & Communication Convergence Engineering 22(2)."
+    "Han, Hyeonbin, et al. \"Prediction of Closed Quotient During Vocal Phonation Using GRU-Type Neural Network with Audio Signals.\" Journal of Information and Communication Convergence Engineering, vol. 22, no. 2, 2024, pp. 145-152."
   ],
   presentations: [
-    "DMD Method for Analyzing Interactions Between Board Game Players, KIICE Fall Conference, 2025.",
-    "Deep learning-based algorithm for analyzing EGG signals to predict closed quotient rate, KIIS Spring Conference, 2024."
+    "\"DMD Method for Analyzing Interactions Between Board Game Players,\" KIICE Fall Conference, 2025. Poster.",
+    "\"Deep Learning-Based Algorithm for Analyzing EGG Signals to Predict Closed Quotient Rate,\" KIIS Spring Conference, 2024. Poster."
   ],
   awards: [
-    "Excellence Award, 2025 Intelligent Robot WE-Meet Project Integrated Competition",
-    "Participation Award, 2025 Shipbuilding & Maritime Big Data Utilization Idea Contest",
-    "Best Paper Award, 2025 KIICE Fall Conference",
-    "Bronze Prize, KIICE Physical AI Challenge",
-    "Excellence Award, 2024 Hanyang University SW/ICT/AI Integrated Conference"
+    "Excellence Award, 2025 Intelligent Robot WE-Meet Project Integrated Competition, Jan 2026.",
+    "Participation Award, 2025 Shipbuilding & Maritime Big Data Utilization Idea Contest, Dec 2025.",
+    "Best Paper Award, 2025 KIICE Fall Conference, Oct 2025.",
+    "Bronze Prize (Robot News President's Award), KIICE Physical AI Challenge, Oct 2025.",
+    "Excellence Award, 2024 Hanyang University SW/ICT/AI Integrated Conference, Dec 2024."
   ]
 };
 
@@ -311,14 +378,27 @@ export const posts: Post[] = Object.entries(postModules)
   .map(([path, module]) => {
     const base = fileBase(path);
     const dateMatch = base.match(/^(\d{4})-(\d{2})-(\d{2})-(.+)$/);
-    const date = dateMatch ? new Date(`${dateMatch[1]}-${dateMatch[2]}-${dateMatch[3]}T00:00:00`) : undefined;
+    const filenameDate = dateMatch ? new Date(`${dateMatch[1]}-${dateMatch[2]}-${dateMatch[3]}T00:00:00`) : undefined;
+    const date = asDate(module.frontmatter.date) ?? filenameDate;
     const title = asString(module.frontmatter.title, base);
     const externalUrl = asString(module.frontmatter.external_url) || undefined;
     const source = module.rawContent?.() ?? "";
+    const detectedMedia = extractFirstMedia(source);
+    const image = asString(module.frontmatter.image) || (detectedMedia?.type === "image" ? detectedMedia.url : undefined);
+    const video = asString(module.frontmatter.video) || (detectedMedia?.type === "video" ? detectedMedia.url : undefined);
+    const media = asString(module.frontmatter.media) || undefined;
+    const mediaUrl = video || media || image || detectedMedia?.url;
+    const mediaType = video
+      ? "video"
+      : normalizeMediaType(module.frontmatter.media_type) || detectedMedia?.type || inferMediaType(mediaUrl);
 
     return {
       title,
       tags: asStringArray(module.frontmatter.tags),
+      image,
+      video,
+      mediaUrl,
+      mediaType,
       description: asString(module.frontmatter.description, "Technical note"),
       externalUrl,
       slug: slugify(dateMatch ? dateMatch[4] : title),
@@ -336,7 +416,7 @@ export const posts: Post[] = Object.entries(postModules)
   });
 
 export function formatDate(date?: Date) {
-  if (!date) return "Undated";
+  if (!date) return "";
 
   return new Intl.DateTimeFormat("en", {
     year: "numeric",

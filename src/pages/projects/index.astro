@@ -16,7 +16,7 @@ const tools = Array.from(new Set(projects.flatMap((project) => project.tools))).
     </div>
   </section>
 
-  <section class="shell project-grid archive">
+  <section class="shell project-grid archive project-archive-grid">
     {projects.map((project) => <ProjectCard project={project} />)}
   </section>
 </BaseLayout>
