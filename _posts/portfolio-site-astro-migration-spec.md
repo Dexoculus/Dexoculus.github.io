@@ -1,8 +1,6 @@
 ---
 title: "Development Note: Astro Migration and Site Specification"
 tags: [Astro, GitHub Pages]
-style: fill
-color: info
 description: "A development note documenting the Astro migration, GitHub Pages deployment model, content structure, design direction, and lightweight rendering support for this portfolio site."
 external_url:
 ---
@@ -50,7 +48,6 @@ _data/
 
 _posts/
   note-title.md
-  YYYY-MM-DD-note-title.md  # optional date-prefix format
 
 _projects/
   (NN) Project Name.md
@@ -189,7 +186,6 @@ To add a note, create a Markdown file in `_posts/` with a descriptive filename a
 title: "Note title"
 tags: [Robotics, AI]
 description: "A concise summary."
-date: 2026-06-06
 image: /assets/images/notes/preview.jpg
 # video: /assets/video/note-preview.mp4
 # media: https://github.com/user-attachments/assets/...
@@ -198,7 +194,7 @@ external_url:
 ---
 ```
 
-The `date` field is optional. Existing `YYYY-MM-DD-note-title.md` filenames remain supported as a date fallback, but the visible title never needs to contain a date. The legacy `style` and `color` fields are not used by the Astro design system.
+Use descriptive filenames without date prefixes. Notes are sorted by title, and dates are not displayed or emitted as post metadata.
 
 The `image`, `video`, `media`, and `media_type` fields are optional. When one is supplied, Notes cards use it as a project-style preview. Without an explicit preview, the first Markdown image, HTML image or video, or GitHub user-attachment link in the note body is detected automatically. Explicit frontmatter always takes priority.
 

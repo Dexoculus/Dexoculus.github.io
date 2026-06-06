@@ -1,8 +1,6 @@
 ---
 title: AI worker physical ai tools setup
 tags: [Robotis, AI worker, Physical AI tools, Robotics]
-style: fill
-color: primary
 description: A Setup guide for physical ai tools.
 external_url: 
 ---

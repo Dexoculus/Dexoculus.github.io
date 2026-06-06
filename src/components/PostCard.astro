@@ -1,5 +1,5 @@
 ---
-import { formatDate, type Post } from "@/lib/content";
+import type { Post } from "@/lib/content";
 import ProjectMedia from "@/components/ProjectMedia.astro";
 
 type Props = {
@@ -9,7 +9,7 @@ type Props = {
 const { post } = Astro.props;
 const href = post.externalUrl || `/blog/${post.slug}/`;
 const isExternal = Boolean(post.externalUrl);
-const metadata = [post.date ? formatDate(post.date) : "", `${post.readingMinutes} min read`].filter(Boolean).join(" / ");
+const metadata = `${post.readingMinutes} min read`;
 ---
 
 <article class="note-card" data-note-card data-tags={post.tags.map((tag) => tag.toLowerCase()).join("|")} data-search={`${post.title} ${post.description} ${post.tags.join(" ")}`.toLowerCase()}>

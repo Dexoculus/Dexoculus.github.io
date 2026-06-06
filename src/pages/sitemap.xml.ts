@@ -1,16 +1,10 @@
-import { posts } from "@/lib/content";
 import { absoluteUrl, escapeXml, sitePages } from "@/lib/seo";
 
 export function GET() {
-  const postDates = new Map(posts.map((post) => [`/blog/${post.slug}/`, post.date]));
-
   const urls = sitePages()
     .map((path) => {
-      const lastmod = postDates.get(path)?.toISOString();
-
       return `<url>
-  <loc>${escapeXml(absoluteUrl(path))}</loc>${lastmod ? `
-  <lastmod>${escapeXml(lastmod)}</lastmod>` : ""}
+  <loc>${escapeXml(absoluteUrl(path))}</loc>
 </url>`;
     })
     .join("\n");

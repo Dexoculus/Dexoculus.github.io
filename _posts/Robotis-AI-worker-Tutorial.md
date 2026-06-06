@@ -1,8 +1,6 @@
 ---
 title: Robotis AI Worker Tutorial
 tags: [Robotis, AI worker, Robotics]
-style: fill
-color: primary
 description: A Instruction of Setup and launch Robotis AI worker.
 external_url: 
 ---

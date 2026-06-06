@@ -1,8 +1,6 @@
 ---
 title: "LeRobot Setup Guide"
 tags: [Huggingface, LeRobot, Setup]
-style: fill
-color: primary
 description: "A step-by-step setup guide for Hugging Face LeRobot, including CUDA-enabled PyTorch installation using uv."
 external_url:
 ---

@@ -1,8 +1,6 @@
 ---
 title: TODO List When install Ubuntu 24.04
 tags: [Linux, Ubuntu]
-style: fill
-color: primary
 description: List of what I need to setup when install Ubuntu 24.04.
 external_url: 
 ---

@@ -1,8 +1,6 @@
 ---
 title: Guide for deploy policy on AI worker platoform
 tags: [Robotis, AI worker, Physical AI tools, Robotics]
-style: fill
-color: info
 description: A guide for deploy policy on AI worker platoform.
 external_url: 
 ---

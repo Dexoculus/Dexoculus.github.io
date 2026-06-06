@@ -1672,6 +1672,20 @@ main {
   line-height: 1.78;
 }
 
+.markdown-panel img {
+  display: block;
+  width: auto;
+  max-width: 100%;
+  height: auto;
+  max-height: min(78vh, 920px);
+  margin: 1.5rem auto;
+  object-fit: contain;
+}
+
+.markdown-panel p > img:only-child {
+  margin-inline: auto;
+}
+
 .markdown-panel a {
   border-bottom: 2px solid var(--core-gold);
   font-weight: 800;

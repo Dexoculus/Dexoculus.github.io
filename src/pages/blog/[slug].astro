@@ -2,7 +2,7 @@
 import BaseLayout from "@/layouts/BaseLayout.astro";
 import ArticleToc from "@/components/ArticleToc.astro";
 import CodeCopyRuntime from "@/components/CodeCopyRuntime.astro";
-import { formatDate, posts } from "@/lib/content";
+import { posts } from "@/lib/content";
 import { absoluteUrl } from "@/lib/seo";
 
 export function getStaticPaths() {
@@ -21,7 +21,6 @@ const articleJsonLd = {
   "@type": "BlogPosting",
   headline: post.title,
   description: post.description,
-  datePublished: post.date?.toISOString(),
   author: {
     "@type": "Person",
     name: "Hyeonbin Han",
@@ -35,7 +34,7 @@ const articleJsonLd = {
   {MathStyles && <MathStyles slot="head" />}
   <article class="shell article-layout">
     <header class="article-header">
-      <p class="section-kicker">{post.date ? `${formatDate(post.date)} / ` : ""}{post.readingMinutes} min read</p>
+      <p class="section-kicker">{post.readingMinutes} min read</p>
       <h1>{post.title}</h1>
       <p>{post.description}</p>
       <div class="tag-row large">

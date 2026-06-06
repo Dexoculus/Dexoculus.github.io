@@ -65,7 +65,6 @@ export type Post = {
   description: string;
   externalUrl?: string;
   slug: string;
-  date?: Date;
   headings: Heading[];
   readingMinutes: number;
   richFeatures: RichFeatures;
@@ -100,20 +99,6 @@ function asStringArray(value: unknown) {
   }
 
   return [];
-}
-
-function asDate(value: unknown) {
-  if (value instanceof Date) {
-    return Number.isNaN(value.getTime()) ? undefined : value;
-  }
-
-  if (typeof value !== "string" && typeof value !== "number") return undefined;
-
-  const source = typeof value === "string" && /^\d{4}-\d{2}-\d{2}$/.test(value.trim())
-    ? `${value.trim()}T00:00:00`
-    : value;
-  const date = new Date(source);
-  return Number.isNaN(date.getTime()) ? undefined : date;
 }
 
 function normalizeMediaType(value: unknown): ProjectMediaType | undefined {
@@ -377,9 +362,6 @@ export const posts: Post[] = Object.entries(postModules)
   .filter(([path]) => fileBase(path).toLowerCase() !== "templete")
   .map(([path, module]) => {
     const base = fileBase(path);
-    const dateMatch = base.match(/^(\d{4})-(\d{2})-(\d{2})-(.+)$/);
-    const filenameDate = dateMatch ? new Date(`${dateMatch[1]}-${dateMatch[2]}-${dateMatch[3]}T00:00:00`) : undefined;
-    const date = asDate(module.frontmatter.date) ?? filenameDate;
     const title = asString(module.frontmatter.title, base);
     const externalUrl = asString(module.frontmatter.external_url) || undefined;
     const source = module.rawContent?.() ?? "";
@@ -393,34 +375,23 @@ export const posts: Post[] = Object.entries(postModules)
       : normalizeMediaType(module.frontmatter.media_type) || detectedMedia?.type || inferMediaType(mediaUrl);
 
     return {
-      title,
-      tags: asStringArray(module.frontmatter.tags),
-      image,
-      video,
-      mediaUrl,
-      mediaType,
-      description: asString(module.frontmatter.description, "Technical note"),
-      externalUrl,
-      slug: slugify(dateMatch ? dateMatch[4] : title),
-      date,
-      headings: module.getHeadings?.().filter((heading) => heading.depth >= 2 && heading.depth <= 3) ?? [],
-      readingMinutes: readingMinutes(source),
-      richFeatures: detectRichFeatures(source),
-      Content: module.Content
+      order: base,
+      post: {
+        title,
+        tags: asStringArray(module.frontmatter.tags),
+        image,
+        video,
+        mediaUrl,
+        mediaType,
+        description: asString(module.frontmatter.description, "Technical note"),
+        externalUrl,
+        slug: slugify(base),
+        headings: module.getHeadings?.().filter((heading) => heading.depth >= 2 && heading.depth <= 3) ?? [],
+        readingMinutes: readingMinutes(source),
+        richFeatures: detectRichFeatures(source),
+        Content: module.Content
+      }
     };
   })
-  .sort((a, b) => {
-    const aTime = a.date?.getTime() ?? 0;
-    const bTime = b.date?.getTime() ?? 0;
-    return bTime - aTime || a.title.localeCompare(b.title);
-  });
-
-export function formatDate(date?: Date) {
-  if (!date) return "";
-
-  return new Intl.DateTimeFormat("en", {
-    year: "numeric",
-    month: "short",
-    day: "numeric"
-  }).format(date);
-}
+  .sort((a, b) => a.post.title.localeCompare(b.post.title) || a.order.localeCompare(b.order))
+  .map(({ post }) => post);

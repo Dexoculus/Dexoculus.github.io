@@ -5,7 +5,7 @@ import ProjectCard from "@/components/ProjectCard.astro";
 import { posts, profile, projects } from "@/lib/content";
 
 const featuredProjects = projects.slice(0, 3);
-const recentPosts = posts.slice(0, 3);
+const featuredPosts = posts.slice(0, 3);
 ---
 
 <BaseLayout
@@ -91,7 +91,7 @@ const recentPosts = posts.slice(0, 3);
       <a class="button text" href="/blog/">All notes</a>
     </div>
     <div class="note-grid home-feature-grid">
-      {recentPosts.map((post) => <PostCard post={post} />)}
+      {featuredPosts.map((post) => <PostCard post={post} />)}
     </div>
   </section>
 </BaseLayout>
