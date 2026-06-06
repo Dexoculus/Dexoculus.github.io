@@ -1,6 +1,8 @@
 ---
 title: "Development Note: Astro Migration and Site Specification"
-tags: [Site, Astro, GitHub Pages, Portfolio]
+tags: [Astro, GitHub Pages]
+style: fill
+color: info
 description: "A development note documenting the Astro migration, GitHub Pages deployment model, content structure, design direction, and lightweight rendering support for this portfolio site."
 external_url:
 ---
