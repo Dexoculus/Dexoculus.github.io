@@ -1,0 +1,75 @@
+---
+type TagCount = {
+  tag: string;
+  count: number;
+  id?: string;
+};
+
+type Props = {
+  tags: TagCount[];
+  total: number;
+  visibleCount?: number;
+  listId: string;
+};
+
+const { tags, total, visibleCount = 5, listId } = Astro.props;
+const rankedTags = [...tags].sort((a, b) => b.count - a.count || a.tag.localeCompare(b.tag));
+const primaryTags = rankedTags.slice(0, visibleCount);
+const overflowTags = rankedTags.slice(visibleCount);
+---
+
+<div class="tag-filter-disclosure" data-tag-disclosure data-expanded="false">
+  <div class="tag-filter-list" id={listId}>
+    <button class="active" type="button" data-tag-filter="all" aria-pressed="true">
+      All <span>{total}</span>
+    </button>
+    {
+      primaryTags.map(({ tag, id, count }) => (
+        <button type="button" data-tag-filter={tag.toLowerCase()} data-tag-id={id} aria-pressed="false">
+          {tag} <span>{count}</span>
+        </button>
+      ))
+    }
+    {
+      overflowTags.map(({ tag, id, count }) => (
+        <button class="tag-filter-overflow" type="button" data-tag-filter={tag.toLowerCase()} data-tag-id={id} aria-pressed="false">
+          {tag} <span>{count}</span>
+        </button>
+      ))
+    }
+    {
+      overflowTags.length > 0 && (
+        <button
+          class="tag-filter-toggle"
+          type="button"
+          aria-controls={listId}
+          aria-expanded="false"
+          data-tag-toggle
+        >
+          <span class="tag-toggle-collapsed">More tags</span>
+          <span class="tag-toggle-expanded">Fewer tags</span>
+          <strong>{overflowTags.length}</strong>
+        </button>
+      )
+    }
+  </div>
+</div>
+
+<script>
+  function bindTagDisclosures() {
+    document.querySelectorAll<HTMLElement>("[data-tag-disclosure]:not([data-disclosure-bound])").forEach((disclosure) => {
+      disclosure.dataset.disclosureBound = "true";
+      const toggle = disclosure.querySelector<HTMLButtonElement>("[data-tag-toggle]");
+      if (!toggle) return;
+
+      toggle.addEventListener("click", () => {
+        const isExpanded = disclosure.dataset.expanded === "true";
+        disclosure.dataset.expanded = String(!isExpanded);
+        toggle.setAttribute("aria-expanded", String(!isExpanded));
+      });
+    });
+  }
+
+  bindTagDisclosures();
+  document.addEventListener("astro:page-load", bindTagDisclosures);
+</script>

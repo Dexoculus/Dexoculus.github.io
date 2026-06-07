@@ -170,7 +170,10 @@ The site follows a static-first optimization policy:
 - no chart library dependency in `package.json`;
 - rich renderers are included only when matching Markdown blocks are detected;
 - charts use SVG output;
-- images are lazy-loaded in project cards;
+- project images use WebP and are lazy-loaded in cards;
+- archive cards use `content-visibility` where supported so off-screen cards can skip rendering;
+- repeated cards and reading panels avoid `backdrop-filter` to keep scrolling on the compositor path;
+- card videos keep their poster unloaded from the video source until desktop hover, while detail pages retain controls and metadata preload;
 - the build output is static and suitable for GitHub Pages.
 
 At the time of this note, the regular build completes in roughly one second locally, and the default `_astro` output contains only the shared CSS asset unless a page explicitly requires a rich renderer.

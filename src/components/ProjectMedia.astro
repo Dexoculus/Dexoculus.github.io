@@ -13,6 +13,7 @@ const mediaUrl = project.mediaUrl || project.image;
 const isVideo = project.mediaType === "video";
 const canVideoFallback = Boolean(mediaUrl && !isVideo && mediaUrl.includes("github.com/user-attachments/assets/"));
 const poster = isVideo ? project.image : undefined;
+const previewSrc = !large && isVideo ? mediaUrl : undefined;
 ---
 
 <div class:list={["project-media", { large }]}>
@@ -20,14 +21,16 @@ const poster = isVideo ? project.image : undefined;
     mediaUrl ? (
       isVideo ? (
         <video
-          src={mediaUrl}
+          src={large ? mediaUrl : undefined}
+          data-preview-src={previewSrc}
+          data-video-autoplay=""
+          data-video-preview={!large ? "" : undefined}
           aria-label={`${mediaLabel} video preview`}
-          autoplay={!large}
           controls={large}
           loop
           muted
           playsinline
-          preload="metadata"
+          preload={large ? "metadata" : "none"}
           poster={poster}
         />
       ) : (
@@ -37,15 +40,16 @@ const poster = isVideo ? project.image : undefined;
             canVideoFallback && (
               <video
                 class="project-media-fallback"
-                src={mediaUrl}
+                data-preview-src={mediaUrl}
+                data-video-autoplay=""
+                data-video-preview=""
                 aria-label={`${mediaLabel} video preview`}
-                autoplay={!large}
                 controls={large}
                 hidden
                 loop
                 muted
                 playsinline
-                preload="metadata"
+                preload="none"
                 poster={project.image}
               />
             )
@@ -60,6 +64,83 @@ const poster = isVideo ? project.image : undefined;
 </div>
 
 <script>
+  const visibleVideos = new WeakSet<HTMLVideoElement>();
+  let videoObserver: IntersectionObserver | undefined;
+
+  function hydratePreview(video: HTMLVideoElement) {
+    if (video.src || !video.dataset.previewSrc) return;
+    video.src = video.dataset.previewSrc;
+    video.load();
+  }
+
+  function canAutoPlayVideo() {
+    const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    const connection = (navigator as Navigator & { connection?: { saveData?: boolean } }).connection;
+    return !reduceMotion && !connection?.saveData;
+  }
+
+  function playVideo(video: HTMLVideoElement) {
+    if (video.hidden || document.hidden) return;
+    hydratePreview(video);
+    video.play().catch(() => undefined);
+  }
+
+  function pauseVideo(video: HTMLVideoElement) {
+    video.pause();
+  }
+
+  function syncVisibleVideo(video: HTMLVideoElement) {
+    if (visibleVideos.has(video)) {
+      playVideo(video);
+    } else {
+      pauseVideo(video);
+    }
+  }
+
+  function isInViewport(video: HTMLVideoElement) {
+    const rect = video.getBoundingClientRect();
+    const viewportHeight = window.innerHeight || document.documentElement.clientHeight;
+    const viewportWidth = window.innerWidth || document.documentElement.clientWidth;
+    return rect.width > 0 && rect.height > 0 && rect.bottom > 0 && rect.right > 0 && rect.top < viewportHeight && rect.left < viewportWidth;
+  }
+
+  function getVideoObserver() {
+    if (videoObserver) return videoObserver;
+    videoObserver = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          const video = entry.target;
+          if (!(video instanceof HTMLVideoElement)) return;
+          if (entry.isIntersecting && entry.intersectionRatio >= 0.18) {
+            visibleVideos.add(video);
+          } else {
+            visibleVideos.delete(video);
+          }
+          syncVisibleVideo(video);
+        });
+      },
+      {
+        rootMargin: "0px",
+        threshold: [0, 0.18, 0.55],
+      }
+    );
+    return videoObserver;
+  }
+
+  function observeVideo(video: HTMLVideoElement) {
+    if (video.dataset.autoplayBound === "true") return;
+    video.dataset.autoplayBound = "true";
+
+    if (!canAutoPlayVideo()) return;
+    if (!("IntersectionObserver" in window)) {
+      hydratePreview(video);
+      playVideo(video);
+      return;
+    }
+
+    getVideoObserver().observe(video);
+  }
+
   function bindProjectMediaFallbacks() {
     document.querySelectorAll<HTMLImageElement>("img[data-video-fallback]:not([data-fallback-bound])").forEach((image) => {
       image.dataset.fallbackBound = "true";
@@ -70,13 +151,33 @@ const poster = isVideo ? project.image : undefined;
           if (!(fallback instanceof HTMLVideoElement)) return;
           image.hidden = true;
           fallback.hidden = false;
-          fallback.play().catch(() => undefined);
+          hydratePreview(fallback);
+          observeVideo(fallback);
+          if (isInViewport(fallback)) {
+            visibleVideos.add(fallback);
+          }
+          syncVisibleVideo(fallback);
         },
         { once: true }
       );
     });
   }
 
+  function bindVideoPreviews() {
+    document.querySelectorAll<HTMLVideoElement>("video[data-video-autoplay]").forEach((video) => {
+      observeVideo(video);
+    });
+  }
+
   bindProjectMediaFallbacks();
-  document.addEventListener("astro:page-load", bindProjectMediaFallbacks);
+  bindVideoPreviews();
+  document.addEventListener("visibilitychange", () => {
+    document.querySelectorAll<HTMLVideoElement>("video[data-video-autoplay]").forEach((video) => {
+      syncVisibleVideo(video);
+    });
+  });
+  document.addEventListener("astro:page-load", () => {
+    bindProjectMediaFallbacks();
+    bindVideoPreviews();
+  });
 </script>

@@ -1,5 +1,6 @@
 ---
 import PostCard from "@/components/PostCard.astro";
+import TagFilterList from "@/components/TagFilterList.astro";
 import BaseLayout from "@/layouts/BaseLayout.astro";
 import { posts } from "@/lib/content";
 
@@ -26,10 +27,7 @@ const tagCounts = tags.map((tag) => ({
       </div>
       <span id="tag-filter-count">{posts.length} notes</span>
     </div>
-    <div class="tag-filter-list">
-      <button class="active" type="button" data-tag-filter="all" aria-pressed="true">All <span>{posts.length}</span></button>
-      {tagCounts.map(({ tag, id, count }) => <button type="button" data-tag-filter={tag.toLowerCase()} data-tag-id={id} aria-pressed="false">{tag} <span>{count}</span></button>)}
-    </div>
+    <TagFilterList tags={tagCounts} total={posts.length} listId="archive-tag-filter" />
   </section>
 
   <section class="shell note-grid archive tag-filter-results">
