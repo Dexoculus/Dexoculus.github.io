@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="Hyeonbin Han mark">
+  <rect width="64" height="64" rx="12" fill="#111111"/>
+  <path d="M12 0h6L0 18v-6L12 0Zm14 0h4L0 30v-4L26 0Zm14 0h4L0 44v-4L40 0Z" fill="#ffef01" opacity=".12"/>
+  <circle cx="32" cy="32" r="23" fill="none" stroke="#ffef01" stroke-width="1.5" opacity=".72"/>
+  <circle cx="32" cy="32" r="17" fill="none" stroke="#00d6fa" stroke-width="1.5" stroke-dasharray="3 4" opacity=".68"/>
+  <circle cx="32" cy="32" r="9" fill="#ffef01"/>
+  <circle cx="35" cy="29" r="3" fill="#fdfdfd" opacity=".36"/>
+</svg>
