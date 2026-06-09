@@ -7,7 +7,7 @@ external_url:
 
 # Training guide for Physical AI tools
 
-We suppose that you already setup Physical AI tools on Ubuntu 24.04. If not, please refer to [Setup guide for Physical AI tools](/blog/ai-worker-physical-ai-tools-setup/).
+We suppose that you already setup Physical AI tools on Ubuntu 24.04. If not, please refer to [Setup guide for Physical AI tools](./AI-worker-physical-ai-tools-setup.md).
 
 ## Enter the docker container
 In `physical-ai-tools` directory, run the following command to enter the docker container:
