@@ -20,3 +20,8 @@ Install Nvidia drivers
 sudo ubuntu-drivers install
 ```
 
+Install UV
+```bash
+curl -LsSf https://astral.sh/uv/install.sh | sh
+```
+

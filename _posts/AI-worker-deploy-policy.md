@@ -6,10 +6,10 @@ external_url:
 ---
 
 # Guide for deploy policy on AI worker platoform
-
+We suppose that you already setup Physical AI tools on Ubuntu 24.04. If not, please refer to [Setup guide for Physical AI tools](./_posts/AI-worker-physical-ai-tools-setup.md).
 
 ## Put trained Policy into AI worker PC (UPC)
-Copy your trained policy from your PC to `~/physical_ai_tools/lerobot/outputs/train/` directory in AI worker PC.
+Copy your trained policy from your PC to `~/physical_ai_tools/lerobot/outputs/train/` directory in AI worker UPC.
 
 (If you don't have permission to write to the UPC folder, apply the following command to the folder)
 ```bash
