@@ -12,7 +12,7 @@ type Props = {
 };
 
 const {
-  title = "Dexter Oculus",
+  title = "Hyeonbin Han",
   description = "Portfolio and technical notes for Hyeonbin Han.",
   image = "https://avatars.githubusercontent.com/u/34956179?v=4",
   type = "website",
@@ -42,11 +42,12 @@ function isActive(href: string) {
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="color-scheme" content="light dark" />
     <meta name="description" content={description} />
-    <meta name="theme-color" content="#111111" />
+    <meta name="theme-color" content="#111111" media="(prefers-color-scheme: dark)" />
+    <meta name="theme-color" content="#fdfdfd" media="(prefers-color-scheme: light)" />
     <meta name="robots" content="index, follow" />
     <link rel="canonical" href={canonical} />
-    <link rel="alternate" type="application/rss+xml" title="Dexter Oculus Notes" href={absoluteUrl("/rss.xml")} />
-    <meta property="og:site_name" content="Dexter Oculus" />
+    <link rel="alternate" type="application/rss+xml" title="Hyeonbin Han Notes" href={absoluteUrl("/rss.xml")} />
+    <meta property="og:site_name" content="Hyeonbin Han" />
     <meta property="og:type" content={type} />
     <meta property="og:title" content={title} />
     <meta property="og:description" content={description} />
@@ -57,7 +58,9 @@ function isActive(href: string) {
     <meta name="twitter:description" content={description} />
     <meta name="twitter:image" content={image} />
     <title>{title}</title>
-    <link rel="icon" href="/favicon.ico" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="icon" href="/favicon.ico" sizes="any" />
+    <link rel="manifest" href="/site.webmanifest" />
     <slot name="head" />
     <script type="application/ld+json" set:html={JSON.stringify(structuredData)} />
     <script is:inline>
@@ -94,11 +97,11 @@ function isActive(href: string) {
   <body>
     <TopoBackground />
     <header class="topbar">
-      <a class="brand-lockup" href="/" aria-label="Dexter Oculus home">
+      <a class="brand-lockup" href="/" aria-label="Hyeonbin Han home">
         <span class="brand-orbit"></span>
         <span>
-          <strong>Dexter Oculus</strong>
-          <small>robotics / vision / data</small>
+          <strong>Hyeonbin Han</strong>
+          <small>dexoculus / robotics / vision / data</small>
         </span>
       </a>
       <nav class="nav" aria-label="Primary navigation">
@@ -120,8 +123,8 @@ function isActive(href: string) {
       <slot />
     </main>
     <footer class="footer shell">
-      <span>DEXTER OCULUS</span>
-      <span>Astro static portfolio / GitHub Pages / guideline-aligned UI</span>
+      <span>HYEONBIN HAN</span>
+      <span>DEXOCULUS / Astro static portfolio / GitHub Pages</span>
     </footer>
     <slot name="runtimes" />
     <script is:inline>

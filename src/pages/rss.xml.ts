@@ -18,7 +18,7 @@ export function GET() {
   const xml = `<?xml version="1.0" encoding="UTF-8"?>
 <rss version="2.0">
 <channel>
-  <title>Dexter Oculus Notes</title>
+  <title>Hyeonbin Han Notes</title>
   <link>${escapeXml(siteUrl)}</link>
   <description>Technical notes, research logs, and case reports by Hyeonbin Han.</description>
   <language>en</language>

@@ -232,7 +232,7 @@ const projectModules = import.meta.glob<MarkdownModule>("../../_projects/*.md", 
 const postModules = import.meta.glob<MarkdownModule>("../../_posts/*.md", { eager: true });
 
 export const profile = {
-  siteTitle: "Dexter Oculus",
+  siteTitle: "Hyeonbin Han",
   name: "Hyeonbin Han",
   handle: "Dexoculus",
   role: "Undergraduate researcher in Mathematical Data Science",
