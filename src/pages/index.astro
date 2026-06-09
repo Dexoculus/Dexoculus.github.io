@@ -31,7 +31,7 @@ const featuredPosts = posts.slice(0, 3);
       </p>
       <div class="hero-actions">
         <a class="button primary" href="/projects/">Explore projects</a>
-        <a class="button secondary" href="/blog/">Read notes</a>
+        <a class="button secondary" href="/note/">Read notes</a>
       </div>
       <dl class="signal-grid">
         <div>
@@ -59,7 +59,7 @@ const featuredPosts = posts.slice(0, 3);
           <strong>Projects</strong>
           <small>Robotics, vision, ML, and deployed systems</small>
         </a>
-        <a href="/blog/">
+        <a href="/note/">
           <span>02</span>
           <strong>Notes</strong>
           <small>Research logs, case reports, and implementation guides</small>
@@ -97,7 +97,7 @@ const featuredPosts = posts.slice(0, 3);
         <p class="section-kicker">WRITING</p>
         <h2>Notes</h2>
       </div>
-      <a class="button text" href="/blog/">All notes</a>
+      <a class="button text" href="/note/">All notes</a>
     </div>
     <div class="note-grid home-feature-grid">
       {featuredPosts.map((post) => <PostCard post={post} />)}

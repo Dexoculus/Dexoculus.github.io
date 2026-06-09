@@ -16,9 +16,9 @@ export function escapeXml(value: unknown) {
 }
 
 export function sitePages() {
-  const staticPages = ["/", "/about/", "/projects/", "/blog/", "/blog/tags/"];
+  const staticPages = ["/", "/about/", "/projects/", "/note/", "/note/tags/"];
   const projectPages = projects.map((project) => `/projects/${project.slug}/`);
-  const postPages = posts.map((post) => `/blog/${post.slug}/`);
+  const postPages = posts.map((post) => `/note/${post.slug}/`);
 
   return [...staticPages, ...projectPages, ...postPages];
 }

@@ -4,7 +4,7 @@ import { absoluteUrl, escapeXml, siteUrl } from "@/lib/seo";
 export function GET() {
   const items = posts
     .map((post) => {
-      const url = absoluteUrl(`/blog/${post.slug}/`);
+      const url = absoluteUrl(`/note/${post.slug}/`);
 
       return `<item>
   <title>${escapeXml(post.title)}</title>

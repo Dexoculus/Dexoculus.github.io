@@ -7,7 +7,7 @@ export function GET() {
         title: post.title,
         tags: post.tags,
         description: post.description,
-        url: post.externalUrl || `/blog/${post.slug}/`
+        url: post.externalUrl || `/note/${post.slug}/`
       }))
     ),
     {

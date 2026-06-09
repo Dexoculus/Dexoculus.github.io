@@ -31,7 +31,7 @@ const tagCounts = postsByTag.map(({ tag, posts }) => ({ tag, count: posts.length
         <p class="section-kicker">FILTER</p>
         <h2>Tags</h2>
       </div>
-      <a class="button text" href="/blog/tags/">Tag archive</a>
+      <a class="button text" href="/note/tags/">Tag archive</a>
     </div>
     <TagFilterList tags={tagCounts} total={posts.length} listId="notes-tag-filter" />
   </section>

@@ -7,7 +7,7 @@ type Props = {
 };
 
 const { post } = Astro.props;
-const href = post.externalUrl || `/blog/${post.slug}/`;
+const href = post.externalUrl || `/note/${post.slug}/`;
 const isExternal = Boolean(post.externalUrl);
 const metadata = `${post.readingMinutes} min read`;
 ---
