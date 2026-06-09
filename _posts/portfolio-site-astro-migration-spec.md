@@ -122,10 +122,33 @@ const x = np.linspace(0, 10, 120)
 plt.title("Training loss")
 plt.xlabel("epoch")
 plt.ylabel("loss")
+plt.cmap("scalar")
+plt.colorbar({ label: "loss", min: 0, max: 1 })
 plt.plot(x, x.map((v) => Math.exp(-v / 3)), { label: "train" })
-plt.scatter([1, 3, 5, 7], [0.8, 0.42, 0.22, 0.12], { label: "checkpoints" })
+plt.scatter([1, 3, 5, 7], [0.8, 0.42, 0.22, 0.12], {
+  label: "checkpoints",
+  colorBy: "y"
+})
 ```
 ````
+
+The same example is rendered below as a live runtime check:
+
+```plot
+const epochs = np.arange(1, 9)
+const loss = [0.92, 0.71, 0.54, 0.39, 0.28, 0.2, 0.15, 0.11]
+
+plt.title("Training loss")
+plt.xlabel("epoch")
+plt.ylabel("loss")
+plt.cmap("scalar")
+plt.colorbar({ label: "loss", min: 0, max: 1 })
+plt.plot(epochs, loss, { label: "train" })
+plt.scatter(epochs, loss, {
+  label: "checkpoints",
+  colorBy: "y"
+})
+```
 
 Supported chart types include:
 
@@ -136,6 +159,14 @@ Supported chart types include:
 - box plots;
 - function plots;
 - slider-driven parameterized function plots.
+
+The plot runtime also exposes the portfolio color system as built-in helpers:
+
+- `plt.cmap("scalar" | "signed" | "risk" | "signal")` selects a numeric map;
+- `colorBy: "x"`, `colorBy: "y"`, or a numeric array maps individual bars, points, or box groups;
+- `plt.colorbar({ label, min, max })` controls the responsive SVG colorbar;
+- `plt.colors("series", count)` returns categorical trace colors;
+- `plt.color(value, options)` and `plt.get_cmap(name)` support manual color assignment.
 
 The `plot` block executes a small JavaScript DSL in the browser. It is intended for trusted first-party notes written by the site owner.
 

@@ -1,46 +1,110 @@
 :root {
   color-scheme: light dark;
-  --decagram-white: #fefefe;
-  --decagram-field: #fdfdfd;
-  --decagram-soft-line: #e1e2e4;
-  --decagram-pale-yellow: #fbef73;
-  --decagram-core-gold: #febb0c;
+
+  /* Endfield: operational UI, navigation, focus, and semantic states. */
   --endfield-black: #111111;
-  --endfield-deep: #08080a;
+  --endfield-white: #fdfdfd;
   --endfield-panel: #1c1c1c;
   --endfield-panel-2: #272727;
+  --endfield-panel-3: #505050;
+  --endfield-gray: #66656b;
+  --endfield-gray-light: #909090;
+  --endfield-line: #e1e2e4;
+  --endfield-red-deep: #920008;
+  --endfield-red-dark: #9b1b1c;
+  --endfield-red: #e42525;
+  --endfield-red-light: #ff5b5b;
+  --endfield-red-soft: #fe8080;
+  --endfield-orange: #ff7000;
   --endfield-yellow: #ffef01;
+  --endfield-gold-1: #ffba03;
+  --endfield-gold-2: #f7be1e;
+  --endfield-gold-3: #ffcb00;
+  --endfield-gold-4: #ffd600;
+  --endfield-green: #99f120;
+  --endfield-blue-1: #309afd;
+  --endfield-blue-2: #15a8d7;
+  --endfield-blue-3: #19cdfa;
+  --endfield-purple: #9e8af9;
+
+  /* Blue Archive: signal routes, halo traces, and rare state accents. */
+  --archive-dark-gray: #2b2b2b;
+  --archive-gray: #808080;
+  --archive-red-deep: #920008;
+  --archive-red: #ff0000;
+  --archive-red-dark: #c71c14;
+  --archive-flame: #f14400;
+  --archive-pink-1: #eb5691;
+  --archive-pink-2: #f765ba;
+  --archive-pink-3: #ff95c8;
+  --archive-pink-4: #ffafe3;
+  --archive-pink-5: #f1b6cf;
+  --archive-pink-6: #f3bad2;
+  --archive-orange: #df8600;
+  --archive-yellow-1: #ffee00;
+  --archive-yellow-2: #ffff00;
+  --archive-yellow-3: #f4e84a;
+  --archive-yellow-4: #f2e54b;
+  --archive-yellow-5: #fdf065;
+  --archive-gold-1: #febb0c;
+  --archive-gold-2: #f9cb23;
+  --archive-gold-3: #f0c80f;
+  --archive-gold-4: #fbdc48;
+  --archive-green-1: #3fc948;
+  --archive-green-2: #cdf67b;
+  --archive-blue-deep: #2a425b;
+  --archive-blue-1: #1288f8;
+  --archive-blue-2: #0085da;
+  --archive-blue-3: #00d6fa;
+  --archive-blue-4: #7cd0ff;
+
+  /* Decagramaton: clean information fields and warm sacred-system accents. */
+  --decagram-black: #08080a;
+  --decagram-white: #fefefe;
+  --decagram-yellow-1: #ffff17;
+  --decagram-yellow-2: #fff14f;
+  --decagram-yellow-3: #fbf273;
+  --decagram-yellow-4: #f7f5ad;
+  --decagram-yellow-5: #ffffc7;
+  --decagram-gold-1: #fabe34;
+  --decagram-gold-2: #ffd40d;
+  --decagram-orange-1: #ef8c38;
+  --decagram-orange-2: #eec16c;
+
   --black: var(--endfield-black);
-  --black-deep: var(--endfield-deep);
-  --white: var(--decagram-field);
+  --black-deep: var(--decagram-black);
+  --white: var(--endfield-white);
   --white-pure: var(--decagram-white);
-  --gray-950: #1c1c1c;
-  --gray-900: #272727;
-  --gray-700: #505050;
-  --gray-600: #66656b;
-  --gray-500: #808080;
-  --gray-400: #909090;
-  --gray-100: var(--decagram-soft-line);
+  --gray-950: var(--endfield-panel);
+  --gray-900: var(--endfield-panel-2);
+  --gray-700: var(--endfield-panel-3);
+  --gray-600: var(--endfield-gray);
+  --gray-500: var(--archive-gray);
+  --gray-400: var(--endfield-gray-light);
+  --gray-100: var(--endfield-line);
   --focus: var(--endfield-yellow);
-  --focus-soft: var(--decagram-pale-yellow);
-  --core-gold: var(--decagram-core-gold);
-  --flame-orange: #f14400;
-  --surface-accent: var(--flame-orange);
-  --surface-accent-glow: rgba(241, 68, 0, 0.2);
-  --warn: #e42525;
-  --power: #ff7000;
-  --state: #1288f8;
-  --signal: #00d6fa;
+  --focus-soft: var(--decagram-yellow-3);
+  --core-gold: var(--decagram-gold-1);
+  --flame-orange: var(--archive-flame);
+  --information-orange: var(--decagram-orange-1);
+  --surface-accent: var(--information-orange);
+  --surface-accent-glow: rgba(239, 140, 56, 0.2);
+  --warn: var(--endfield-red);
+  --power: var(--endfield-orange);
+  --state: var(--archive-blue-1);
+  --signal: var(--archive-blue-3);
+  --positive: var(--endfield-green);
+  --rare: var(--endfield-purple);
   --text: var(--black);
-  --text-soft: #2f3337;
-  --text-muted: #72777d;
+  --text-soft: var(--endfield-panel-3);
+  --text-muted: var(--endfield-gray);
   --line: rgba(17, 17, 17, 0.12);
   --line-strong: rgba(17, 17, 17, 0.24);
   --surface: rgba(253, 253, 253, 0.88);
   --surface-strong: rgba(254, 254, 254, 0.96);
   --surface-dark: rgba(17, 17, 17, 0.94);
   --inverse-surface: rgba(17, 17, 17, 0.96);
-  --inverse-text: #fdfdfd;
+  --inverse-text: var(--endfield-white);
   --inverse-muted: rgba(253, 253, 253, 0.62);
   --inverse-line: rgba(253, 253, 253, 0.16);
   --inverse-accent: var(--focus);
@@ -57,19 +121,19 @@
 }
 
 :root[data-theme="dark"] {
-  --text: #f5f5f2;
-  --text-soft: #d5d7d2;
-  --text-muted: #a5a8ad;
+  --text: var(--decagram-white);
+  --text-soft: var(--endfield-line);
+  --text-muted: var(--endfield-gray-light);
   --line: rgba(253, 253, 253, 0.14);
   --line-strong: rgba(253, 253, 253, 0.28);
   --surface: rgba(28, 28, 28, 0.82);
   --surface-strong: rgba(39, 39, 39, 0.94);
   --surface-dark: rgba(8, 8, 10, 0.96);
   --inverse-surface: rgba(253, 253, 253, 0.96);
-  --inverse-text: #111111;
+  --inverse-text: var(--endfield-black);
   --inverse-muted: rgba(17, 17, 17, 0.62);
   --inverse-line: rgba(17, 17, 17, 0.16);
-  --inverse-accent: var(--flame-orange);
+  --inverse-accent: var(--information-orange);
   --inverse-chip: rgba(17, 17, 17, 0.06);
   --inverse-shadow: 0 20px 58px rgba(0, 0, 0, 0.44), 0 0 30px rgba(253, 253, 253, 0.1);
   --surface-accent: var(--focus);
@@ -100,7 +164,7 @@ body {
   background:
     radial-gradient(circle at 80% 14%, rgba(255, 239, 1, 0.1), transparent 24%),
     radial-gradient(circle at 14% 18%, rgba(0, 214, 250, 0.055), transparent 22%),
-    linear-gradient(135deg, var(--decagram-white) 0%, #eef2f5 46%, var(--decagram-field) 100%);
+    linear-gradient(135deg, var(--decagram-white) 0%, var(--endfield-line) 46%, var(--endfield-white) 100%);
   background-size: 100% 100%, 100% 100%, 100% 100%;
 }
 
@@ -108,7 +172,7 @@ body {
   background:
     radial-gradient(circle at 82% 12%, rgba(255, 239, 1, 0.08), transparent 25%),
     radial-gradient(circle at 14% 20%, rgba(0, 214, 250, 0.075), transparent 24%),
-    linear-gradient(135deg, var(--endfield-deep) 0%, #15171a 54%, #0e0f12 100%);
+    linear-gradient(135deg, var(--decagram-black) 0%, var(--endfield-panel) 54%, var(--endfield-black) 100%);
 }
 
 button,
@@ -287,7 +351,7 @@ img {
 }
 
 :root[data-theme="dark"] .tactical-map {
-  color: #fdfdfd;
+  color: var(--endfield-white);
   opacity: 0.92;
 }
 
@@ -355,7 +419,7 @@ img {
   min-height: 84px;
   margin: 8px auto 0;
   padding: 0 12px 0 16px;
-  color: #fdfdfd;
+  color: var(--endfield-white);
   background:
     linear-gradient(180deg, rgba(253, 253, 253, 0.055), transparent 42%),
     repeating-linear-gradient(135deg, rgba(253, 253, 253, 0.055) 0 1px, transparent 1px 7px) left center / 64px 100% no-repeat,
@@ -509,7 +573,7 @@ img {
 }
 
 .nav a:hover {
-  color: #fdfdfd;
+  color: var(--endfield-white);
   background: rgba(253, 253, 253, 0.06);
 }
 
@@ -555,7 +619,7 @@ img {
   gap: 8px;
   width: 106px;
   min-height: 48px;
-  color: #fdfdfd;
+  color: var(--endfield-white);
   background: rgba(253, 253, 253, 0.06);
   border: 1px solid rgba(253, 253, 253, 0.14);
   font-family: var(--font-mono);
@@ -831,7 +895,7 @@ main {
 }
 
 :root[data-theme="dark"] .inline-link:hover {
-  color: #fdfdfd;
+  color: var(--endfield-white);
 }
 
 .signal-grid {
@@ -1140,7 +1204,7 @@ main {
   position: relative;
   aspect-ratio: 16 / 10;
   overflow: hidden;
-  background: #18191d;
+  background: var(--endfield-panel);
 }
 
 .project-media img,
@@ -1186,7 +1250,7 @@ main {
   background:
     radial-gradient(circle at 50% 50%, rgba(255, 239, 1, 0.9) 0 5px, transparent 6px),
     repeating-radial-gradient(circle at 50% 50%, transparent 0 34px, rgba(0, 214, 250, 0.28) 35px 36px),
-    linear-gradient(135deg, #17181c, #2a2c31);
+    linear-gradient(135deg, var(--endfield-black), var(--endfield-panel-2));
 }
 
 .generated-project-art.large {
@@ -1721,8 +1785,8 @@ main {
 .markdown-panel pre {
   overflow-x: auto;
   padding: 18px;
-  color: #fdfdfd;
-  background: #111111;
+  color: var(--endfield-white);
+  background: var(--endfield-black);
   border: 1px solid rgba(255, 239, 1, 0.26);
   border-radius: var(--radius);
 }
@@ -1762,7 +1826,7 @@ main {
 }
 
 .code-copy-button[data-state="failed"] {
-  color: #fdfdfd;
+  color: var(--endfield-white);
   background: var(--warn);
   border-color: var(--warn);
 }
@@ -2528,17 +2592,17 @@ main {
 
 @media print {
   :root {
-    --text: #111111;
-    --text-soft: #2f3337;
-    --text-muted: #66656b;
-    --surface: #ffffff;
-    --surface-strong: #ffffff;
+    --text: var(--endfield-black);
+    --text-soft: var(--endfield-panel-3);
+    --text-muted: var(--endfield-gray);
+    --surface: var(--decagram-white);
+    --surface-strong: var(--decagram-white);
     --line: rgba(17, 17, 17, 0.18);
     --shadow: none;
   }
 
   body {
-    background: #ffffff !important;
+    background: var(--decagram-white) !important;
   }
 
   .topbar,
@@ -2562,8 +2626,8 @@ main {
   .info-panel,
   .dark-panel,
   .resume-item {
-    color: #111111;
-    background: #ffffff;
+    color: var(--endfield-black);
+    background: var(--decagram-white);
     border: 1px solid rgba(17, 17, 17, 0.18);
     box-shadow: none;
   }

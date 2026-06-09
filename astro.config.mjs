@@ -9,6 +9,10 @@ export default defineConfig({
   site: "https://page.dexoculus.com",
   trailingSlash: "always",
   markdown: {
+    syntaxHighlight: {
+      type: "shiki",
+      excludeLangs: ["plot", "chart", "mermaid", "three"]
+    },
     processor: unified({
       remarkPlugins: [remarkMath],
       rehypePlugins: [

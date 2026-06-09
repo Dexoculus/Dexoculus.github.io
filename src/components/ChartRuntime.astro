@@ -1,10 +1,34 @@
+---
+import {
+  visualizationColorMapAliases,
+  visualizationColorMaps,
+  visualizationSeries
+} from "@/lib/visualization-colors";
+
+const visualizationColorConfig = JSON.stringify({
+  aliases: visualizationColorMapAliases,
+  maps: visualizationColorMaps,
+  series: visualizationSeries
+}).replace(/</g, "\\u003c");
+---
+
+<script
+  id="visualization-color-config"
+  type="application/json"
+  set:html={visualizationColorConfig}
+></script>
+
 <script is:inline type="module">
   const chartBlocks = Array.from(
     document.querySelectorAll("pre > code.language-chart, pre > code.language-plot")
   );
 
   if (chartBlocks.length > 0) {
-    const palette = ["#febb0c", "#ffef01", "#1288f8", "#00d6fa", "#99f120", "#9e8af9", "#e42525", "#ff7000"];
+    const colorConfigElement = document.getElementById("visualization-color-config");
+    const colorConfig = JSON.parse(colorConfigElement?.textContent || "{}");
+    const colorMaps = colorConfig.maps || {};
+    const colorMapAliases = colorConfig.aliases || {};
+    const palette = colorConfig.series || ["#ffef01", "#1288f8", "#00d6fa", "#99f120"];
 
     function escapeText(value) {
       return String(value ?? "").replace(/[&<>"']/g, (char) => ({
@@ -25,6 +49,86 @@
       return Array.isArray(value) ? value : [];
     }
 
+    function clamp(value, min = 0, max = 1) {
+      return Math.min(max, Math.max(min, Number(value) || 0));
+    }
+
+    function resolveColorMapName(name = "scalar") {
+      const normalized = String(name || "scalar").trim().toLowerCase();
+      if (colorMaps[normalized]) return normalized;
+      return colorMapAliases[normalized] || "scalar";
+    }
+
+    function resolveColorMap(name = "scalar") {
+      const resolved = resolveColorMapName(name);
+      return colorMaps[resolved] || {
+        label: "Scalar / Intensity",
+        kind: "sequential",
+        colors: ["#08080a", "#909090", "#ffef01"]
+      };
+    }
+
+    function hexToRgb(hex) {
+      const normalized = String(hex).replace("#", "");
+      const value = normalized.length === 3
+        ? normalized.split("").map((character) => character + character).join("")
+        : normalized;
+      const number = Number.parseInt(value, 16);
+      return {
+        r: (number >> 16) & 255,
+        g: (number >> 8) & 255,
+        b: number & 255
+      };
+    }
+
+    function rgbToHex({ r, g, b }) {
+      const channel = (value) => Math.round(clamp(value, 0, 255)).toString(16).padStart(2, "0");
+      return `#${channel(r)}${channel(g)}${channel(b)}`;
+    }
+
+    function interpolateColor(left, right, amount) {
+      const start = hexToRgb(left);
+      const end = hexToRgb(right);
+      const t = clamp(amount);
+      return rgbToHex({
+        r: start.r + (end.r - start.r) * t,
+        g: start.g + (end.g - start.g) * t,
+        b: start.b + (end.b - start.b) * t
+      });
+    }
+
+    function sampleColorMap(name, position, reverse = false) {
+      const map = resolveColorMap(name);
+      const colors = reverse ? [...map.colors].reverse() : map.colors;
+      if (colors.length === 0) return "#ffef01";
+      if (colors.length === 1) return colors[0];
+      const t = clamp(position);
+      if (map.kind === "categorical") {
+        return colors[Math.min(colors.length - 1, Math.floor(t * colors.length))];
+      }
+      const scaled = t * (colors.length - 1);
+      const index = Math.min(colors.length - 2, Math.floor(scaled));
+      return interpolateColor(colors[index], colors[index + 1], scaled - index);
+    }
+
+    function mapValueToColor(value, min, max, name, reverse = false) {
+      const lower = Number(min);
+      const upper = Number(max);
+      const position = upper === lower ? 0.5 : (Number(value) - lower) / (upper - lower);
+      return sampleColorMap(name, position, reverse);
+    }
+
+    function sampleColors(name = "series", count = 8, reverse = false) {
+      const map = resolveColorMap(name);
+      const length = Math.max(1, Math.floor(Number(count) || 1));
+      const colors = reverse ? [...map.colors].reverse() : [...map.colors];
+      if (map.kind === "categorical") {
+        return Array.from({ length }, (_, index) => colors[index % colors.length]);
+      }
+      if (length === 1) return [sampleColorMap(name, 0.5, reverse)];
+      return Array.from({ length }, (_, index) => sampleColorMap(name, index / (length - 1), reverse));
+    }
+
     function normalizeOptions(options) {
       if (typeof options === "string") return { label: options };
       return options && typeof options === "object" && !Array.isArray(options) ? options : {};
@@ -39,6 +143,8 @@
         ylim: null,
         grid: true,
         legend: true,
+        cmap: "scalar",
+        colorbar: null,
         traces: [],
         params: {}
       };
@@ -113,6 +219,43 @@
         legend(value = true) {
           spec.legend = Boolean(value);
           return plt;
+        },
+        cmap(name = "scalar") {
+          spec.cmap = resolveColorMapName(name);
+          return plt;
+        },
+        set_cmap(name = "scalar") {
+          return plt.cmap(name);
+        },
+        colorbar(options = {}) {
+          const config = typeof options === "string" ? { label: options } : normalizeOptions(options);
+          spec.colorbar = { show: true, ...config };
+          if (config.cmap) spec.cmap = resolveColorMapName(config.cmap);
+          return plt;
+        },
+        colors(name = "series", count = 8, options = {}) {
+          if (typeof name === "number") {
+            return sampleColors("series", name, Boolean(count?.reverse));
+          }
+          const config = normalizeOptions(options);
+          return sampleColors(name, count, Boolean(config.reverse));
+        },
+        color(value, options = {}) {
+          const config = typeof options === "string" ? { cmap: options } : normalizeOptions(options);
+          return mapValueToColor(
+            value,
+            config.min ?? 0,
+            config.max ?? 1,
+            config.cmap || spec.cmap,
+            Boolean(config.reverse)
+          );
+        },
+        get_cmap(name = "scalar", options = {}) {
+          const config = normalizeOptions(options);
+          return (value) => sampleColorMap(name, value, Boolean(config.reverse));
+        },
+        cmaps() {
+          return Object.keys(colorMaps);
         },
         param(name, first, max, step, value) {
           const id = String(name);
@@ -240,6 +383,8 @@
       spec.ylim = raw.ylim || null;
       spec.grid = raw.grid ?? true;
       spec.legend = raw.legend ?? true;
+      spec.cmap = resolveColorMapName(raw.cmap || raw.colormap || "scalar");
+      spec.colorbar = raw.colorbar ?? null;
       spec.params = raw.params || {};
 
       if (Array.isArray(raw.traces)) {
@@ -258,7 +403,14 @@
             y: asArray(trace.y),
             groups: trace.groups,
             label: trace.name || trace.label,
-            color: trace.color || trace.marker?.color || trace.line?.color
+            color: trace.color || trace.marker?.color || trace.line?.color,
+            cmap: trace.cmap || trace.colormap,
+            colorBy: trace.colorBy,
+            colorValues: trace.colorValues || trace.values,
+            vmin: trace.vmin,
+            vmax: trace.vmax,
+            reverse: trace.reverse,
+            colorbar: trace.colorbar
           };
         });
         return spec;
@@ -271,7 +423,8 @@
           domain: raw.domain,
           samples: raw.samples,
           label: raw.label || raw.expression,
-          color: raw.color
+          color: raw.color,
+          cmap: raw.cmap || raw.colormap
         });
         return spec;
       }
@@ -280,7 +433,19 @@
         const groups = raw.groups && typeof raw.groups === "object"
           ? Object.entries(raw.groups).map(([name, values]) => ({ name, y: asArray(values) }))
           : [{ name: raw.title || "values", y: asArray(raw.y) }];
-        spec.traces.push({ type: "box", groups, label: raw.label, color: raw.color });
+        spec.traces.push({
+          type: "box",
+          groups,
+          label: raw.label,
+          color: raw.color,
+          cmap: raw.cmap || raw.colormap,
+          colorBy: raw.colorBy,
+          colorValues: raw.colorValues || raw.values,
+          vmin: raw.vmin,
+          vmax: raw.vmax,
+          reverse: raw.reverse,
+          colorbar: raw.colorbar
+        });
         return spec;
       }
 
@@ -289,7 +454,14 @@
         x: asArray(raw.x),
         y: asArray(raw.y),
         label: raw.label || raw.title,
-        color: raw.color
+        color: raw.color,
+        cmap: raw.cmap || raw.colormap,
+        colorBy: raw.colorBy,
+        colorValues: raw.colorValues || raw.values,
+        vmin: raw.vmin,
+        vmax: raw.vmax,
+        reverse: raw.reverse,
+        colorbar: raw.colorbar
       });
       return spec;
     }
@@ -323,8 +495,39 @@
       return trace.color || palette[index % palette.length];
     }
 
+    function traceColorValues(trace) {
+      if (Array.isArray(trace.colorValues)) return trace.colorValues;
+      if (Array.isArray(trace.colorBy)) return trace.colorBy;
+      if (trace.colorBy === "x") return asArray(trace.x);
+      if (trace.colorBy === "y") return asArray(trace.y);
+      if (trace.colorBy === "group") {
+        return asArray(trace.groups).map((_, index) => index);
+      }
+      return [];
+    }
+
+    function applyTraceColorMap(trace, spec) {
+      const values = traceColorValues(trace).map(Number);
+      const numeric = values.filter(Number.isFinite);
+      if (numeric.length === 0) return trace;
+      const [dataMin, dataMax] = extent(numeric, [0, 1]);
+      const min = Number.isFinite(Number(trace.vmin)) ? Number(trace.vmin) : dataMin;
+      const max = Number.isFinite(Number(trace.vmax)) ? Number(trace.vmax) : dataMax;
+      const cmap = resolveColorMapName(trace.cmap || spec.cmap);
+      const reverse = Boolean(trace.reverse);
+      return {
+        ...trace,
+        cmap,
+        colorMin: min,
+        colorMax: max,
+        mappedColors: values.map((value) =>
+          Number.isFinite(value) ? mapValueToColor(value, min, max, cmap, reverse) : trace.color
+        )
+      };
+    }
+
     function prepareTraces(spec, params) {
-      return spec.traces.flatMap((trace, index) => {
+      const prepared = spec.traces.flatMap((trace, index) => {
         if (trace.type !== "function") {
           return [{ ...trace, color: traceColor(trace, index) }];
         }
@@ -357,6 +560,7 @@
           color: traceColor(trace, index)
         }];
       });
+      return prepared.map((trace) => applyTraceColorMap(trace, spec));
     }
 
     function formatTick(value) {
@@ -424,21 +628,44 @@
       };
     }
 
+    function resolveColorbar(spec, traces) {
+      const mappedTrace = traces.find((trace) => Array.isArray(trace.mappedColors));
+      const traceConfig = mappedTrace?.colorbar;
+      const requested = spec.colorbar || traceConfig;
+      if (!requested && !mappedTrace) return null;
+      if (spec.colorbar === false || traceConfig === false || requested?.show === false) return null;
+      const config = typeof requested === "string"
+        ? { label: requested }
+        : requested === true
+          ? {}
+          : normalizeOptions(requested);
+      return {
+        cmap: resolveColorMapName(config.cmap || mappedTrace?.cmap || spec.cmap),
+        label: config.label || mappedTrace?.colorbar?.label || "",
+        min: Number.isFinite(Number(config.min)) ? Number(config.min) : mappedTrace?.colorMin ?? 0,
+        max: Number.isFinite(Number(config.max)) ? Number(config.max) : mappedTrace?.colorMax ?? 1,
+        reverse: Boolean(config.reverse ?? mappedTrace?.reverse),
+        ticks: Math.max(2, Math.min(8, Math.floor(Number(config.ticks) || 5)))
+      };
+    }
+
     function buildSvg(spec, traces, params) {
       const isDark = document.documentElement.dataset.theme === "dark";
       const colors = {
-        text: isDark ? "#f5f5f2" : "#111111",
-        muted: isDark ? "#a5a8ad" : "#66656b",
+        text: isDark ? "#fefefe" : "#111111",
+        muted: isDark ? "#909090" : "#66656b",
         grid: isDark ? "rgba(253,253,253,.12)" : "rgba(17,17,17,.12)",
-        axis: isDark ? "#f5f5f2" : "#111111",
+        axis: isDark ? "#fefefe" : "#111111",
         surface: "rgba(0,0,0,0)"
       };
       const width = 860;
       const height = 500;
       const legendHeight = spec.legend === false ? 0 : 34;
+      const colorbar = resolveColorbar(spec, traces);
+      const colorbarGradientId = `plot-colorbar-gradient-${buildSvg.renderId = (buildSvg.renderId || 0) + 1}`;
       const margin = {
         top: spec.title ? 58 : 28,
-        right: 28,
+        right: colorbar ? 118 : 28,
         bottom: spec.xLabel ? 82 : 62,
         left: 70
       };
@@ -502,6 +729,16 @@
       const barTraces = traces.filter((trace) => trace.type === "bar");
       const boxTraces = traces.filter((trace) => trace.type === "box");
       let svg = `<svg class="plot-svg" role="img" viewBox="0 0 ${width} ${height}" aria-label="${escapeText(spec.title || "Chart")}">`;
+      if (colorbar) {
+        const map = resolveColorMap(colorbar.cmap);
+        const stops = colorbar.reverse ? [...map.colors].reverse() : map.colors;
+        svg += `<defs><linearGradient id="${colorbarGradientId}" x1="0" y1="1" x2="0" y2="0">`;
+        for (const [index, color] of stops.entries()) {
+          const offset = stops.length === 1 ? 50 : (index / (stops.length - 1)) * 100;
+          svg += `<stop offset="${offset}%" stop-color="${color}"/>`;
+        }
+        svg += `</linearGradient></defs>`;
+      }
       svg += `<rect width="${width}" height="${height}" fill="${colors.surface}"/>`;
 
       if (spec.title) {
@@ -552,26 +789,28 @@
           const x = xScale(rawX) + offset - barWidth / 2;
           const y = yScale(Math.max(value, base));
           const barHeight = Math.abs(yScale(value) - yScale(base));
-          svg += `<rect x="${x}" y="${y}" width="${barWidth}" height="${barHeight}" fill="${trace.color}" opacity="0.86"/>`;
+          const fill = trace.mappedColors?.[index] || trace.color;
+          svg += `<rect x="${x}" y="${y}" width="${barWidth}" height="${barHeight}" fill="${fill}" opacity="0.9"/>`;
         }
       }
 
       for (const [traceIndex, trace] of boxTraces.entries()) {
         const boxWidth = Math.max(12, (band * 0.52) / Math.max(1, boxTraces.length));
         const offset = (traceIndex - (boxTraces.length - 1) / 2) * boxWidth;
-        for (const group of asArray(trace.groups)) {
+        for (const [groupIndex, group] of asArray(trace.groups).entries()) {
           const stats = boxStats(asArray(group.y));
+          const groupColor = trace.mappedColors?.[groupIndex] || trace.color;
           const x = xScale(group.name) + offset;
           const q1 = yScale(stats.q1);
           const q3 = yScale(stats.q3);
           const min = yScale(stats.min);
           const max = yScale(stats.max);
           const median = yScale(stats.median);
-          svg += `<line x1="${x}" y1="${min}" x2="${x}" y2="${max}" stroke="${trace.color}" stroke-width="2"/>`;
-          svg += `<line x1="${x - boxWidth / 3}" y1="${min}" x2="${x + boxWidth / 3}" y2="${min}" stroke="${trace.color}" stroke-width="2"/>`;
-          svg += `<line x1="${x - boxWidth / 3}" y1="${max}" x2="${x + boxWidth / 3}" y2="${max}" stroke="${trace.color}" stroke-width="2"/>`;
-          svg += `<rect x="${x - boxWidth / 2}" y="${Math.min(q1, q3)}" width="${boxWidth}" height="${Math.abs(q3 - q1)}" fill="${trace.color}" opacity="0.28" stroke="${trace.color}" stroke-width="2"/>`;
-          svg += `<line x1="${x - boxWidth / 2}" y1="${median}" x2="${x + boxWidth / 2}" y2="${median}" stroke="${trace.color}" stroke-width="2.4"/>`;
+          svg += `<line x1="${x}" y1="${min}" x2="${x}" y2="${max}" stroke="${groupColor}" stroke-width="2"/>`;
+          svg += `<line x1="${x - boxWidth / 3}" y1="${min}" x2="${x + boxWidth / 3}" y2="${min}" stroke="${groupColor}" stroke-width="2"/>`;
+          svg += `<line x1="${x - boxWidth / 3}" y1="${max}" x2="${x + boxWidth / 3}" y2="${max}" stroke="${groupColor}" stroke-width="2"/>`;
+          svg += `<rect x="${x - boxWidth / 2}" y="${Math.min(q1, q3)}" width="${boxWidth}" height="${Math.abs(q3 - q1)}" fill="${groupColor}" opacity="0.28" stroke="${groupColor}" stroke-width="2"/>`;
+          svg += `<line x1="${x - boxWidth / 2}" y1="${median}" x2="${x + boxWidth / 2}" y2="${median}" stroke="${groupColor}" stroke-width="2.4"/>`;
         }
       }
 
@@ -582,8 +821,17 @@
           return Number.isFinite(yValue) ? [xScale(xValue), yScale(yValue)] : null;
         }).filter(Boolean);
         if (points.length === 0) continue;
-        const path = points.map(([x, y], index) => `${index === 0 ? "M" : "L"}${x.toFixed(2)} ${y.toFixed(2)}`).join(" ");
-        svg += `<path d="${path}" fill="none" stroke="${trace.color}" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>`;
+        if (Array.isArray(trace.mappedColors) && points.length > 1) {
+          for (let index = 1; index < points.length; index += 1) {
+            const [x1, y1] = points[index - 1];
+            const [x2, y2] = points[index];
+            const stroke = trace.mappedColors[index] || trace.mappedColors[index - 1] || trace.color;
+            svg += `<line x1="${x1.toFixed(2)}" y1="${y1.toFixed(2)}" x2="${x2.toFixed(2)}" y2="${y2.toFixed(2)}" stroke="${stroke}" stroke-width="3" stroke-linecap="round"/>`;
+          }
+        } else {
+          const path = points.map(([x, y], index) => `${index === 0 ? "M" : "L"}${x.toFixed(2)} ${y.toFixed(2)}`).join(" ");
+          svg += `<path d="${path}" fill="none" stroke="${trace.color}" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>`;
+        }
       }
 
       for (const trace of traces.filter((candidate) => candidate.type === "scatter")) {
@@ -591,7 +839,28 @@
           const xValue = asArray(trace.x)[index] ?? index;
           const yValue = Number(asArray(trace.y)[index]);
           if (!Number.isFinite(yValue)) continue;
-          svg += `<circle cx="${xScale(xValue)}" cy="${yScale(yValue)}" r="4.4" fill="${trace.color}" stroke="${colors.axis}" stroke-width="1"/>`;
+          const fill = trace.mappedColors?.[index] || trace.color;
+          svg += `<circle cx="${xScale(xValue)}" cy="${yScale(yValue)}" r="4.4" fill="${fill}" stroke="${colors.axis}" stroke-width="1"/>`;
+        }
+      }
+
+      if (colorbar) {
+        const barX = plot.right + 26;
+        const barWidth = 14;
+        svg += `<rect x="${barX}" y="${plot.top}" width="${barWidth}" height="${plot.height}" rx="2" fill="url(#${colorbarGradientId})" stroke="${colors.axis}" stroke-opacity=".28"/>`;
+        const ticks = niceTicks(colorbar.min, colorbar.max, colorbar.ticks);
+        for (const tick of ticks) {
+          const position = colorbar.max === colorbar.min
+            ? 0.5
+            : (tick - colorbar.min) / (colorbar.max - colorbar.min);
+          const y = plot.bottom - clamp(position) * plot.height;
+          svg += `<line x1="${barX + barWidth}" y1="${y}" x2="${barX + barWidth + 5}" y2="${y}" stroke="${colors.axis}" stroke-width="1"/>`;
+          svg += `<text x="${barX + barWidth + 9}" y="${y + 4}" fill="${colors.muted}" font-size="11">${escapeText(formatTick(tick))}</text>`;
+        }
+        if (colorbar.label) {
+          const labelX = width - 13;
+          const labelY = plot.top + plot.height / 2;
+          svg += `<text transform="translate(${labelX} ${labelY}) rotate(-90)" text-anchor="middle" fill="${colors.text}" font-size="12" font-weight="700">${escapeText(colorbar.label)}</text>`;
         }
       }
 
@@ -603,7 +872,8 @@
         const y = height - 18;
         for (const trace of legendItems.slice(0, 8)) {
           const label = trace.label || trace.name || trace.expression;
-          svg += `<line x1="${cursor}" y1="${y - 4}" x2="${cursor + 18}" y2="${y - 4}" stroke="${trace.color}" stroke-width="3"/>`;
+          const legendColor = trace.mappedColors?.[Math.floor(trace.mappedColors.length / 2)] || trace.color;
+          svg += `<line x1="${cursor}" y1="${y - 4}" x2="${cursor + 18}" y2="${y - 4}" stroke="${legendColor}" stroke-width="3"/>`;
           svg += `<text x="${cursor + 24}" y="${y}" fill="${colors.muted}" font-size="12" font-weight="700">${escapeText(label)}</text>`;
           cursor += Math.min(170, 34 + String(label).length * 7);
         }
