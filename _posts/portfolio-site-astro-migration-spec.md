@@ -211,7 +211,12 @@ At the time of this note, the regular build completes in roughly one second loca
 
 ## Maintenance Notes
 
-To add a project, create a Markdown file in `_projects/` with frontmatter for name, tools, image, description, and optional external URL.
+To add a project, create a Markdown file in `_projects/` with frontmatter for name, tools, image, description, and optional external URL. Add the following fields only when the project should appear on Home:
+
+```yaml
+featured: true
+featured_order: 1
+```
 
 To add a note, create a Markdown file in `_posts/` with a descriptive filename and minimal frontmatter:
 
@@ -220,6 +225,8 @@ To add a note, create a Markdown file in `_posts/` with a descriptive filename a
 title: "Note title"
 tags: [Robotics, AI]
 description: "A concise summary."
+featured: true
+featured_order: 1
 image: /assets/images/notes/preview.jpg
 # video: /assets/video/note-preview.mp4
 # media: https://github.com/user-attachments/assets/...
@@ -229,6 +236,8 @@ external_url:
 ```
 
 Use descriptive filenames without date prefixes. Notes are sorted by title, and dates are not displayed or emitted as post metadata.
+
+Home displays only content with `featured: true`. The optional `featured_order` controls the Home card order, with lower numbers appearing first. There is no fixed three-card limit; remove `featured` or set it to `false` to hide an item from Home without removing it from the Projects or Notes archive.
 
 The `image`, `video`, `media`, and `media_type` fields are optional. When one is supplied, Notes cards use it as a project-style preview. Without an explicit preview, the first Markdown image, HTML image or video, or GitHub user-attachment link in the note body is detected automatically. Explicit frontmatter always takes priority.
 

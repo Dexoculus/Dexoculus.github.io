@@ -29,6 +29,8 @@ export type ProjectMediaType = "image" | "video";
 export type Project = {
   name: string;
   tools: string[];
+  featured: boolean;
+  featuredOrder: number;
   image?: string;
   video?: string;
   mediaUrl?: string;
@@ -58,6 +60,8 @@ export type Heading = {
 export type Post = {
   title: string;
   tags: string[];
+  featured: boolean;
+  featuredOrder: number;
   image?: string;
   video?: string;
   mediaUrl?: string;
@@ -99,6 +103,22 @@ function asStringArray(value: unknown) {
   }
 
   return [];
+}
+
+function asBoolean(value: unknown, fallback = false) {
+  if (typeof value === "boolean") return value;
+  if (typeof value === "number") return value !== 0;
+  if (typeof value === "string") {
+    const normalized = value.trim().toLowerCase();
+    if (["true", "yes", "on", "1"].includes(normalized)) return true;
+    if (["false", "no", "off", "0"].includes(normalized)) return false;
+  }
+  return fallback;
+}
+
+function asNumber(value: unknown, fallback = Number.MAX_SAFE_INTEGER) {
+  const number = Number(value);
+  return Number.isFinite(number) ? number : fallback;
 }
 
 function normalizeMediaType(value: unknown): ProjectMediaType | undefined {
@@ -343,6 +363,8 @@ export const projects: Project[] = Object.entries(projectModules)
     return {
       name,
       tools: asStringArray(module.frontmatter.tools),
+      featured: asBoolean(module.frontmatter.featured),
+      featuredOrder: asNumber(module.frontmatter.featured_order),
       image,
       video,
       mediaUrl,
@@ -379,6 +401,8 @@ export const posts: Post[] = Object.entries(postModules)
       post: {
         title,
         tags: asStringArray(module.frontmatter.tags),
+        featured: asBoolean(module.frontmatter.featured),
+        featuredOrder: asNumber(module.frontmatter.featured_order),
         image,
         video,
         mediaUrl,

@@ -1,6 +1,8 @@
 ---
 title: "Case Report: Error opening camera: CALIBRATION FILE NOT AVAILABLE"
 tags: [Case Report, AI worker, ZED mini]
+featured: true
+featured_order: 3
 description: "Case Report of ZED mini camera 'Error opening camera: CALIBRATION FILE NOT AVAILABLE'"
 external_url:
 ---

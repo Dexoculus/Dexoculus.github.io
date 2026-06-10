@@ -4,8 +4,12 @@ import PostCard from "@/components/PostCard.astro";
 import ProjectCard from "@/components/ProjectCard.astro";
 import { posts, profile, projects } from "@/lib/content";
 
-const featuredProjects = projects.slice(0, 3);
-const featuredPosts = posts.slice(0, 3);
+const featuredProjects = projects
+  .filter((project) => project.featured)
+  .sort((a, b) => a.featuredOrder - b.featuredOrder || b.sequence - a.sequence);
+const featuredPosts = posts
+  .filter((post) => post.featured)
+  .sort((a, b) => a.featuredOrder - b.featuredOrder || a.title.localeCompare(b.title));
 ---
 
 <BaseLayout
@@ -78,29 +82,37 @@ const featuredPosts = posts.slice(0, 3);
     </aside>
   </section>
 
-  <section class="shell section-grid">
-    <div class="section-head wide">
-      <div>
-        <p class="section-kicker">PROJECTS</p>
-        <h2>Selected Projects</h2>
-      </div>
-      <a class="button text" href="/projects/">All projects</a>
-    </div>
-    <div class="project-grid home-feature-grid">
-      {featuredProjects.map((project) => <ProjectCard project={project} compact />)}
-    </div>
-  </section>
+  {
+    featuredProjects.length > 0 && (
+      <section class="shell section-grid">
+        <div class="section-head wide">
+          <div>
+            <p class="section-kicker">PROJECTS</p>
+            <h2>Selected Projects</h2>
+          </div>
+          <a class="button text" href="/projects/">All projects</a>
+        </div>
+        <div class="project-grid home-feature-grid">
+          {featuredProjects.map((project) => <ProjectCard project={project} compact />)}
+        </div>
+      </section>
+    )
+  }
 
-  <section class="shell section-grid">
-    <div class="section-head wide">
-      <div>
-        <p class="section-kicker">WRITING</p>
-        <h2>Notes</h2>
-      </div>
-      <a class="button text" href="/note/">All notes</a>
-    </div>
-    <div class="note-grid home-feature-grid">
-      {featuredPosts.map((post) => <PostCard post={post} />)}
-    </div>
-  </section>
+  {
+    featuredPosts.length > 0 && (
+      <section class="shell section-grid">
+        <div class="section-head wide">
+          <div>
+            <p class="section-kicker">WRITING</p>
+            <h2>Notes</h2>
+          </div>
+          <a class="button text" href="/note/">All notes</a>
+        </div>
+        <div class="note-grid home-feature-grid">
+          {featuredPosts.map((post) => <PostCard post={post} />)}
+        </div>
+      </section>
+    )
+  }
 </BaseLayout>
