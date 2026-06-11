@@ -5,7 +5,6 @@ description: "A step-by-step setup guide for Hugging Face LeRobot, including CUD
 external_url:
 ---
 
-# Setup Guide for Hugging Face LeRobot
 Last updated: 2026-05-06 (For LeRobot version 0.5.2)
 
 > Reference:
@@ -30,9 +29,9 @@ uv venv --python 3.12
 
 After the virtual environment is created, activate it.
 ```bash
-# Linux/macOS
+### Linux/macOS
 source .venv/bin/activate
-# Windows PowerShell
+### Windows PowerShell
 .venv\Scripts\activate
 ```
 

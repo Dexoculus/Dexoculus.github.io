@@ -4,8 +4,6 @@ tags: [Astro, GitHub Pages]
 description: "A development note documenting the Astro migration, GitHub Pages deployment model, content structure, design direction, and lightweight rendering support for this portfolio site."
 external_url:
 ---
-# Development Note: Astro Migration and Site Specification
-
 ## Purpose
 
 This site is maintained as a personal CV, selected project portfolio, and technical note archive. The current version was rebuilt to move away from the previous Jekyll and portfolYOU-based structure while preserving the useful content model of projects, posts, profile data, and timeline entries.

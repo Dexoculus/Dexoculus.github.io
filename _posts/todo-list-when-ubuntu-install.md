@@ -1,7 +1,7 @@
 ---
-title: TODO List When install Ubuntu 24.04
+title: Ubuntu 24.04 Installation Checklist
 tags: [Linux, Ubuntu]
-description: List of what I need to setup when install Ubuntu 24.04.
+description: A concise checklist for configuring a fresh Ubuntu 24.04 installation.
 external_url: 
 ---
 

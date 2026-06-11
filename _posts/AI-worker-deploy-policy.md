@@ -1,12 +1,11 @@
 ---
-title: Guide for deploy policy on AI worker platoform
+title: AI Worker Policy Deployment Guide
 tags: [Robotis, AI worker, Physical AI tools, Robotics]
-description: A guide for deploy policy on AI worker platoform.
+description: A practical guide to deploying a trained policy on the ROBOTIS AI Worker platform.
 external_url: 
 ---
 
-# Guide for deploy policy on AI worker platoform
-We suppose that you already setup Physical AI tools on Ubuntu 24.04. If not, please refer to [Setup guide for Physical AI tools](./_posts/AI-worker-physical-ai-tools-setup.md).
+This guide assumes that Physical AI Tools is already configured on Ubuntu 24.04. Otherwise, begin with the [Physical AI Tools setup guide](/note/ai-worker-physical-ai-tools-setup/).
 
 ## Put trained Policy into AI worker PC (UPC)
 Copy your trained policy from your PC to `~/physical_ai_tools/lerobot/outputs/train/` directory in AI worker UPC.
@@ -24,11 +23,11 @@ cd ~/ai_worker/docker && ./container.sh enter
 
 Run only follower node
 ```bash
-# In Robot PC, AI worker container
+## In the AI Worker container on the robot PC
 ffw_sg2_follower_ai
 ```
 
-## Run Inference
+### Run inference
 
 Enter the `physical_ai_tools` container:
 ```bash
@@ -37,7 +36,7 @@ cd ~/physical_ai_tools/docker && ./container.sh enter
 
 Launch the AI server:
 ```bash 
-# In physical_ai_tools container
+## In the Physical AI Tools container
 ai_server
 ```
 

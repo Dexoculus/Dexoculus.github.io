@@ -1,13 +1,11 @@
 ---
-title: Training guide for Physical AI tools
+title: Training Guide for Physical AI Tools
 tags: [Robotis, AI worker, Physical AI tools, Robotics]
-description: A training guide for physical ai tools.
+description: A guide to preparing datasets and training policies with Physical AI Tools.
 external_url: 
 ---
 
-# Training guide for Physical AI tools
-
-We suppose that you already setup Physical AI tools on Ubuntu 24.04. If not, please refer to [Setup guide for Physical AI tools](./AI-worker-physical-ai-tools-setup.md).
+This guide assumes that Physical AI Tools is already configured on Ubuntu 24.04. Otherwise, begin with the [Physical AI Tools setup guide](/note/ai-worker-physical-ai-tools-setup/).
 
 ## Enter the docker container
 In `physical-ai-tools` directory, run the following command to enter the docker container:

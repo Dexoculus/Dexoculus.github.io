@@ -5,21 +5,24 @@ type Props = {
   project: Project | Post;
   badge?: string;
   large?: boolean;
+  autoplayPreview?: boolean;
 };
 
-const { project, badge, large = false } = Astro.props;
+const { project, badge, large = false, autoplayPreview = true } = Astro.props;
 const mediaLabel = "name" in project ? project.name : project.title;
 const mediaUrl = project.mediaUrl || project.image;
 const isVideo = project.mediaType === "video";
 const canVideoFallback = Boolean(mediaUrl && !isVideo && mediaUrl.includes("github.com/user-attachments/assets/"));
 const poster = isVideo ? project.image : undefined;
-const previewSrc = !large && isVideo ? mediaUrl : undefined;
+const shouldRenderVideo = isVideo && (large || autoplayPreview);
+const previewSrc = !large && shouldRenderVideo ? mediaUrl : undefined;
+const placeholderTools = "tools" in project ? project.tools.slice(0, 3) : project.tags.slice(0, 3);
 ---
 
 <div class:list={["project-media", { large }]}>
   {
     mediaUrl ? (
-      isVideo ? (
+      shouldRenderVideo ? (
         <video
           src={large ? mediaUrl : undefined}
           data-preview-src={previewSrc}
@@ -33,9 +36,18 @@ const previewSrc = !large && isVideo ? mediaUrl : undefined;
           preload={large ? "metadata" : "none"}
           poster={poster}
         />
+      ) : isVideo && poster ? (
+        <img src={poster} alt="" loading="lazy" decoding="async" fetchpriority="low" />
       ) : (
         <>
-          <img src={mediaUrl} alt="" loading={large ? undefined : "lazy"} data-video-fallback={canVideoFallback ? "github-attachment" : undefined} />
+          <img
+            src={mediaUrl}
+            alt={large ? `${mediaLabel} project media` : ""}
+            loading={large ? undefined : "lazy"}
+            decoding="async"
+            fetchpriority={large ? "high" : "low"}
+            data-video-fallback={canVideoFallback ? "github-attachment" : undefined}
+          />
           {
             canVideoFallback && (
               <video
@@ -57,10 +69,15 @@ const previewSrc = !large && isVideo ? mediaUrl : undefined;
         </>
       )
     ) : (
-      <div class:list={["generated-project-art", { large }]} aria-hidden="true"></div>
+      <div class:list={["project-record-art", { large }]}>
+        <span>PROJECT RECORD</span>
+        <strong>{mediaLabel}</strong>
+        {placeholderTools.length > 0 && <small>{placeholderTools.join(" / ")}</small>}
+      </div>
     )
   }
-  {badge && <span>{badge}</span>}
+  {isVideo && !shouldRenderVideo && <span class="media-play-indicator" aria-hidden="true"></span>}
+  {badge && <span class="media-sequence">{badge}</span>}
 </div>
 
 <script>

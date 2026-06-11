@@ -23,10 +23,10 @@ const pathname = Astro.url.pathname;
 const canonical = absoluteUrl(pathname);
 const structuredData = jsonLd ?? personJsonLd;
 const navItems = [
-  { href: "/", label: "Home", icon: "home" },
-  { href: "/projects/", label: "Projects", icon: "projects" },
-  { href: "/note/", label: "Notes", icon: "notes" },
-  { href: "/about/", label: "CV", icon: "cv" }
+  { href: "/", label: "Home" },
+  { href: "/projects/", label: "Projects" },
+  { href: "/note/", label: "Notes" },
+  { href: "/about/", label: "CV" }
 ];
 
 function isActive(href: string) {
@@ -108,11 +108,7 @@ function isActive(href: string) {
       <nav class="nav" aria-label="Primary navigation">
         {
           navItems.map((item) => (
-            <a
-              class:list={[`nav-icon-${item.icon}`, { "active-tab": isActive(item.href) }]}
-              href={item.href}
-              aria-current={isActive(item.href) ? "page" : undefined}
-            >
+            <a class:list={{ "active-tab": isActive(item.href) }} href={item.href} aria-current={isActive(item.href) ? "page" : undefined}>
               <span class="nav-marker" aria-hidden="true"></span>
               <span>{item.label}</span>
             </a>

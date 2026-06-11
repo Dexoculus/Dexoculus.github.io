@@ -105,6 +105,19 @@ function asStringArray(value: unknown) {
   return [];
 }
 
+const tagAliases = new Map([
+  ["ai worker", "AI Worker"],
+  ["physical ai tools", "Physical AI Tools"],
+  ["huggingface", "Hugging Face"],
+  ["zed mini", "ZED Mini"],
+  ["robotis", "ROBOTIS"]
+]);
+
+function normalizeTags(value: unknown) {
+  const normalized = asStringArray(value).map((tag) => tagAliases.get(tag.toLowerCase()) || tag);
+  return Array.from(new Set(normalized));
+}
+
 function asBoolean(value: unknown, fallback = false) {
   if (typeof value === "boolean") return value;
   if (typeof value === "number") return value !== 0;
@@ -264,16 +277,16 @@ export const profile = {
   focus: ["Computer Vision", "Robotics", "Data Science", "Imitation Learning", "Vision-Language-Action (VLA)"],
   researchInterests: ["Computer Vision", "Robotics", "Data Science", "Imitation Learning", "Vision-Language-Action (VLA)", "Anomaly Detection"],
   skillGroups: [
-    { label: "Languages", scope: "programming", items: ["Python", "C++", "SQL", "JavaScript / TypeScript"] },
+    { label: "Languages", scope: "programming", items: ["Python", "C++", "SQL"] },
     {
       label: "AI / Machine Learning",
       scope: "research stack",
-      items: ["PyTorch", "Flower", "Hugging Face LeRobot", "ACT", "Diffusion Policy", "YOLOv8", "PatchCore", "EfficientNet"]
+      items: ["PyTorch", "Flower", "Hugging Face LeRobot"]
     },
     {
       label: "Robotics / Hardware",
       scope: "physical systems",
-      items: ["ROS 2", "Raspberry Pi", "RB-Y1", "UR5", "Robotis FFW-SG2"]
+      items: ["Raspberry Pi", "RB-Y1", "UR5", "Robotis FFW-SG2"]
     },
     {
       label: "Data / Applications",
@@ -283,7 +296,7 @@ export const profile = {
     {
       label: "Infrastructure",
       scope: "deployment",
-      items: ["Linux (Ubuntu)", "Docker", "Git", "Cloudflare Tunnels", "Astro"]
+      items: ["Linux (Ubuntu)", "Docker", "Git", "Cloudflare Tunnels"]
     },
     {
       label: "Fabrication / 3D",
@@ -291,7 +304,7 @@ export const profile = {
       items: ["Fusion 360", "FreeCAD", "Blender", "3D Printing"]
     }
   ],
-  stack: ["Python", "C++", "SQL", "JavaScript / TypeScript", "PyTorch", "ROS 2", "LeRobot", "ACT", "Diffusion Policy", "YOLOv8", "NumPy", "Pandas", "Scikit-learn", "Matplotlib", "Streamlit", "Linux", "Docker", "Git", "Astro", "Cloudflare Tunnels"],
+  stack: ["Python", "C++", "SQL", "PyTorch", "Flower", "LeRobot", "NumPy", "Pandas", "Scikit-learn", "Matplotlib", "Streamlit", "Linux", "Docker", "Git", "Cloudflare Tunnels"],
   links: [
     { label: "GitHub", href: "https://github.com/Dexoculus" },
     { label: "ORCID", href: "https://orcid.org/0009-0007-4713-5892" },
@@ -311,7 +324,7 @@ export const profile = {
       organizationUrl: "https://www.cmesrobotics.ai/",
       location: "Seoul, Korea",
       role: "Junior Research Assistant, Robot Intelligence Team (Humanoid TF)",
-      period: "Mar 2026 - Jun 2026",
+      period: "Mar 2026 - Aug 2026",
       bullets: [
         "Architected a scalable data acquisition and curation platform for the RB-Y1 humanoid robot and standardized the teleoperation environment for high-fidelity data collection.",
         "Deployed the Gello teleoperation framework for UR5 manipulators and streamlined the pipeline from data curation to ACT policy training and physical deployment."
@@ -336,6 +349,7 @@ export const profile = {
     "\"Deep Learning-Based Algorithm for Analyzing EGG Signals to Predict Closed Quotient Rate,\" KIIS Spring Conference, 2024. Poster."
   ],
   awards: [
+    "Excellence Award, Hanyang University ERICA College of Computing Capstone Fair, Jun 2026. KRW 2,000,000 prize.",
     "Excellence Award, 2025 Intelligent Robot WE-Meet Project Integrated Competition, Jan 2026.",
     "Participation Award, 2025 Shipbuilding & Maritime Big Data Utilization Idea Contest, Dec 2025.",
     "Best Paper Award, 2025 KIICE Fall Conference, Oct 2025.",
@@ -381,7 +395,10 @@ export const projects: Project[] = Object.entries(projectModules)
   .sort((a, b) => b.sequence - a.sequence || a.name.localeCompare(b.name));
 
 export const posts: Post[] = Object.entries(postModules)
-  .filter(([path]) => fileBase(path).toLowerCase() !== "templete")
+  .filter(([path, module]) => {
+    if (fileBase(path).toLowerCase() === "templete") return false;
+    return Boolean(asString(module.frontmatter.title) || module.rawContent?.().trim());
+  })
   .map(([path, module]) => {
     const base = fileBase(path);
     const title = asString(module.frontmatter.title, base);
@@ -400,7 +417,7 @@ export const posts: Post[] = Object.entries(postModules)
       order: base,
       post: {
         title,
-        tags: asStringArray(module.frontmatter.tags),
+        tags: normalizeTags(module.frontmatter.tags),
         featured: asBoolean(module.frontmatter.featured),
         featuredOrder: asNumber(module.frontmatter.featured_order),
         image,

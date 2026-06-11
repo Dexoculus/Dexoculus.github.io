@@ -1,24 +1,24 @@
 ---
-title: Robotis AI Worker Tutorial
+title: ROBOTIS AI Worker Tutorial
 tags: [Robotis, AI worker, Robotics]
-description: A Instruction of Setup and launch Robotis AI worker.
-external_url: 
+description: Instructions for configuring and launching the ROBOTIS AI Worker platform.
+external_url:
 ---
-> Reference : [Robotis AI Worker Documentation](https://ai.robotis.com/ai_worker/introduction_ai_worker.html)
+> Reference: [ROBOTIS AI Worker Documentation](https://ai.robotis.com/ai_worker/introduction_ai_worker.html)
 
-# Specifications
+## Specifications
 
-## Hardware
+### Hardware
 
-### Components
+#### Components
 
 ![Components](https://ai.robotis.com/specifications/ai_worker/product_components.png)
 <br>
 <small>*Source: [ROBOTIS Official Specifications](https://ai.robotis.com/ai_worker/hardware_ai_worker.html)*</small>
 
-In this post, we deals with FFW-SG2.
+This post focuses on the FFW-SG2.
 
-### Gripper
+#### Gripper
 
 ![Gripper](https://ai.robotis.com/specifications/ai_worker/model_rh_p12_rn.png)
 <br>
@@ -26,7 +26,8 @@ In this post, we deals with FFW-SG2.
 
 The RH-P12-RN is a multi-functional, 1-DOF two-fingered robot hand.
 
-### Degrees of Freedom
+#### Degrees of Freedom
+
 - Total: 25 DOF
 - Arm: 7 DOF x 2
 - Gripper: 1 DOF x 2
@@ -34,14 +35,10 @@ The RH-P12-RN is a multi-functional, 1-DOF two-fingered robot hand.
 - Lift: 1 DOF x 1
 - Mobile: 6 DOF
 
+### Software
 
-## Software
+## Setup
 
+### Hardware
 
-
-
-# Setup
-
-## Hardware
-
-## Software
+### Software

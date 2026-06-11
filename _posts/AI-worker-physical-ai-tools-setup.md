@@ -1,13 +1,12 @@
 ---
-title: AI worker physical ai tools setup
+title: Physical AI Tools Setup for AI Worker
 tags: [Robotis, AI worker, Physical AI tools, Robotics]
 featured: true
 featured_order: 1
-description: A Setup guide for physical ai tools.
+description: A setup guide for running Physical AI Tools on the ROBOTIS AI Worker platform.
 external_url: 
 ---
 
-# Setup Guide for Physical AI tools
 Last updated: 2026-06-05 (For Physical AI tools version 0.8.3)
 
 

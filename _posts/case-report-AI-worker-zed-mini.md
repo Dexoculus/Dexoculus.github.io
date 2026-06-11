@@ -3,11 +3,9 @@ title: "Case Report: Error opening camera: CALIBRATION FILE NOT AVAILABLE"
 tags: [Case Report, AI worker, ZED mini]
 featured: true
 featured_order: 3
-description: "Case Report of ZED mini camera 'Error opening camera: CALIBRATION FILE NOT AVAILABLE'"
+description: "A case report on resolving a missing calibration file error from a ZED Mini camera."
 external_url:
 ---
-# Report on ZED mini camera in AI worker and Resolution
-
 ## Overview
 When I launch Physical AI server for collecting data, I met some errors related to Zed mini camera.
 

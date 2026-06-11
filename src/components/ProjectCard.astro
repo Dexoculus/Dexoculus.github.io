@@ -5,19 +5,30 @@ import ProjectMedia from "@/components/ProjectMedia.astro";
 type Props = {
   project: Project;
   compact?: boolean;
+  headingLevel?: 2 | 3;
+  autoplayPreview?: boolean;
 };
 
-const { project, compact = false } = Astro.props;
+const { project, compact = false, headingLevel = 3, autoplayPreview = true } = Astro.props;
 const href = project.externalUrl || `/projects/${project.slug}/`;
 const isExternal = Boolean(project.externalUrl);
+const Heading = headingLevel === 2 ? "h2" : "h3";
 ---
 
-<article class:list={["project-card", { compact }]}>
+<article
+  class:list={["project-card", { compact }]}
+  data-project-card
+  data-tools={project.tools.map((tool) => tool.toLowerCase()).join("|")}
+>
   <a href={href} target={isExternal ? "_blank" : undefined} rel={isExternal ? "noreferrer" : undefined}>
-    <ProjectMedia project={project} badge={String(project.sequence).padStart(2, "0")} />
+    <ProjectMedia
+      project={project}
+      badge={String(project.sequence).padStart(2, "0")}
+      autoplayPreview={autoplayPreview}
+    />
     <div class="project-body">
       <div class="card-kicker">{isExternal ? "External project" : "Project file"}</div>
-      <h3>{project.name}</h3>
+      <Heading>{project.name}</Heading>
       <p>{project.description}</p>
       <div class="tag-row">
         {project.tools.slice(0, compact ? 3 : 6).map((tool) => <span>{tool}</span>)}

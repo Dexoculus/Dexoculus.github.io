@@ -1,9 +1,14 @@
 ---
 import ProjectCard from "@/components/ProjectCard.astro";
+import TagFilterList from "@/components/TagFilterList.astro";
 import BaseLayout from "@/layouts/BaseLayout.astro";
 import { projects } from "@/lib/content";
 
 const tools = Array.from(new Set(projects.flatMap((project) => project.tools))).sort();
+const toolCounts = tools.map((tool) => ({
+  tag: tool,
+  count: projects.filter((project) => project.tools.includes(tool)).length
+}));
 ---
 
 <BaseLayout title="Projects | Hyeonbin Han" description="Project portfolio for robotics, computer vision, and machine learning work.">
@@ -11,12 +16,45 @@ const tools = Array.from(new Set(projects.flatMap((project) => project.tools))).
     <p class="section-kicker">PROJECTS</p>
     <h1>Selected Projects</h1>
     <p>Project work in robotics, computer vision, anomaly detection, transformer implementation, and data science.</p>
-    <div class="tag-row large">
-      {tools.slice(0, 14).map((tool) => <span>{tool}</span>)}
+    <div class="project-filter" aria-label="Filter projects by tool">
+      <div class="project-filter-label">
+        <span>FILTER BY TOOL</span>
+        <strong id="project-filter-count">{projects.length} projects</strong>
+      </div>
+      <TagFilterList tags={toolCounts} total={projects.length} visibleCount={6} listId="projects-tool-filter" />
     </div>
   </section>
 
   <section class="shell project-grid archive project-archive-grid">
-    {projects.map((project) => <ProjectCard project={project} />)}
+    {projects.map((project) => <ProjectCard project={project} headingLevel={2} autoplayPreview={false} />)}
   </section>
+
+  <script>
+    const buttons = Array.from(document.querySelectorAll<HTMLButtonElement>("[data-tag-filter]"));
+    const cards = Array.from(document.querySelectorAll<HTMLElement>("[data-project-card]"));
+    const count = document.querySelector("#project-filter-count");
+
+    function filterProjects(selectedTool: string) {
+      let visible = 0;
+
+      buttons.forEach((button) => {
+        const isActive = (button.dataset.tagFilter || "all") === selectedTool;
+        button.classList.toggle("active", isActive);
+        button.setAttribute("aria-pressed", String(isActive));
+      });
+
+      cards.forEach((card) => {
+        const tools = (card.dataset.tools || "").split("|");
+        const isVisible = selectedTool === "all" || tools.includes(selectedTool);
+        card.hidden = !isVisible;
+        if (isVisible) visible += 1;
+      });
+
+      if (count) count.textContent = `${visible} ${visible === 1 ? "project" : "projects"}`;
+    }
+
+    buttons.forEach((button) => {
+      button.addEventListener("click", () => filterProjects(button.dataset.tagFilter || "all"));
+    });
+  </script>
 </BaseLayout>
