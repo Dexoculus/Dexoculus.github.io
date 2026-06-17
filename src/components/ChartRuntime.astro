@@ -650,12 +650,11 @@ const visualizationColorConfig = JSON.stringify({
     }
 
     function buildSvg(spec, traces, params) {
-      const isDark = document.documentElement.dataset.theme === "dark";
       const colors = {
-        text: isDark ? "#fefefe" : "#111111",
-        muted: isDark ? "#909090" : "#66656b",
-        grid: isDark ? "rgba(253,253,253,.12)" : "rgba(17,17,17,.12)",
-        axis: isDark ? "#fefefe" : "#111111",
+        text: "var(--plot-text)",
+        muted: "var(--plot-muted)",
+        grid: "var(--plot-grid)",
+        axis: "var(--plot-axis)",
         surface: "rgba(0,0,0,0)"
       };
       const width = 860;

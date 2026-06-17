@@ -1942,6 +1942,10 @@ main {
 }
 
 .markdown-panel .plot-frame {
+  --plot-text: var(--text);
+  --plot-muted: rgba(80, 80, 80, 0.86);
+  --plot-axis: rgba(17, 17, 17, 0.72);
+  --plot-grid: rgba(17, 17, 17, 0.1);
   margin: 28px 0;
   padding: 14px;
   background:
@@ -1955,10 +1959,15 @@ main {
 }
 
 :root[data-theme="dark"] .markdown-panel .plot-frame {
+  --plot-text: rgba(253, 253, 253, 0.92);
+  --plot-muted: rgba(253, 253, 253, 0.62);
+  --plot-axis: rgba(253, 253, 253, 0.72);
+  --plot-grid: rgba(253, 253, 253, 0.1);
   background:
-    linear-gradient(rgba(253, 253, 253, 0.024) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(253, 253, 253, 0.024) 1px, transparent 1px),
-    rgba(17, 17, 17, 0.6);
+    linear-gradient(rgba(253, 253, 253, 0.032) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(253, 253, 253, 0.032) 1px, transparent 1px),
+    rgba(8, 8, 10, 0.76);
+  border-color: rgba(253, 253, 253, 0.18);
 }
 
 .markdown-panel .plot-canvas {

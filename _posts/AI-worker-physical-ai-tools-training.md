@@ -31,7 +31,7 @@ ai_server
 
 Open `http://localhost` in your browser.
 
-![Training Web UI](/assets/images/posts/ai_worker/robotis_ai_worker_training_ui.png)
+![Training Web UI](/assets/images/posts/ai_worker/robotis_ai_worker_ui_training.png)
 
 Configure the training configs using web UI and start training.<br>
 The results are saved in `physical_ai_tools(project root)/lerobot/outputs/train/` directory.

@@ -306,40 +306,40 @@ Use `plt.cmap(name)` to set the default numeric map for the current plot.
 
 ````md
 ```plot
-const x = np.linspace(-3, 3, 120)
-const y = x.map((v) => v * v - 2)
+const command = np.linspace(-1, 1, 120)
+const residual = command.map((v) => 4.8 * Math.sin(v * 2.2) + 1.2 * v)
 
-plt.title("Signed residual color")
-plt.xlabel("x")
-plt.ylabel("residual")
+plt.title("Steering residual by command speed")
+plt.xlabel("normalized command speed")
+plt.ylabel("lateral residual (cm)")
 plt.cmap("signed")
-plt.scatter(x, y, {
-  label: "sample",
-  colorBy: "y",
-  vmin: -2,
-  vmax: 7
+plt.scatter(command, residual, {
+  label: "sampled residual",
+  colorBy: residual,
+  vmin: -6,
+  vmax: 6
 })
-plt.colorbar({ label: "residual", min: -2, max: 7, ticks: 6 })
+plt.colorbar({ label: "residual (cm)", min: -6, max: 6, ticks: 7 })
 ```
 ````
 
 Rendered:
 
 ```plot
-const x = np.linspace(-3, 3, 120)
-const y = x.map((v) => v * v - 2)
+const command = np.linspace(-1, 1, 120)
+const residual = command.map((v) => 4.8 * Math.sin(v * 2.2) + 1.2 * v)
 
-plt.title("Signed residual color")
-plt.xlabel("x")
-plt.ylabel("residual")
+plt.title("Steering residual by command speed")
+plt.xlabel("normalized command speed")
+plt.ylabel("lateral residual (cm)")
 plt.cmap("signed")
-plt.scatter(x, y, {
-  label: "sample",
-  colorBy: "y",
-  vmin: -2,
-  vmax: 7
+plt.scatter(command, residual, {
+  label: "sampled residual",
+  colorBy: residual,
+  vmin: -6,
+  vmax: 6
 })
-plt.colorbar({ label: "residual", min: -2, max: 7, ticks: 6 })
+plt.colorbar({ label: "residual (cm)", min: -6, max: 6, ticks: 7 })
 ```
 
 ## Color-Mapped Values
@@ -363,23 +363,23 @@ Trace-level range controls:
 | `reverse: true` | Reverse the selected color map. |
 | `colorbar: false` | Disable the automatic colorbar for that mapped trace. |
 
-Example using `risk` for utilization:
+Example using `risk` for thermal or load severity:
 
 ````md
 ```plot
-const nodes = ["cpu", "gpu", "io", "net", "disk"]
-const usage = [48, 91, 64, 38, 78]
+const stages = ["camera", "policy", "planner", "logger", "network"]
+const thermalRisk = [18, 86, 63, 34, 71]
 
-plt.title("System utilization")
-plt.ylabel("usage (%)")
+plt.title("Thermal risk by compute stage")
+plt.ylabel("risk score")
 plt.ylim(0, 100)
-plt.bar(nodes, usage, {
-  label: "load",
-  colorBy: usage,
+plt.bar(stages, thermalRisk, {
+  label: "thermal risk",
+  colorBy: thermalRisk,
   cmap: "risk",
   vmin: 0,
   vmax: 100,
-  colorbar: { label: "utilization (%)", ticks: 6 }
+  colorbar: { label: "thermal risk (%)", min: 0, max: 100, ticks: 6 }
 })
 ```
 ````
@@ -387,19 +387,19 @@ plt.bar(nodes, usage, {
 Rendered:
 
 ```plot
-const nodes = ["cpu", "gpu", "io", "net", "disk"]
-const usage = [48, 91, 64, 38, 78]
+const stages = ["camera", "policy", "planner", "logger", "network"]
+const thermalRisk = [18, 86, 63, 34, 71]
 
-plt.title("System utilization")
-plt.ylabel("usage (%)")
+plt.title("Thermal risk by compute stage")
+plt.ylabel("risk score")
 plt.ylim(0, 100)
-plt.bar(nodes, usage, {
-  label: "load",
-  colorBy: usage,
+plt.bar(stages, thermalRisk, {
+  label: "thermal risk",
+  colorBy: thermalRisk,
   cmap: "risk",
   vmin: 0,
   vmax: 100,
-  colorbar: { label: "utilization (%)", ticks: 6 }
+  colorbar: { label: "thermal risk (%)", min: 0, max: 100, ticks: 6 }
 })
 ```
 
@@ -432,27 +432,35 @@ Colorbar options:
 The recommended pattern is:
 
 1. Set a map with `plt.cmap("risk")` or with trace-level `cmap`.
-2. Map values with `colorBy`.
+2. Map values with `colorBy` only when the color represents a real scalar quantity.
 3. Fix the range using `vmin` and `vmax` for stable comparisons across figures.
 4. Add `plt.colorbar({ label, min, max })` if the automatic range or label is not explicit enough.
 
-Example with reversed scalar color:
+Example with a reversed risk map. The raw metric is a safety margin, so lower values should look more dangerous:
 
 ````md
 ```plot
-const score = [0.12, 0.22, 0.41, 0.63, 0.82, 0.95]
+const candidates = ["A", "B", "C", "D", "E", "F"]
+const clearance = [6.8, 4.1, 2.6, 1.2, 0.7, 3.4]
 
-plt.title("Distance-to-target score")
-plt.ylabel("score")
-plt.ylim(0, 1)
-plt.bar(["A", "B", "C", "D", "E", "F"], score, {
-  colorBy: "y",
-  cmap: "scalar",
+plt.title("Obstacle clearance margin")
+plt.ylabel("clearance (cm)")
+plt.ylim(0, 7)
+plt.bar(candidates, clearance, {
+  colorBy: clearance,
+  cmap: "risk",
   reverse: true,
   vmin: 0,
-  vmax: 1
+  vmax: 7
 })
-plt.colorbar({ label: "lower is better", min: 0, max: 1, reverse: true })
+plt.colorbar({
+  label: "clearance margin (cm)",
+  min: 0,
+  max: 7,
+  cmap: "risk",
+  reverse: true,
+  ticks: 8
+})
 ```
 ````
 
@@ -506,22 +514,26 @@ const c2 = signal(1.0)
 
 ## Box Plot Color Groups
 
-For box plots, `colorBy: "group"` maps each group index to the selected color map.
+For box plots, pass an explicit numeric `colorBy` array when the colorbar should describe a real group-level measurement. This is usually clearer than coloring by group index.
 
 ````md
 ```plot
-plt.title("Latency by deployment mode")
-plt.ylabel("ms")
+const packetLoss = [1.5, 7.2, 18.4]
+
+plt.title("Latency distribution by link quality")
+plt.ylabel("round-trip latency (ms)")
 plt.boxplot(
   {
-    local: [18, 21, 19, 23, 20, 22],
-    edge: [26, 28, 25, 31, 29, 27],
-    remote: [44, 48, 41, 52, 47, 45]
+    lab: [18, 21, 19, 23, 20, 22],
+    hallway: [28, 31, 35, 33, 29, 37],
+    basement: [49, 55, 61, 58, 52, 66]
   },
   {
-    colorBy: "group",
+    colorBy: packetLoss,
     cmap: "risk",
-    colorbar: { label: "deployment index", min: 0, max: 2, ticks: 3 }
+    vmin: 0,
+    vmax: 20,
+    colorbar: { label: "packet loss (%)", min: 0, max: 20, ticks: 5 }
   }
 )
 ```
@@ -530,18 +542,22 @@ plt.boxplot(
 Rendered:
 
 ```plot
-plt.title("Latency by deployment mode")
-plt.ylabel("ms")
+const packetLoss = [1.5, 7.2, 18.4]
+
+plt.title("Latency distribution by link quality")
+plt.ylabel("round-trip latency (ms)")
 plt.boxplot(
   {
-    local: [18, 21, 19, 23, 20, 22],
-    edge: [26, 28, 25, 31, 29, 27],
-    remote: [44, 48, 41, 52, 47, 45]
+    lab: [18, 21, 19, 23, 20, 22],
+    hallway: [28, 31, 35, 33, 29, 37],
+    basement: [49, 55, 61, 58, 52, 66]
   },
   {
-    colorBy: "group",
+    colorBy: packetLoss,
     cmap: "risk",
-    colorbar: { label: "deployment index", min: 0, max: 2, ticks: 3 }
+    vmin: 0,
+    vmax: 20,
+    colorbar: { label: "packet loss (%)", min: 0, max: 20, ticks: 5 }
   }
 )
 ```
@@ -554,14 +570,14 @@ Older `chart` blocks still work for simple cases. Use this format when you want 
 ```chart
 {
   "kind": "bar",
-  "title": "Ablation",
+  "title": "Grasp confidence by variant",
   "xLabel": "variant",
-  "yLabel": "accuracy",
-  "x": ["base", "aug", "aug+filter"],
-  "y": [0.71, 0.78, 0.83],
+  "yLabel": "confidence",
+  "x": ["baseline", "multi-view", "filtered"],
+  "y": [0.62, 0.78, 0.86],
   "colorBy": "y",
   "cmap": "scalar",
-  "colorbar": { "label": "accuracy", "min": 0.65, "max": 0.85 }
+  "colorbar": { "label": "confidence", "min": 0, "max": 1 }
 }
 ```
 ````
@@ -571,14 +587,14 @@ Rendered:
 ```chart
 {
   "kind": "bar",
-  "title": "Ablation",
+  "title": "Grasp confidence by variant",
   "xLabel": "variant",
-  "yLabel": "accuracy",
-  "x": ["base", "aug", "aug+filter"],
-  "y": [0.71, 0.78, 0.83],
+  "yLabel": "confidence",
+  "x": ["baseline", "multi-view", "filtered"],
+  "y": [0.62, 0.78, 0.86],
   "colorBy": "y",
   "cmap": "scalar",
-  "colorbar": { "label": "accuracy", "min": 0.65, "max": 0.85 }
+  "colorbar": { "label": "confidence", "min": 0, "max": 1 }
 }
 ```
 

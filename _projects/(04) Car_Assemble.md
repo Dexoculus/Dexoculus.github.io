@@ -1,7 +1,7 @@
 ---
 name: Anomaly Detection for Automobile Assembly Process
 tools: [ML, PyTorch, 'Anomaly Detection']
-image: /assets/images/projects/car-assembly-anomaly.webp
+image: https://github.com/Dexoculus/AD-for-car-assemble/raw/main/figure/ng.png
 description: The implementation and results for the [Classification / Anomaly Detection] task for Automobile Assembly Process.
 external_url: https://github.com/Dexoculus/Anomaly-Detection-for-Car-Assemble-Process
 ---
