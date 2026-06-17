@@ -92,16 +92,16 @@ const placeholderTools = "tools" in project ? project.tools.slice(0, 3) : projec
     video.load();
   }
 
-  function canAutoPlayVideo() {
-    const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    const connection = (navigator as Navigator & { connection?: { saveData?: boolean } }).connection;
-    return !reduceMotion && !connection?.saveData;
-  }
-
   function playVideo(video: HTMLVideoElement) {
     if (video.hidden || document.hidden) return;
     hydratePreview(video);
-    video.play().catch(() => undefined);
+    video.play()
+      .then(() => {
+        delete video.dataset.videoBlocked;
+      })
+      .catch(() => {
+        video.dataset.videoBlocked = "true";
+      });
   }
 
   function pauseVideo(video: HTMLVideoElement) {
@@ -150,7 +150,10 @@ const placeholderTools = "tools" in project ? project.tools.slice(0, 3) : projec
     if (video.dataset.autoplayBound === "true") return;
     video.dataset.autoplayBound = "true";
 
-    if (!canAutoPlayVideo()) return;
+    video.addEventListener("pointerenter", () => playVideo(video));
+    video.addEventListener("click", () => playVideo(video));
+    video.addEventListener("touchstart", () => playVideo(video), { passive: true });
+
     if (!("IntersectionObserver" in window)) {
       hydratePreview(video);
       playVideo(video);

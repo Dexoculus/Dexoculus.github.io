@@ -231,8 +231,34 @@ export function slugify(input: string) {
     .replace(/^-+|-+$/g, "");
 }
 
-const projectModules = import.meta.glob<MarkdownModule>("../../_projects/*.md", { eager: true });
-const postModules = import.meta.glob<MarkdownModule>("../../_posts/*.md", { eager: true });
+function assertUniqueSlugs<T extends { slug: string }>(
+  items: T[],
+  collectionName: string,
+  label: (item: T) => string
+) {
+  const seen = new Map<string, string>();
+
+  for (const item of items) {
+    const currentLabel = label(item);
+    if (!item.slug) {
+      throw new Error(`[content] Empty ${collectionName} slug for "${currentLabel}".`);
+    }
+
+    const previousLabel = seen.get(item.slug);
+    if (previousLabel) {
+      throw new Error(
+        `[content] Duplicate ${collectionName} slug "${item.slug}" for "${previousLabel}" and "${currentLabel}". Keep filenames and generated slugs globally unique.`
+      );
+    }
+
+    seen.set(item.slug, currentLabel);
+  }
+
+  return items;
+}
+
+const projectModules = import.meta.glob<MarkdownModule>("../../_projects/**/*.md", { eager: true });
+const postModules = import.meta.glob<MarkdownModule>("../../_posts/**/*.md", { eager: true });
 
 export const profile = {
   siteTitle: "Hyeonbin Han",
@@ -328,77 +354,85 @@ export const profile = {
   ]
 };
 
-export const projects: Project[] = Object.entries(projectModules)
-  .map(([path, module]) => {
-    const base = fileBase(path);
-    const name = asString(module.frontmatter.name, base.replace(/^\(\d+\)\s*/, ""));
-    const externalUrl = asString(module.frontmatter.external_url) || undefined;
-    const image = asString(module.frontmatter.image) || undefined;
-    const video = asString(module.frontmatter.video) || undefined;
-    const media = asString(module.frontmatter.media) || undefined;
-    const mediaUrl = video || media || image;
-    const mediaType = video ? "video" : normalizeMediaType(module.frontmatter.media_type) || inferMediaType(mediaUrl);
-    const source = module.rawContent?.() ?? "";
+export const projects: Project[] = assertUniqueSlugs(
+  Object.entries(projectModules)
+    .map(([path, module]) => {
+      const base = fileBase(path);
+      const name = asString(module.frontmatter.name, base.replace(/^\(\d+\)\s*/, ""));
+      const externalUrl = asString(module.frontmatter.external_url) || undefined;
+      const image = asString(module.frontmatter.image) || undefined;
+      const video = asString(module.frontmatter.video) || undefined;
+      const media = asString(module.frontmatter.media) || undefined;
+      const mediaUrl = video || media || image;
+      const mediaType = video ? "video" : normalizeMediaType(module.frontmatter.media_type) || inferMediaType(mediaUrl);
+      const source = module.rawContent?.() ?? "";
 
-    return {
-      name,
-      tools: asStringArray(module.frontmatter.tools),
-      featured: asBoolean(module.frontmatter.featured),
-      featuredOrder: asNumber(module.frontmatter.featured_order),
-      image,
-      video,
-      mediaUrl,
-      mediaType,
-      description: asString(module.frontmatter.description, "Project note"),
-      externalUrl,
-      slug: slugify(name || base),
-      sequence: extractSequence(base),
-      headings: module.getHeadings?.().filter((heading) => heading.depth >= 2 && heading.depth <= 3) ?? [],
-      richFeatures: detectRichFeatures(source),
-      Content: module.Content
-    };
-  })
-  .sort((a, b) => b.sequence - a.sequence || a.name.localeCompare(b.name));
-
-export const posts: Post[] = Object.entries(postModules)
-  .filter(([path, module]) => {
-    if (fileBase(path).toLowerCase() === "templete") return false;
-    return Boolean(asString(module.frontmatter.title) || module.rawContent?.().trim());
-  })
-  .map(([path, module]) => {
-    const base = fileBase(path);
-    const title = asString(module.frontmatter.title, base);
-    const externalUrl = asString(module.frontmatter.external_url) || undefined;
-    const source = module.rawContent?.() ?? "";
-    const detectedMedia = extractFirstMedia(source);
-    const image = asString(module.frontmatter.image) || (detectedMedia?.type === "image" ? detectedMedia.url : undefined);
-    const video = asString(module.frontmatter.video) || (detectedMedia?.type === "video" ? detectedMedia.url : undefined);
-    const media = asString(module.frontmatter.media) || undefined;
-    const mediaUrl = video || media || image || detectedMedia?.url;
-    const mediaType = video
-      ? "video"
-      : normalizeMediaType(module.frontmatter.media_type) || detectedMedia?.type || inferMediaType(mediaUrl);
-
-    return {
-      order: base,
-      post: {
-        title,
-        tags: normalizeTags(module.frontmatter.tags),
+      return {
+        name,
+        tools: asStringArray(module.frontmatter.tools),
         featured: asBoolean(module.frontmatter.featured),
         featuredOrder: asNumber(module.frontmatter.featured_order),
         image,
         video,
         mediaUrl,
         mediaType,
-        description: asString(module.frontmatter.description, "Technical note"),
+        description: asString(module.frontmatter.description, "Project note"),
         externalUrl,
-        slug: slugify(base),
+        slug: slugify(name || base),
+        sequence: extractSequence(base),
         headings: module.getHeadings?.().filter((heading) => heading.depth >= 2 && heading.depth <= 3) ?? [],
-        readingMinutes: readingMinutes(source),
         richFeatures: detectRichFeatures(source),
         Content: module.Content
-      }
-    };
-  })
-  .sort((a, b) => a.post.title.localeCompare(b.post.title) || a.order.localeCompare(b.order))
-  .map(({ post }) => post);
+      };
+    })
+    .sort((a, b) => b.sequence - a.sequence || a.name.localeCompare(b.name)),
+  "project",
+  (project) => project.name
+);
+
+export const posts: Post[] = assertUniqueSlugs(
+  Object.entries(postModules)
+    .filter(([path, module]) => {
+      if (fileBase(path).toLowerCase() === "templete") return false;
+      return Boolean(asString(module.frontmatter.title) || module.rawContent?.().trim());
+    })
+    .map(([path, module]) => {
+      const base = fileBase(path);
+      const title = asString(module.frontmatter.title, base);
+      const externalUrl = asString(module.frontmatter.external_url) || undefined;
+      const source = module.rawContent?.() ?? "";
+      const detectedMedia = extractFirstMedia(source);
+      const image = asString(module.frontmatter.image) || (detectedMedia?.type === "image" ? detectedMedia.url : undefined);
+      const video = asString(module.frontmatter.video) || (detectedMedia?.type === "video" ? detectedMedia.url : undefined);
+      const media = asString(module.frontmatter.media) || undefined;
+      const mediaUrl = video || media || image || detectedMedia?.url;
+      const mediaType = video
+        ? "video"
+        : normalizeMediaType(module.frontmatter.media_type) || detectedMedia?.type || inferMediaType(mediaUrl);
+
+      return {
+        order: base,
+        post: {
+          title,
+          tags: normalizeTags(module.frontmatter.tags),
+          featured: asBoolean(module.frontmatter.featured),
+          featuredOrder: asNumber(module.frontmatter.featured_order),
+          image,
+          video,
+          mediaUrl,
+          mediaType,
+          description: asString(module.frontmatter.description, "Technical note"),
+          externalUrl,
+          slug: slugify(base),
+          headings: module.getHeadings?.().filter((heading) => heading.depth >= 2 && heading.depth <= 3) ?? [],
+          readingMinutes: readingMinutes(source),
+          richFeatures: detectRichFeatures(source),
+          Content: module.Content
+        }
+      };
+    })
+    .sort((a, b) => a.post.title.localeCompare(b.post.title) || a.order.localeCompare(b.order))
+    .map(({ post }) => post),
+  "post",
+  (post) => post.title
+);
