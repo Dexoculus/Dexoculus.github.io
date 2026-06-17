@@ -4,12 +4,10 @@ tags: [Robotis, AI worker, Physical AI tools, Robotics]
 featured: true
 featured_order: 1
 description: A setup guide for running Physical AI Tools on the ROBOTIS AI Worker platform.
-external_url: 
 ---
 
+# Setup Guide for Physical AI tools
 Last updated: 2026-06-05 (For Physical AI tools version 0.8.3)
-
-
 
 ## Prerequisites
 - Ubuntu 24.04 LTS
@@ -104,4 +102,36 @@ Use the container.sh helper script to start the container:
 ./docker/container.sh start
 ```
 
-## Configuration
+### Enter the docker container
+In `physical-ai-tools` directory, run the following command to enter the docker container:
+```bash
+./docker/container.sh enter
+```
+
+### Build the package
+```bash
+colcon build --symlink-install --cmake-args -DCMAKE_BUILD_TYPE=Release
+```
+
+### Launch Physical AI Server
+After enter the physical-ai-tools container and build the package, launch the physical ai server by running the following command:
+```bash
+ai_server
+```
+### Open Web UI
+
+Open `http://localhost` in your browser.<br>
+Then you can see the following web UI.
+
+![UI_home](/assets/images/posts/ai_worker/robotis_ai_worker_ui_home1.png)
+
+To begin managing AI worker platform, select the appropriate robot type in `Robot Type Selection` section, and click `Set Robot Type` button. In this case, we select `ffw_sg2_rev1`.
+
+![Robot_Type_Selection](/assets/images/posts/ai_worker/robotis_ai_worker_ui_home2.png)
+
+Then you can see `Robot type set to ffw_sg2_rev1` and Ui state will be change to `Connected`.
+
+![Robot_Type_Set_to_ffw_sg2_rev1](/assets/images/posts/ai_worker/robotis_ai_worker_ui_home3.png)
+
+Now you are ready to use the AI worker platform.
+

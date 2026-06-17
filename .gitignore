@@ -1,16 +1,9 @@
 # Build outputs
 dist/
-_site/
 .astro/
 
 # Dependencies
 node_modules/
-
-# Local caches
-.sass-cache/
-.jekyll-cache/
-.jekyll-metadata
-.bundle/
 
 # Logs
 *.log

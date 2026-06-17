@@ -2,7 +2,7 @@
 name: Adversarial Robustness in Distributed Learning
 tools: [Federated Learning, Flower, YOLOv8, Raspberry Pi, Adversarial ML, Edge AI]
 featured: true
-featured_order: 1
+featured_order: 3
 description: Reproducible federated learning and physical edge validation pipeline for studying adversarial attacks against distributed traffic-signal perception.
 ---
 

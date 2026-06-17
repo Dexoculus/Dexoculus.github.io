@@ -620,27 +620,30 @@ img {
   justify-self: end;
   align-self: center;
   gap: 8px;
-  width: 106px;
-  min-height: 48px;
+  width: 92px;
+  min-height: 44px;
+  padding: 0 6px;
   color: var(--endfield-white);
-  background: rgba(253, 253, 253, 0.06);
-  border: 1px solid rgba(253, 253, 253, 0.14);
+  background: transparent;
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
   font-family: var(--font-mono);
   font-size: 0.72rem;
 }
 
 .theme-toggle i {
   position: relative;
-  flex: 0 0 28px;
-  width: 28px;
-  height: 28px;
+  flex: 0 0 32px;
+  width: 32px;
+  height: 32px;
   overflow: hidden;
   background:
-    repeating-linear-gradient(135deg, rgba(253, 253, 253, 0.24) 0 2px, transparent 2px 5px),
-    linear-gradient(180deg, var(--archive-flame) 0%, var(--endfield-red-dark) 100%);
-  border: 1px solid rgba(253, 253, 253, 0.34);
-  border-radius: 2px;
-  box-shadow: inset 0 0 0 1px rgba(8, 8, 10, 0.28);
+    repeating-linear-gradient(135deg, rgba(8, 8, 10, 0.52) 0 2px, transparent 2px 5px),
+    var(--archive-red-dark);
+  border: 0;
+  border-radius: 1px;
+  box-shadow: none;
 }
 
 .theme-toggle i::before,
@@ -650,7 +653,7 @@ img {
 }
 
 .theme-toggle i::before {
-  top: 4px;
+  top: 5px;
   left: 50%;
   z-index: 1;
   width: 3px;
@@ -661,10 +664,25 @@ img {
 }
 
 .theme-toggle i::after {
-  inset: 6px;
+  inset: 7px;
   border: 3px solid var(--endfield-white);
   border-top-color: transparent;
   border-radius: 50%;
+}
+
+.theme-toggle:hover {
+  background: transparent;
+}
+
+.theme-toggle:hover i {
+  background:
+    repeating-linear-gradient(135deg, rgba(8, 8, 10, 0.42) 0 2px, transparent 2px 5px),
+    var(--endfield-red);
+}
+
+.theme-toggle:focus-visible {
+  outline: 1px solid var(--focus);
+  outline-offset: 3px;
 }
 
 .theme-toggle:hover,
@@ -1371,15 +1389,8 @@ main {
 .project-body h3,
 .note-card h3,
 .resume-item h3,
-.timeline-list h3 {
-  margin: 0;
-  font-size: 1.08rem;
-  line-height: 1.25;
-}
-
 .project-body p,
 .note-card p,
-.timeline-list p,
 .resume-item p,
 .info-panel p,
 .dark-panel p {
@@ -1575,68 +1586,11 @@ main {
   padding: clamp(22px, 4vw, 36px);
 }
 
-.timeline-list {
-  display: grid;
-  gap: 14px;
-  padding: 0;
-  margin: 24px 0 0;
-  list-style: none;
-}
-
-.timeline-list li {
-  display: grid;
-  grid-template-columns: 108px minmax(0, 1fr);
-  gap: 16px;
-  padding-top: 16px;
-  border-top: 2px solid var(--surface-accent);
-}
-
-.timeline-list span,
 .resume-item span,
 .plain-list span {
   color: var(--text-muted);
   font-family: var(--font-mono);
   font-size: 0.72rem;
-}
-
-.skill-stack {
-  display: grid;
-  gap: 14px;
-  margin-top: 22px;
-}
-
-.skill-row div {
-  display: flex;
-  justify-content: space-between;
-  gap: 12px;
-  margin-bottom: 7px;
-  color: inherit;
-}
-
-.skill-row span {
-  color: var(--text-muted);
-  font-family: var(--font-mono);
-}
-
-.dark-panel .skill-row span {
-  color: var(--inverse-muted);
-}
-
-.skill-row i {
-  display: block;
-  height: 10px;
-  overflow: hidden;
-  background: rgba(128, 128, 128, 0.2);
-  border-radius: var(--pill);
-}
-
-.skill-row i::before {
-  display: block;
-  width: var(--value);
-  height: 100%;
-  background: linear-gradient(90deg, var(--gray-400), var(--core-gold), var(--focus));
-  border-radius: inherit;
-  content: "";
 }
 
 .page-hero {
@@ -2383,7 +2337,6 @@ main {
   .project-body h2,
   .note-card h3,
   .resume-item h3,
-  .timeline-list h3,
   .directory-list strong,
   .cv-project-route h2,
   .markdown-panel h1,
@@ -2470,19 +2423,19 @@ main {
 
   .theme-toggle {
     position: static;
-    flex: 0 0 78px;
+    flex: 0 0 72px;
     margin-left: auto;
-    width: 78px;
+    width: 72px;
     min-height: 38px;
     gap: 6px;
-    padding: 0 8px;
+    padding: 0 4px;
     font-size: 0.58rem;
   }
 
   .theme-toggle i {
-    flex-basis: 24px;
-    width: 24px;
-    height: 24px;
+    flex-basis: 28px;
+    width: 28px;
+    height: 28px;
   }
 
   .nav {
@@ -2756,10 +2709,6 @@ main {
     flex-direction: column;
   }
 
-  .timeline-list li {
-    grid-template-columns: 1fr;
-    gap: 8px;
-  }
 }
 
 @media print {

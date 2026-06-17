@@ -2,7 +2,6 @@
 title: ROBOTIS AI Worker Tutorial
 tags: [Robotis, AI worker, Robotics]
 description: Instructions for configuring and launching the ROBOTIS AI Worker platform.
-external_url:
 ---
 > Reference: [ROBOTIS AI Worker Documentation](https://ai.robotis.com/ai_worker/introduction_ai_worker.html)
 

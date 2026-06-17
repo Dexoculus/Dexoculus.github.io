@@ -2,8 +2,8 @@
 title: Training Guide for Physical AI Tools
 tags: [Robotis, AI worker, Physical AI tools, Robotics]
 description: A guide to preparing datasets and training policies with Physical AI Tools.
-external_url: 
 ---
+# Training guide for Physical AI tools
 
 This guide assumes that Physical AI Tools is already configured on Ubuntu 24.04. Otherwise, begin with the [Physical AI Tools setup guide](/note/ai-worker-physical-ai-tools-setup/).
 
@@ -31,7 +31,7 @@ ai_server
 
 Open `http://localhost` in your browser.
 
-![Training Web UI](/assets/images/posts/Robotis_AI_worker_training_UI.png)
+![Training Web UI](/assets/images/posts/ai_worker/robotis_ai_worker_training_ui.png)
 
-configure the training configs using web UI and start training.<br>
+Configure the training configs using web UI and start training.<br>
 The results are saved in `physical_ai_tools(project root)/lerobot/outputs/train/` directory.

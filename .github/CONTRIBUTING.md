@@ -1,4 +1,4 @@
-# Contribute to Dexter Oculus
+# Contribute to Hyeonbin Han's Portfolio
 
 This repository is an Astro-powered portfolio and technical notes site.
 
@@ -6,7 +6,7 @@ This repository is an Astro-powered portfolio and technical notes site.
 1. Start local development with `npm run dev`.
 1. Verify production output with `npm run build`.
 1. Keep project content in `_projects/`, notes in `_posts/`, and profile data in `_data/`.
-1. Keep visual changes aligned with `guideline.html`: black and white surfaces, yellow focus states, restrained contour geometry, and compact tactical panels.
+1. Keep visual changes aligned with `guideline.html`: inverse black and white surfaces, yellow focus states, side hatching, structured grid fields, and compact technical panels.
 
 ## Writing Notes
 

@@ -1,27 +1,8 @@
-import fs from "node:fs";
-import path from "node:path";
-import { parse } from "yaml";
-
 type MarkdownModule = {
   frontmatter: Record<string, unknown>;
   Content: unknown;
   getHeadings?: () => Heading[];
   rawContent?: () => string;
-};
-
-type Skill = {
-  name: string;
-  percentage: number;
-  color?: string;
-};
-
-type TimelineItem = {
-  title: string;
-  linkText?: string;
-  url?: string;
-  from: number;
-  to: number;
-  description: string;
 };
 
 export type ProjectMediaType = "image" | "video";
@@ -74,17 +55,6 @@ export type Post = {
   richFeatures: RichFeatures;
   Content: unknown;
 };
-
-const dataPath = (fileName: string) => path.join(process.cwd(), "_data", fileName);
-
-function readYaml<T>(fileName: string, fallback: T): T {
-  try {
-    const source = fs.readFileSync(dataPath(fileName), "utf8");
-    return parse(source) as T;
-  } catch {
-    return fallback;
-  }
-}
 
 function asString(value: unknown, fallback = "") {
   return typeof value === "string" ? value.trim() : fallback;
@@ -357,10 +327,6 @@ export const profile = {
     "Excellence Award, 2024 Hanyang University SW/ICT/AI Integrated Conference, Dec 2024."
   ]
 };
-
-export const programmingSkills = readYaml<Skill[]>("programming-skills.yml", []);
-export const otherSkills = readYaml<Skill[]>("other-skills.yml", []);
-export const timeline = readYaml<TimelineItem[]>("timeline.yml", []);
 
 export const projects: Project[] = Object.entries(projectModules)
   .map(([path, module]) => {

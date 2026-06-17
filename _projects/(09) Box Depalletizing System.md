@@ -1,6 +1,8 @@
 ---
 name: Box Depalletizing System
 tools: [YOLOv8, 3D Perception, RB5-850, Python, PyTorch, Blender]
+featured: true
+featured_order: 2
 image: /assets/images/projects/box-depalletizing.webp
 video: /assets/video/box_depal_demo.mp4
 description: 3D vision-based box detection and pose estimation system utilizing YOLOv8 on depth maps for robotic depalletizing.

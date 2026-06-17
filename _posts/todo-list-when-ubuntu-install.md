@@ -2,7 +2,6 @@
 title: Ubuntu 24.04 Installation Checklist
 tags: [Linux, Ubuntu]
 description: A concise checklist for configuring a fresh Ubuntu 24.04 installation.
-external_url: 
 ---
 
 Update package info

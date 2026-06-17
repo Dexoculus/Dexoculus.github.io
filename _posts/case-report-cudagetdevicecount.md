@@ -4,8 +4,9 @@ tags: [Case Report, Linux]
 featured: true
 featured_order: 2
 description: "A case report on resolving an unexpected cudaGetDeviceCount() runtime error."
-external_url:
 ---
+# Report on CUDA Driver Error and Resolution
+
 ## Overview
 While utilizing the research lab's server for model training, I encountered an issue that could potentially affect other users. This report documents the error and its resolution to assist others who might face a similar problem.
 

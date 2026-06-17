@@ -2,11 +2,10 @@
 title: "Development Note: Astro Migration and Site Specification"
 tags: [Astro, GitHub Pages]
 description: "A development note documenting the Astro migration, GitHub Pages deployment model, content structure, design direction, and lightweight rendering support for this portfolio site."
-external_url:
 ---
 ## Purpose
 
-This site is maintained as a personal CV, selected project portfolio, and technical note archive. The current version was rebuilt to move away from the previous Jekyll and portfolYOU-based structure while preserving the useful content model of projects, posts, profile data, and timeline entries.
+This site is maintained as a personal CV, selected project portfolio, and technical note archive. The current version was rebuilt to move away from the previous Jekyll and portfolYOU-based structure while preserving the useful content model of projects, posts, and profile data.
 
 The main objectives of the migration were:
 
@@ -27,8 +26,7 @@ The site is built with Astro and configured for static output. The project uses 
   "remark-math": "^6.0.0",
   "rehype-katex": "^7.0.1",
   "rehype-slug": "^6.0.0",
-  "rehype-autolink-headings": "^7.1.0",
-  "yaml": "^2.9.0"
+  "rehype-autolink-headings": "^7.1.0"
 }
 ```
 
@@ -39,11 +37,6 @@ Astro was selected because the site is mostly static content, but still benefits
 The content structure intentionally remains close to the original repository layout:
 
 ```text
-_data/
-  programming-skills.yml
-  other-skills.yml
-  timeline.yml
-
 _posts/
   note-title.md
 
@@ -64,27 +57,27 @@ Projects are loaded from `_projects/*.md`, posts are loaded from `_posts/*.md`, 
 
 The primary routes are:
 
-- `/` for the CV-oriented landing page.
+- `/` for the site overview and selected work.
 - `/about/` for the printable CV profile.
 - `/projects/` for selected project work.
 - `/projects/[slug]/` for individual project notes.
-- `/blog/` for notes with search and tag grouping.
-- `/blog/[slug]/` for individual notes.
-- `/blog/tags/` for the tag archive.
+- `/note/` for notes with search and tag filtering.
+- `/note/[slug]/` for individual notes.
+- `/note/tags/` for the tag archive.
 - `/rss.xml`, `/sitemap.xml`, `/robots.txt`, and `/search.json` for publishing and discoverability.
 
 ## Design Direction
 
 The visual direction follows the local `guideline.html` reference rather than the previous Jekyll theme. The interface uses a restrained technical CV style with:
 
-- high-contrast black, white, gray, and yellow accents;
-- topographic contour and grid background elements;
-- hatch marks near the top navigation area;
+- inverse black and white surfaces with yellow and flame-orange accents;
+- structured vertical grid fields and sparse dot matrices;
+- hatch marks restricted to the side regions of the top navigation;
 - compact project and note cards;
-- CV-first language on the landing page;
-- direct labels such as `Selected Projects`, `Timeline`, and `Notes`.
+- an overview-first landing page with CV details kept under `/about/`;
+- direct labels such as `Selected Projects`, `Notes`, and `CV`.
 
-The landing page avoids oversized personal branding and instead emphasizes education, current affiliation, research focus, selected work, timeline, and recent notes.
+The landing page avoids oversized personal branding and instead presents the site's purpose, selected work, and recent notes.
 
 ## Markdown Features
 
@@ -202,7 +195,7 @@ The site follows a static-first optimization policy:
 - project images use WebP and are lazy-loaded in cards;
 - archive cards use `content-visibility` where supported so off-screen cards can skip rendering;
 - repeated cards and reading panels avoid `backdrop-filter` to keep scrolling on the compositor path;
-- card videos keep their poster unloaded from the video source until desktop hover, while detail pages retain controls and metadata preload;
+- project archives use static posters and defer full video loading to featured or detail views;
 - the build output is static and suitable for GitHub Pages.
 
 At the time of this note, the regular build completes in roughly one second locally, and the default `_astro` output contains only the shared CSS asset unless a page explicitly requires a rich renderer.
@@ -229,7 +222,6 @@ image: /assets/images/notes/preview.jpg
 # video: /assets/video/note-preview.mp4
 # media: https://github.com/user-attachments/assets/...
 # media_type: video
-external_url:
 ---
 ```
 
@@ -239,7 +231,7 @@ Home displays only content with `featured: true`. The optional `featured_order` 
 
 The `image`, `video`, `media`, and `media_type` fields are optional. When one is supplied, Notes cards use it as a project-style preview. Without an explicit preview, the first Markdown image, HTML image or video, or GitHub user-attachment link in the note body is detected automatically. Explicit frontmatter always takes priority.
 
-To update CV data, edit `src/lib/content.ts` and the YAML files under `_data/`.
+To update CV data, edit the `profile` object in `src/lib/content.ts`.
 
 To verify the site locally:
 

@@ -1,8 +1,6 @@
 ---
 name: Control Panel Anomaly Detection & Classification
 tools: [PatchCore, EfficientNet, Streamlit, PyTorch, MLOps, Docker]
-featured: true
-featured_order: 3
 image: /assets/images/projects/control-panel.webp
 description: Dual-stage vision pipeline for precise anomaly detection and product classification with a Streamlit-based MLOps dashboard.
 external_url: https://github.com/Dexoculus/canon-control-pannel-cls
