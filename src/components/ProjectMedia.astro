@@ -32,7 +32,7 @@ const placeholderTools = "tools" in project ? project.tools.slice(0, 3) : projec
           loop
           muted
           playsinline
-          preload={large ? "metadata" : "none"}
+          preload="metadata"
           poster={poster}
         />
       ) : isVideo && poster ? (
@@ -83,6 +83,7 @@ const placeholderTools = "tools" in project ? project.tools.slice(0, 3) : projec
 <script>
   const visibleVideos = new WeakSet<HTMLVideoElement>();
   let videoObserver: IntersectionObserver | undefined;
+  let videoSyncFrame = 0;
 
   function hydratePreview(video: HTMLVideoElement) {
     if (video.src || !video.dataset.previewSrc) return;
@@ -135,7 +136,7 @@ const placeholderTools = "tools" in project ? project.tools.slice(0, 3) : projec
         entries.forEach((entry) => {
           const video = entry.target;
           if (!(video instanceof HTMLVideoElement)) return;
-          if (entry.isIntersecting && entry.intersectionRatio >= 0.18) {
+          if (entry.isIntersecting && entry.intersectionRatio > 0) {
             visibleVideos.add(video);
           } else {
             visibleVideos.delete(video);
@@ -144,11 +145,20 @@ const placeholderTools = "tools" in project ? project.tools.slice(0, 3) : projec
         });
       },
       {
-        rootMargin: "0px",
-        threshold: [0, 0.18, 0.55],
+        rootMargin: "80px 0px",
+        threshold: [0, 0.01, 0.18, 0.55],
       }
     );
     return videoObserver;
+  }
+
+  function syncInitialVisibility(video: HTMLVideoElement) {
+    if (isInViewport(video)) {
+      visibleVideos.add(video);
+    } else {
+      visibleVideos.delete(video);
+    }
+    syncVisibleVideo(video);
   }
 
   function observeVideo(video: HTMLVideoElement) {
@@ -166,12 +176,8 @@ const placeholderTools = "tools" in project ? project.tools.slice(0, 3) : projec
     }
 
     getVideoObserver().observe(video);
-    requestAnimationFrame(() => {
-      if (isInViewport(video)) {
-        visibleVideos.add(video);
-      }
-      syncVisibleVideo(video);
-    });
+    requestAnimationFrame(() => syncInitialVisibility(video));
+    window.setTimeout(() => syncInitialVisibility(video), 160);
   }
 
   function bindProjectMediaFallbacks() {
@@ -202,15 +208,47 @@ const placeholderTools = "tools" in project ? project.tools.slice(0, 3) : projec
     });
   }
 
-  bindProjectMediaFallbacks();
-  bindVideoPreviews();
-  document.addEventListener("visibilitychange", () => {
+  function syncAllVisibleVideos() {
     document.querySelectorAll<HTMLVideoElement>("video[data-video-autoplay]").forEach((video) => {
+      if (isInViewport(video)) {
+        visibleVideos.add(video);
+      } else {
+        visibleVideos.delete(video);
+      }
       syncVisibleVideo(video);
     });
-  });
-  document.addEventListener("astro:page-load", () => {
+  }
+
+  function scheduleVideoSync() {
+    if (videoSyncFrame) return;
+    videoSyncFrame = window.requestAnimationFrame(() => {
+      videoSyncFrame = 0;
+      syncAllVisibleVideos();
+    });
+  }
+
+  function bindProjectMedia() {
     bindProjectMediaFallbacks();
     bindVideoPreviews();
+    scheduleVideoSync();
+  }
+
+  bindProjectMedia();
+
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", bindProjectMedia, { once: true });
+  } else {
+    requestAnimationFrame(bindProjectMedia);
+  }
+
+  window.addEventListener("load", bindProjectMedia, { once: true });
+  window.setTimeout(bindProjectMedia, 320);
+  window.setTimeout(bindProjectMedia, 1000);
+  window.addEventListener("scroll", scheduleVideoSync, { passive: true });
+  window.addEventListener("resize", scheduleVideoSync);
+
+  document.addEventListener("visibilitychange", () => {
+    syncAllVisibleVideos();
   });
+  document.addEventListener("astro:page-load", bindProjectMedia);
 </script>
