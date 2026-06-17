@@ -132,7 +132,7 @@ function extractFirstMedia(source = "") {
   collect(/!\[[^\]]*]\(\s*(<[^>]+>|[^\s)]+)(?:\s+["'][^"']*["'])?\s*\)/g, 1);
   collect(/<img\b[^>]*\bsrc=["']([^"']+)["'][^>]*>/gi, 1, "image");
   collect(/<(?:video|source)\b[^>]*\bsrc=["']([^"']+)["'][^>]*>/gi, 1, "video");
-  collect(/\[[^\]]+]\(\s*(https?:\/\/github\.com\/user-attachments\/assets\/[^)\s]+)\s*\)/gi, 1);
+  collect(/\[[^\]]+]\(\s*(https?:\/\/github\.com\/user-attachments\/assets\/[^)\s]+)\s*\)/gi, 1, "video");
   collect(/\[[^\]]+]\(\s*(<?[^)\s>]+\.(?:mp4|webm|mov|m4v|ogv|ogg)(?:\?[^)\s>]*)?>?)\s*\)/gi, 1, "video");
 
   return candidates.sort((a, b) => a.index - b.index)[0];

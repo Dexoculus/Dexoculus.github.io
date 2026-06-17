@@ -29,6 +29,7 @@ const placeholderTools = "tools" in project ? project.tools.slice(0, 3) : projec
           data-video-autoplay=""
           data-video-preview={!large ? "" : undefined}
           aria-label={`${mediaLabel} video preview`}
+          autoplay={!large}
           controls={large}
           loop
           muted
@@ -56,6 +57,7 @@ const placeholderTools = "tools" in project ? project.tools.slice(0, 3) : projec
                 data-video-autoplay=""
                 data-video-preview=""
                 aria-label={`${mediaLabel} video preview`}
+                autoplay={!large}
                 controls={large}
                 hidden
                 loop
@@ -156,6 +158,12 @@ const placeholderTools = "tools" in project ? project.tools.slice(0, 3) : projec
     }
 
     getVideoObserver().observe(video);
+    requestAnimationFrame(() => {
+      if (isInViewport(video)) {
+        visibleVideos.add(video);
+      }
+      syncVisibleVideo(video);
+    });
   }
 
   function bindProjectMediaFallbacks() {
