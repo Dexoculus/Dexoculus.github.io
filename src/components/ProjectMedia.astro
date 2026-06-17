@@ -15,7 +15,6 @@ const isVideo = project.mediaType === "video";
 const canVideoFallback = Boolean(mediaUrl && !isVideo && mediaUrl.includes("github.com/user-attachments/assets/"));
 const poster = isVideo ? project.image : undefined;
 const shouldRenderVideo = isVideo && (large || autoplayPreview);
-const previewSrc = !large && shouldRenderVideo ? mediaUrl : undefined;
 const placeholderTools = "tools" in project ? project.tools.slice(0, 3) : project.tags.slice(0, 3);
 ---
 
@@ -24,8 +23,7 @@ const placeholderTools = "tools" in project ? project.tools.slice(0, 3) : projec
     mediaUrl ? (
       shouldRenderVideo ? (
         <video
-          src={large ? mediaUrl : undefined}
-          data-preview-src={previewSrc}
+          src={mediaUrl}
           data-video-autoplay=""
           data-video-preview={!large ? "" : undefined}
           aria-label={`${mediaLabel} video preview`}
@@ -92,9 +90,16 @@ const placeholderTools = "tools" in project ? project.tools.slice(0, 3) : projec
     video.load();
   }
 
+  function prepareVideo(video: HTMLVideoElement) {
+    video.muted = true;
+    video.defaultMuted = true;
+    video.playsInline = true;
+    hydratePreview(video);
+  }
+
   function playVideo(video: HTMLVideoElement) {
     if (video.hidden || document.hidden) return;
-    hydratePreview(video);
+    prepareVideo(video);
     video.play()
       .then(() => {
         delete video.dataset.videoBlocked;
@@ -149,13 +154,13 @@ const placeholderTools = "tools" in project ? project.tools.slice(0, 3) : projec
   function observeVideo(video: HTMLVideoElement) {
     if (video.dataset.autoplayBound === "true") return;
     video.dataset.autoplayBound = "true";
+    prepareVideo(video);
 
     video.addEventListener("pointerenter", () => playVideo(video));
     video.addEventListener("click", () => playVideo(video));
     video.addEventListener("touchstart", () => playVideo(video), { passive: true });
 
     if (!("IntersectionObserver" in window)) {
-      hydratePreview(video);
       playVideo(video);
       return;
     }
@@ -179,7 +184,7 @@ const placeholderTools = "tools" in project ? project.tools.slice(0, 3) : projec
           if (!(fallback instanceof HTMLVideoElement)) return;
           image.hidden = true;
           fallback.hidden = false;
-          hydratePreview(fallback);
+          prepareVideo(fallback);
           observeVideo(fallback);
           if (isInViewport(fallback)) {
             visibleVideos.add(fallback);
