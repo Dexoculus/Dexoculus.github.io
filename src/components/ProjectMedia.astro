@@ -3,12 +3,11 @@ import type { Post, Project } from "@/lib/content";
 
 type Props = {
   project: Project | Post;
-  badge?: string;
   large?: boolean;
   autoplayPreview?: boolean;
 };
 
-const { project, badge, large = false, autoplayPreview = true } = Astro.props;
+const { project, large = false, autoplayPreview = true } = Astro.props;
 const mediaLabel = "name" in project ? project.name : project.title;
 const mediaUrl = project.mediaUrl || project.image;
 const isVideo = project.mediaType === "video";
@@ -77,7 +76,6 @@ const placeholderTools = "tools" in project ? project.tools.slice(0, 3) : projec
     )
   }
   {isVideo && !shouldRenderVideo && <span class="media-play-indicator" aria-hidden="true"></span>}
-  {badge && <span class="media-sequence">{badge}</span>}
 </div>
 
 <script>
