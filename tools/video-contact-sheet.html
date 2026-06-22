@@ -1,0 +1,330 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Video Contact Sheet</title>
+    <style>
+      :root {
+        color-scheme: dark;
+        --bg: #111111;
+        --panel: #1c1c1c;
+        --line: rgba(253, 253, 253, 0.16);
+        --text: #fdfdfd;
+        --muted: #909090;
+        --accent: #ffef01;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        color: var(--text);
+        background:
+          repeating-linear-gradient(135deg, rgba(253, 253, 253, 0.06) 0 1px, transparent 1px 10px),
+          var(--bg);
+        font-family: "Segoe UI", Arial, sans-serif;
+      }
+
+      main {
+        width: min(1100px, calc(100% - 32px));
+        margin: 0 auto;
+        padding: 32px 0;
+      }
+
+      h1 {
+        margin: 0 0 8px;
+        font-size: clamp(1.8rem, 4vw, 3rem);
+        line-height: 1;
+      }
+
+      p {
+        max-width: 72ch;
+        margin: 0 0 20px;
+        color: var(--muted);
+        line-height: 1.6;
+      }
+
+      .panel {
+        display: grid;
+        gap: 16px;
+        padding: 18px;
+        background: rgba(28, 28, 28, 0.92);
+        border: 1px solid var(--line);
+        border-radius: 8px;
+      }
+
+      .controls {
+        display: grid;
+        grid-template-columns: repeat(5, minmax(120px, 1fr));
+        gap: 12px;
+      }
+
+      label {
+        display: grid;
+        gap: 6px;
+        color: var(--muted);
+        font-size: 0.75rem;
+        font-weight: 700;
+        text-transform: uppercase;
+      }
+
+      input,
+      button {
+        min-height: 40px;
+        color: var(--text);
+        background: rgba(253, 253, 253, 0.08);
+        border: 1px solid var(--line);
+        border-radius: 6px;
+        font: inherit;
+      }
+
+      input {
+        padding: 8px 10px;
+      }
+
+      input[type="file"] {
+        grid-column: 1 / -1;
+      }
+
+      button {
+        cursor: pointer;
+        color: #111111;
+        background: var(--accent);
+        border-color: var(--accent);
+        font-weight: 800;
+      }
+
+      button:disabled {
+        cursor: not-allowed;
+        color: var(--muted);
+        background: rgba(253, 253, 253, 0.08);
+        border-color: var(--line);
+      }
+
+      .status {
+        min-height: 24px;
+        color: var(--muted);
+        font-family: Consolas, monospace;
+        font-size: 0.82rem;
+      }
+
+      canvas {
+        display: block;
+        width: 100%;
+        margin-top: 18px;
+        background: #08080a;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+      }
+
+      .actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+      }
+
+      a.download {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        min-height: 40px;
+        padding: 0 14px;
+        color: var(--text);
+        border: 1px solid var(--line);
+        border-radius: 6px;
+        text-decoration: none;
+      }
+
+      @media (max-width: 760px) {
+        .controls {
+          grid-template-columns: 1fr 1fr;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <h1>Video Contact Sheet</h1>
+      <p>
+        Select a local video and generate a frame grid with browser-native video decoding.
+        No ffmpeg or server is required.
+      </p>
+
+      <section class="panel">
+        <input id="file" type="file" accept="video/*" />
+
+        <div class="controls">
+          <label>
+            Frames
+            <input id="frames" type="number" min="2" max="60" value="12" />
+          </label>
+          <label>
+            Columns
+            <input id="columns" type="number" min="1" max="8" value="4" />
+          </label>
+          <label>
+            Thumb width
+            <input id="thumbWidth" type="number" min="160" max="1280" step="20" value="560" />
+          </label>
+          <label>
+            Start %
+            <input id="start" type="number" min="0" max="99" value="0" />
+          </label>
+          <label>
+            End %
+            <input id="end" type="number" min="1" max="100" value="100" />
+          </label>
+        </div>
+
+        <div class="actions">
+          <button id="generate" disabled>Generate</button>
+          <a id="download" class="download" hidden download="video-contact-sheet.png">Download PNG</a>
+        </div>
+
+        <div id="status" class="status">Waiting for a video file.</div>
+      </section>
+
+      <canvas id="sheet" hidden></canvas>
+      <video id="video" muted playsinline preload="metadata" hidden></video>
+    </main>
+
+    <script>
+      const fileInput = document.querySelector("#file");
+      const generateButton = document.querySelector("#generate");
+      const downloadLink = document.querySelector("#download");
+      const status = document.querySelector("#status");
+      const canvas = document.querySelector("#sheet");
+      const video = document.querySelector("#video");
+      const ctx = canvas.getContext("2d");
+
+      let objectUrl = "";
+
+      function readNumber(id) {
+        return Number(document.querySelector(id).value);
+      }
+
+      function setStatus(message) {
+        status.textContent = message;
+      }
+
+      function waitForVideoEvent(name) {
+        return new Promise((resolve, reject) => {
+          const onEvent = () => {
+            cleanup();
+            resolve();
+          };
+          const onError = () => {
+            cleanup();
+            reject(new Error(`Video ${name} failed.`));
+          };
+          const cleanup = () => {
+            video.removeEventListener(name, onEvent);
+            video.removeEventListener("error", onError);
+          };
+          video.addEventListener(name, onEvent, { once: true });
+          video.addEventListener("error", onError, { once: true });
+        });
+      }
+
+      async function seekTo(time) {
+        const clamped = Math.min(Math.max(time, 0), Math.max(video.duration - 0.05, 0));
+        if (Math.abs(video.currentTime - clamped) < 0.02 && video.readyState >= 2) return;
+        const done = waitForVideoEvent("seeked");
+        video.currentTime = clamped;
+        await done;
+      }
+
+      function formatTime(seconds) {
+        const mins = Math.floor(seconds / 60);
+        const secs = Math.floor(seconds % 60).toString().padStart(2, "0");
+        const ms = Math.floor((seconds % 1) * 10);
+        return `${mins}:${secs}.${ms}`;
+      }
+
+      async function generateSheet() {
+        if (!video.duration || !video.videoWidth || !video.videoHeight) {
+          setStatus("Video metadata is not ready.");
+          return;
+        }
+
+        const frameCount = readNumber("#frames");
+        const columns = readNumber("#columns");
+        const thumbWidth = readNumber("#thumbWidth");
+        const startRatio = readNumber("#start") / 100;
+        const endRatio = readNumber("#end") / 100;
+        const startTime = video.duration * Math.min(startRatio, endRatio);
+        const endTime = video.duration * Math.max(startRatio, endRatio);
+        const rows = Math.ceil(frameCount / columns);
+        const gap = 18;
+        const labelHeight = 30;
+        const thumbHeight = Math.round((thumbWidth * video.videoHeight) / video.videoWidth);
+        const sheetWidth = columns * thumbWidth + (columns + 1) * gap;
+        const sheetHeight = rows * (thumbHeight + labelHeight) + (rows + 1) * gap;
+
+        canvas.width = sheetWidth;
+        canvas.height = sheetHeight;
+        canvas.hidden = false;
+        ctx.fillStyle = "#08080a";
+        ctx.fillRect(0, 0, sheetWidth, sheetHeight);
+        ctx.font = "18px Consolas, monospace";
+        ctx.textBaseline = "middle";
+
+        for (let index = 0; index < frameCount; index += 1) {
+          const progress = frameCount === 1 ? 0 : index / (frameCount - 1);
+          const time = startTime + (endTime - startTime) * progress;
+          const column = index % columns;
+          const row = Math.floor(index / columns);
+          const x = gap + column * (thumbWidth + gap);
+          const y = gap + row * (thumbHeight + labelHeight + gap);
+
+          setStatus(`Rendering frame ${index + 1} / ${frameCount} at ${formatTime(time)}.`);
+          await seekTo(time);
+          ctx.drawImage(video, x, y, thumbWidth, thumbHeight);
+
+          ctx.fillStyle = "rgba(17, 17, 17, 0.9)";
+          ctx.fillRect(x, y + thumbHeight, thumbWidth, labelHeight);
+          ctx.fillStyle = "#ffef01";
+          ctx.fillText(`#${String(index + 1).padStart(2, "0")}  ${formatTime(time)}`, x + 10, y + thumbHeight + labelHeight / 2);
+        }
+
+        const blob = await new Promise((resolve) => canvas.toBlob(resolve, "image/png"));
+        if (!blob) {
+          setStatus("Failed to export PNG.");
+          return;
+        }
+
+        if (downloadLink.href) URL.revokeObjectURL(downloadLink.href);
+        downloadLink.href = URL.createObjectURL(blob);
+        downloadLink.hidden = false;
+        setStatus(`Done. ${frameCount} frames, ${columns} columns, ${Math.round(blob.size / 1024)} KB PNG.`);
+      }
+
+      fileInput.addEventListener("change", async () => {
+        const file = fileInput.files?.[0];
+        generateButton.disabled = true;
+        downloadLink.hidden = true;
+        canvas.hidden = true;
+
+        if (!file) {
+          setStatus("Waiting for a video file.");
+          return;
+        }
+
+        if (objectUrl) URL.revokeObjectURL(objectUrl);
+        objectUrl = URL.createObjectURL(file);
+        video.src = objectUrl;
+        setStatus("Loading metadata.");
+        await waitForVideoEvent("loadedmetadata");
+        generateButton.disabled = false;
+        setStatus(`${file.name}: ${video.videoWidth}x${video.videoHeight}, ${formatTime(video.duration)}.`);
+      });
+
+      generateButton.addEventListener("click", () => {
+        generateSheet().catch((error) => setStatus(error.message));
+      });
+    </script>
+  </body>
+</html>

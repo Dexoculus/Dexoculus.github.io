@@ -3,15 +3,13 @@ import type { Post, Project } from "@/lib/content";
 
 type Props = {
   project: Project | Post;
-  actionLabel?: string;
   large?: boolean;
   autoplayPreview?: boolean;
 };
 
-const { project, actionLabel, large = false, autoplayPreview = true } = Astro.props;
+const { project, large = false, autoplayPreview = true } = Astro.props;
 const mediaLabel = "name" in project ? project.name : project.title;
 const mediaUrl = project.mediaUrl || project.image;
-const mediaAction = actionLabel || undefined;
 const isVideo = project.mediaType === "video";
 const canVideoFallback = Boolean(mediaUrl && !isVideo && mediaUrl.includes("github.com/user-attachments/assets/"));
 const poster = isVideo ? project.image : undefined;
@@ -21,7 +19,7 @@ const placeholderLabel = isProject ? "PROJECT RECORD" : "NOTE RECORD";
 const placeholderTools = isProject ? project.tools.slice(0, 3) : project.tags.slice(0, 3);
 ---
 
-<div class:list={["project-media", { large }]} data-media-action={mediaAction}>
+<div class:list={["project-media", { large }]}>
   {
     mediaUrl ? (
       shouldRenderVideo ? (

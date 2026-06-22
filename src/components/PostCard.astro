@@ -15,7 +15,7 @@ const actionLabel = isExternal ? "Open note" : "Read note";
 
 <article class="note-card" data-note-card data-tags={post.tags.map((tag) => tag.toLowerCase()).join("|")} data-search={`${post.title} ${post.description} ${post.tags.join(" ")}`.toLowerCase()}>
   <a href={href} target={isExternal ? "_blank" : undefined} rel={isExternal ? "noreferrer" : undefined}>
-    <ProjectMedia project={post} actionLabel={actionLabel} />
+    <ProjectMedia project={post} />
     <div class="note-body">
       <div class="card-kicker">{metadata}</div>
       <h3>{post.title}</h3>
@@ -23,6 +23,7 @@ const actionLabel = isExternal ? "Open note" : "Read note";
       <div class="tag-row">
         {post.tags.map((tag) => <span>{tag}</span>)}
       </div>
+      <span class="card-action-pill">{actionLabel}</span>
     </div>
   </a>
 </article>
