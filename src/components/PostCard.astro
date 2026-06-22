@@ -10,11 +10,12 @@ const { post } = Astro.props;
 const href = post.externalUrl || `/note/${post.slug}/`;
 const isExternal = Boolean(post.externalUrl);
 const metadata = `${post.readingMinutes} min read`;
+const actionLabel = isExternal ? "Open note" : "Read note";
 ---
 
 <article class="note-card" data-note-card data-tags={post.tags.map((tag) => tag.toLowerCase()).join("|")} data-search={`${post.title} ${post.description} ${post.tags.join(" ")}`.toLowerCase()}>
   <a href={href} target={isExternal ? "_blank" : undefined} rel={isExternal ? "noreferrer" : undefined}>
-    {post.mediaUrl && <ProjectMedia project={post} />}
+    <ProjectMedia project={post} actionLabel={actionLabel} />
     <div class="note-body">
       <div class="card-kicker">{metadata}</div>
       <h3>{post.title}</h3>

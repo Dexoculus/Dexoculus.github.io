@@ -89,9 +89,6 @@
   --information-orange: var(--decagram-orange-1);
   --surface-accent: var(--information-orange);
   --surface-accent-glow: rgba(239, 140, 56, 0.2);
-  --card-hover-surface: rgba(254, 254, 254, 0.98);
-  --card-hover-shadow: 0 24px 54px rgba(8, 8, 10, 0.16);
-  --card-hover-media-filter: brightness(1.03) contrast(1.02);
   --warn: var(--endfield-red);
   --power: var(--endfield-orange);
   --state: var(--archive-blue-1);
@@ -141,9 +138,6 @@
   --inverse-shadow: 0 20px 58px rgba(0, 0, 0, 0.44), 0 0 30px rgba(253, 253, 253, 0.1);
   --surface-accent: var(--focus);
   --surface-accent-glow: var(--focus-glow);
-  --card-hover-surface: rgba(39, 39, 39, 0.96);
-  --card-hover-shadow: 0 24px 58px rgba(0, 0, 0, 0.48);
-  --card-hover-media-filter: brightness(1.08) contrast(1.04);
   --shadow: 0 18px 58px rgba(0, 0, 0, 0.35);
   --hatch-soft: repeating-linear-gradient(135deg, rgba(253, 253, 253, 0.15) 0 1px, transparent 1px 8px);
   --hatch-focus: repeating-linear-gradient(135deg, rgba(255, 239, 1, 0.26) 0 1px, transparent 1px 8px);
@@ -759,7 +753,6 @@ main {
   opacity: 0.46;
   -webkit-mask-image: linear-gradient(135deg, transparent 0 12%, #000 42%, #000 100%);
   mask-image: linear-gradient(135deg, transparent 0 12%, #000 42%, #000 100%);
-  transition: opacity 180ms ease, transform 180ms ease;
 }
 
 .hero-copy::after,
@@ -1245,37 +1238,35 @@ main {
 
 .project-card a,
 .note-card a {
-  display: flex;
-  flex-direction: column;
+  display: grid;
+  grid-template-rows: 164px minmax(0, 1fr);
   min-width: 0;
+  min-height: 356px;
   height: 100%;
   overflow: hidden;
-  transition: transform 180ms ease, box-shadow 180ms ease, background-color 180ms ease;
+  transition: grid-template-rows 170ms ease;
+}
+
+.project-card.compact a {
+  grid-template-rows: 148px minmax(0, 1fr);
+  min-height: 342px;
+}
+
+.note-card a {
+  grid-template-rows: 132px minmax(0, 1fr);
+  min-height: 326px;
 }
 
 @supports (content-visibility: auto) {
   .project-grid.archive .project-card {
     content-visibility: auto;
-    contain-intrinsic-size: auto 520px;
+    contain-intrinsic-size: auto 356px;
   }
 
   .note-grid.archive .note-card {
     content-visibility: auto;
-    contain-intrinsic-size: auto 340px;
+    contain-intrinsic-size: auto 326px;
   }
-}
-
-.project-card a:hover,
-.note-card a:hover {
-  background: var(--card-hover-surface);
-  transform: translateY(-3px);
-  box-shadow: var(--card-hover-shadow);
-}
-
-.project-card a:hover::after,
-.note-card a:hover::after {
-  opacity: 0.52;
-  transform: translate(-4px, -2px);
 }
 
 .project-media {
@@ -1285,10 +1276,67 @@ main {
   background: var(--endfield-panel);
 }
 
-.project-media img,
-.project-media video,
-.project-record-art {
-  transition: transform 220ms ease, filter 220ms ease;
+.project-card .project-media:not(.large),
+.note-card .project-media:not(.large) {
+  aspect-ratio: auto;
+  height: 100%;
+  min-height: 0;
+}
+
+.project-media::after {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  pointer-events: none;
+  content: "";
+  background: linear-gradient(180deg, rgba(8, 8, 10, 0.42), rgba(8, 8, 10, 0.58));
+  opacity: 0;
+  transition: opacity 150ms ease;
+}
+
+.project-media[data-media-action]::before {
+  position: absolute;
+  left: 12px;
+  bottom: 12px;
+  z-index: 3;
+  pointer-events: none;
+  padding: 5px 9px;
+  color: var(--endfield-white);
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+  line-height: 1;
+  text-transform: uppercase;
+  content: attr(data-media-action);
+  background: rgba(8, 8, 10, 0.76);
+  border-left: 3px solid var(--surface-accent);
+  opacity: 0;
+  transform: translateY(4px);
+  transition: opacity 150ms ease, transform 150ms ease;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .project-card a:hover {
+    grid-template-rows: 104px minmax(0, 1fr);
+  }
+
+  .project-card.compact a:hover {
+    grid-template-rows: 96px minmax(0, 1fr);
+  }
+
+  .note-card a:hover {
+    grid-template-rows: 88px minmax(0, 1fr);
+  }
+
+  .project-card a:hover .project-media::after,
+  .note-card a:hover .project-media::after {
+    opacity: 1;
+  }
+
+  .project-card a:hover .project-media[data-media-action]::before,
+  .note-card a:hover .project-media[data-media-action]::before {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 .project-media img,
@@ -1297,13 +1345,6 @@ main {
   width: 100%;
   height: 100%;
   object-fit: cover;
-}
-
-.project-card a:hover .project-media img,
-.project-card a:hover .project-media video,
-.project-card a:hover .project-record-art {
-  filter: var(--card-hover-media-filter);
-  transform: scale(1.018);
 }
 
 .project-media video {
@@ -1321,6 +1362,7 @@ main {
 
 .media-play-indicator {
   position: absolute;
+  z-index: 4;
   left: 12px;
   bottom: 12px;
   display: grid;
@@ -1385,6 +1427,11 @@ main {
   line-height: 1.16;
 }
 
+.project-card .project-record-art:not(.large),
+.note-card .project-record-art:not(.large) {
+  min-height: 0;
+}
+
 .project-record-art.large {
   min-height: 320px;
   border-radius: var(--radius);
@@ -1392,8 +1439,11 @@ main {
 
 .project-body,
 .note-body {
+  display: flex;
+  flex-direction: column;
   min-width: 0;
-  padding: 18px;
+  min-height: 0;
+  padding: 16px;
 }
 
 .project-body h2,
@@ -1408,6 +1458,27 @@ main {
   margin: 10px 0 0;
   color: var(--text-soft);
   line-height: 1.62;
+}
+
+.project-card h2,
+.project-card h3,
+.note-card h3,
+.project-card p,
+.note-card p {
+  display: -webkit-box;
+  overflow: hidden;
+  -webkit-box-orient: vertical;
+}
+
+.project-card h2,
+.project-card h3,
+.note-card h3 {
+  -webkit-line-clamp: 2;
+}
+
+.project-card p,
+.note-card p {
+  -webkit-line-clamp: 3;
 }
 
 .dark-panel p,
@@ -1431,6 +1502,14 @@ main {
   flex-wrap: wrap;
   gap: 7px;
   margin-top: 16px;
+}
+
+.project-card .tag-row,
+.note-card .tag-row {
+  max-height: 60px;
+  margin-top: auto;
+  padding-top: 14px;
+  overflow: hidden;
 }
 
 .tag-row span,
@@ -2615,21 +2694,15 @@ main {
     grid-template-columns: 1fr;
   }
 
-  .project-card a {
-    min-height: auto;
+  .project-card a,
+  .project-card.compact a,
+  .note-card a {
+    grid-template-rows: 138px minmax(0, 1fr);
+    min-height: 320px;
   }
 
-  .project-media:not(.large) {
-    aspect-ratio: 2 / 1;
-    min-height: 0;
-    max-height: 210px;
-  }
-
-  .project-record-art:not(.large) {
-    min-height: 0;
-  }
-
-  .project-body {
+  .project-body,
+  .note-body {
     padding: 14px;
   }
 

@@ -23,6 +23,7 @@ const Heading = headingLevel === 2 ? "h2" : "h3";
   <a href={href} target={isExternal ? "_blank" : undefined} rel={isExternal ? "noreferrer" : undefined}>
     <ProjectMedia
       project={project}
+      actionLabel={isExternal ? "Open project" : "View project"}
       autoplayPreview={autoplayPreview}
     />
     <div class="project-body">

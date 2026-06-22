@@ -3,21 +3,25 @@ import type { Post, Project } from "@/lib/content";
 
 type Props = {
   project: Project | Post;
+  actionLabel?: string;
   large?: boolean;
   autoplayPreview?: boolean;
 };
 
-const { project, large = false, autoplayPreview = true } = Astro.props;
+const { project, actionLabel, large = false, autoplayPreview = true } = Astro.props;
 const mediaLabel = "name" in project ? project.name : project.title;
 const mediaUrl = project.mediaUrl || project.image;
+const mediaAction = actionLabel || undefined;
 const isVideo = project.mediaType === "video";
 const canVideoFallback = Boolean(mediaUrl && !isVideo && mediaUrl.includes("github.com/user-attachments/assets/"));
 const poster = isVideo ? project.image : undefined;
 const shouldRenderVideo = isVideo && (large || autoplayPreview);
-const placeholderTools = "tools" in project ? project.tools.slice(0, 3) : project.tags.slice(0, 3);
+const isProject = "tools" in project;
+const placeholderLabel = isProject ? "PROJECT RECORD" : "NOTE RECORD";
+const placeholderTools = isProject ? project.tools.slice(0, 3) : project.tags.slice(0, 3);
 ---
 
-<div class:list={["project-media", { large }]}>
+<div class:list={["project-media", { large }]} data-media-action={mediaAction}>
   {
     mediaUrl ? (
       shouldRenderVideo ? (
@@ -69,7 +73,7 @@ const placeholderTools = "tools" in project ? project.tools.slice(0, 3) : projec
       )
     ) : (
       <div class:list={["project-record-art", { large }]}>
-        <span>PROJECT RECORD</span>
+        <span>{placeholderLabel}</span>
         <strong>{mediaLabel}</strong>
         {placeholderTools.length > 0 && <small>{placeholderTools.join(" / ")}</small>}
       </div>
