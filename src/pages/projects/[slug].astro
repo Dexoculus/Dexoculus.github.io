@@ -17,6 +17,7 @@ const MathStyles = project.richFeatures.math ? (await import("@/components/MathS
 const ChartRuntime = project.richFeatures.chart ? (await import("@/components/ChartRuntime.astro")).default : null;
 const ThreeRuntime = project.richFeatures.three ? (await import("@/components/ThreeRuntime.astro")).default : null;
 const MermaidRuntime = project.richFeatures.mermaid ? (await import("@/components/MermaidRuntime.astro")).default : null;
+const hasToc = project.headings.length > 0;
 const projectJsonLd = {
   "@context": "https://schema.org",
   "@type": "CreativeWork",
@@ -41,7 +42,7 @@ const projectJsonLd = {
       </div>
       <ProjectMedia project={project} large />
     </header>
-    <div class="article-body">
+    <div class:list={["article-body", { "no-toc": !hasToc }]}>
       <ArticleToc headings={project.headings} />
       <div class="markdown-panel">
         {typeof Content === "function" ? <Content /> : <p>{project.description}</p>}

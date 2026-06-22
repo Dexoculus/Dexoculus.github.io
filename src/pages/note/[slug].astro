@@ -16,6 +16,7 @@ const MathStyles = post.richFeatures.math ? (await import("@/components/MathStyl
 const ChartRuntime = post.richFeatures.chart ? (await import("@/components/ChartRuntime.astro")).default : null;
 const ThreeRuntime = post.richFeatures.three ? (await import("@/components/ThreeRuntime.astro")).default : null;
 const MermaidRuntime = post.richFeatures.mermaid ? (await import("@/components/MermaidRuntime.astro")).default : null;
+const hasToc = post.headings.length > 0;
 const articleJsonLd = {
   "@context": "https://schema.org",
   "@type": "BlogPosting",
@@ -41,7 +42,7 @@ const articleJsonLd = {
         {post.tags.map((tag) => <span>{tag}</span>)}
       </div>
     </header>
-    <div class="article-body">
+    <div class:list={["article-body", { "no-toc": !hasToc }]}>
       <ArticleToc headings={post.headings} />
       <div class="markdown-panel">
         {typeof Content === "function" ? <Content /> : <p>{post.description}</p>}

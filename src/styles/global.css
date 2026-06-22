@@ -1243,20 +1243,7 @@ main {
   min-width: 0;
   height: 100%;
   overflow: hidden;
-  transition: border-color 160ms ease, transform 160ms ease, box-shadow 160ms ease;
-}
-
-.project-card a::before,
-.note-card a::before {
-  position: absolute;
-  inset: 0;
-  z-index: 2;
-  pointer-events: none;
-  content: "";
-  border-radius: inherit;
-  opacity: 0;
-  box-shadow: inset 0 0 0 1px var(--surface-accent);
-  transition: opacity 160ms ease;
+  transition: transform 160ms ease, box-shadow 160ms ease, background-color 160ms ease;
 }
 
 @supports (content-visibility: auto) {
@@ -1274,13 +1261,7 @@ main {
 .project-card a:hover,
 .note-card a:hover {
   transform: translateY(-2px);
-  border-color: var(--surface-accent);
-  box-shadow: 0 18px 50px var(--surface-accent-glow);
-}
-
-.project-card a:hover::before,
-.note-card a:hover::before {
-  opacity: 1;
+  box-shadow: 0 0 0 1px var(--surface-accent), 0 14px 30px var(--surface-accent-glow);
 }
 
 .project-media {
@@ -1711,6 +1692,10 @@ main {
   grid-template-columns: 220px minmax(0, 1fr);
   gap: 18px;
   align-items: start;
+}
+
+.article-body.no-toc {
+  grid-template-columns: minmax(0, 1fr);
 }
 
 .article-toc {
