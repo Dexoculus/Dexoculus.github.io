@@ -1294,59 +1294,45 @@ main {
   transition: opacity 150ms ease;
 }
 
-.project-card a::before,
-.note-card a::before {
-  position: absolute;
-  top: 14px;
-  right: 14px;
-  z-index: 3;
-  pointer-events: none;
-  width: 30px;
-  height: 16px;
-  content: "";
-  background:
-    linear-gradient(var(--surface-accent), var(--surface-accent)) right top / 16px 1px no-repeat,
-    linear-gradient(var(--surface-accent), var(--surface-accent)) right top / 1px 8px no-repeat;
-  opacity: 0;
-  transform: translate(4px, -4px);
-  transition: opacity 150ms ease, transform 150ms ease;
-}
 
 @media (hover: hover) and (pointer: fine) {
   .project-card a:hover,
   .project-card a:focus-visible,
   .note-card a:hover,
   .note-card a:focus-visible {
-    border-color: rgba(239, 140, 56, 0.54);
-    box-shadow: var(--shadow), 0 0 0 1px rgba(239, 140, 56, 0.16);
-    transform: translateY(-2px);
+    border-color: var(--line-strong);
+    transform: translateY(-1px);
   }
 
   .project-card a:hover .project-media::after,
   .project-card a:focus-visible .project-media::after,
   .note-card a:hover .project-media::after,
   .note-card a:focus-visible .project-media::after {
-    opacity: 0.42;
+    opacity: 0.2;
   }
 
-  .project-card a:hover::before,
-  .project-card a:focus-visible::before,
-  .note-card a:hover::before,
-  .note-card a:focus-visible::before {
-    opacity: 0.92;
-    transform: translate(0, 0);
+  .project-card a:hover .card-action-pill,
+  .project-card a:focus-visible .card-action-pill,
+  .note-card a:hover .card-action-pill,
+  .note-card a:focus-visible .card-action-pill {
+    color: var(--text);
+    border-color: var(--surface-accent);
   }
 
-  .project-card a:hover .project-body::before,
-  .project-card a:focus-visible .project-body::before,
-  .note-card a:hover .note-body::before,
-  .note-card a:focus-visible .note-body::before,
   .project-card a:hover .card-action-pill::before,
   .project-card a:focus-visible .card-action-pill::before,
   .note-card a:hover .card-action-pill::before,
   .note-card a:focus-visible .card-action-pill::before {
+    width: calc(100% - 20px);
     opacity: 1;
-    transform: scaleX(1);
+  }
+
+  .project-card a:hover .card-action-pill::after,
+  .project-card a:focus-visible .card-action-pill::after,
+  .note-card a:hover .card-action-pill::after,
+  .note-card a:focus-visible .card-action-pill::after {
+    width: 18px;
+    opacity: 0.86;
   }
 
   .project-card a:hover .project-media img,
@@ -1357,31 +1343,30 @@ main {
   .note-card a:focus-visible .project-media img,
   .note-card a:hover .project-media video,
   .note-card a:focus-visible .project-media video {
-    transform: scale(1.012);
+    transform: scale(1.008);
   }
 }
 
 @media (hover: none) {
-  .project-card a::before,
-  .note-card a::before {
-    opacity: 0.48;
-    transform: translate(0, 0);
+  .card-action-pill::before {
+    width: 28px;
+    opacity: 0.82;
   }
 
-  .card-action-pill::before {
-    opacity: 0.82;
-    transform: scaleX(0.62);
+  .card-action-pill::after {
+    width: 10px;
+    opacity: 0.54;
   }
 
   .project-card a:active .project-media::after,
   .note-card a:active .project-media::after {
-    opacity: 0.28;
+    opacity: 0.2;
   }
 
   .project-card a:active .card-action-pill::before,
   .note-card a:active .card-action-pill::before {
+    width: calc(100% - 20px);
     opacity: 1;
-    transform: scaleX(1);
   }
 }
 
@@ -1496,28 +1481,6 @@ main {
   padding: 16px;
 }
 
-.project-body::before,
-.note-body::before {
-  position: absolute;
-  left: 16px;
-  right: 16px;
-  top: 56px;
-  z-index: 0;
-  height: 1px;
-  pointer-events: none;
-  content: "";
-  background: linear-gradient(90deg, transparent, var(--surface-accent), rgba(253, 253, 253, 0.38), transparent);
-  opacity: 0;
-  transform: scaleX(0.24);
-  transform-origin: left center;
-  transition: opacity 150ms ease, transform 170ms ease;
-}
-
-.project-body > *,
-.note-body > * {
-  position: relative;
-  z-index: 1;
-}
 
 .project-body h2,
 .project-body h3,
@@ -1590,9 +1553,9 @@ main {
   display: inline-flex;
   align-items: center;
   align-self: flex-start;
-  min-height: 28px;
+  min-height: 30px;
   margin-top: 12px;
-  padding: 0 10px;
+  padding: 0 12px 2px;
   overflow: hidden;
   color: var(--text-soft);
   background: rgba(253, 253, 253, 0.5);
@@ -1603,21 +1566,32 @@ main {
   font-weight: 800;
   line-height: 1;
   text-transform: uppercase;
+  transition: color 150ms ease, border-color 150ms ease, background 150ms ease;
+}
+
+.card-action-pill::before,
+.card-action-pill::after {
+  position: absolute;
+  pointer-events: none;
+  content: "";
+  background: var(--surface-accent);
+  opacity: 0.72;
+  transition: width 190ms cubic-bezier(0.22, 1, 0.36, 1), opacity 150ms ease;
 }
 
 .card-action-pill::before {
-  position: absolute;
-  left: 8px;
-  right: 8px;
+  left: 10px;
   bottom: 6px;
+  width: 14px;
+  height: 2px;
+}
+
+.card-action-pill::after {
+  top: 6px;
+  right: 10px;
+  width: 7px;
   height: 1px;
-  pointer-events: none;
-  content: "";
-  background: linear-gradient(90deg, transparent, var(--surface-accent), transparent);
-  opacity: 0.62;
-  transform: scaleX(0.28);
-  transform-origin: left center;
-  transition: opacity 150ms ease, transform 170ms ease;
+  opacity: 0.42;
 }
 
 :root[data-theme="dark"] .card-action-pill {
