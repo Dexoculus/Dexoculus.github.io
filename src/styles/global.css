@@ -1307,9 +1307,9 @@ main {
   pointer-events: none;
   content: "";
   background: var(--surface-accent);
-  opacity: 0.62;
-  transform: scaleX(0.055);
-  transition: transform 520ms cubic-bezier(0.19, 1, 0.22, 1), opacity 220ms ease;
+  opacity: 0.96;
+  transform: scaleX(0.001);
+  transition: transform 780ms cubic-bezier(0.22, 0.61, 0.36, 1), opacity 160ms linear;
 }
 
 .project-body::before,
@@ -1370,7 +1370,7 @@ main {
   .note-body::before,
   .note-body::after {
     opacity: 0.72;
-    transform: scaleX(0.12);
+    transform: scaleX(0.08);
   }
 
   .project-card a:active .project-body::before,
