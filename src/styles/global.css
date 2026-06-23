@@ -1239,33 +1239,33 @@ main {
 .project-card a,
 .note-card a {
   display: grid;
-  grid-template-rows: 164px minmax(0, 1fr);
+  grid-template-rows: 188px minmax(0, 1fr);
   min-width: 0;
-  min-height: 356px;
+  min-height: 406px;
   height: 100%;
   overflow: hidden;
   transition: border-color 180ms ease, transform 220ms cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 .project-card.compact a {
-  grid-template-rows: 148px minmax(0, 1fr);
-  min-height: 342px;
+  grid-template-rows: 170px minmax(0, 1fr);
+  min-height: 386px;
 }
 
 .note-card a {
-  grid-template-rows: 132px minmax(0, 1fr);
-  min-height: 326px;
+  grid-template-rows: 172px minmax(0, 1fr);
+  min-height: 392px;
 }
 
 @supports (content-visibility: auto) {
   .project-grid.archive .project-card {
     content-visibility: auto;
-    contain-intrinsic-size: auto 356px;
+    contain-intrinsic-size: auto 406px;
   }
 
   .note-grid.archive .note-card {
     content-visibility: auto;
-    contain-intrinsic-size: auto 326px;
+    contain-intrinsic-size: auto 392px;
   }
 }
 
@@ -1295,11 +1295,11 @@ main {
 }
 
 
-.project-card a::before,
-.note-card a::before {
+.project-body::before,
+.note-body::before {
   position: absolute;
   left: 18px;
-  bottom: 16px;
+  top: 0;
   z-index: 3;
   right: 18px;
   height: 2px;
@@ -1308,7 +1308,7 @@ main {
   background: var(--surface-accent);
   opacity: 0.7;
   transform: scaleX(0.045);
-  transform-origin: left center;
+  transform-origin: right center;
   transition: transform 320ms cubic-bezier(0.16, 1, 0.3, 1), opacity 180ms ease;
 }
 
@@ -1321,10 +1321,10 @@ main {
     transform: translateY(-1px);
   }
 
-  .project-card a:hover::before,
-  .project-card a:focus-visible::before,
-  .note-card a:hover::before,
-  .note-card a:focus-visible::before {
+  .project-card a:hover .project-body::before,
+  .project-card a:focus-visible .project-body::before,
+  .note-card a:hover .note-body::before,
+  .note-card a:focus-visible .note-body::before {
     opacity: 1;
     transform: scaleX(1);
   }
@@ -1349,14 +1349,14 @@ main {
 }
 
 @media (hover: none) {
-  .project-card a::before,
-  .note-card a::before {
+  .project-body::before,
+  .note-body::before {
     opacity: 0.72;
     transform: scaleX(0.12);
   }
 
-  .project-card a:active::before,
-  .note-card a:active::before {
+  .project-card a:active .project-body::before,
+  .note-card a:active .note-body::before {
     opacity: 1;
     transform: scaleX(1);
   }
@@ -1451,9 +1451,14 @@ main {
 }
 
 .project-record-art strong {
+  display: -webkit-box;
   max-width: 26ch;
+  overflow: hidden;
+  overflow-wrap: anywhere;
   font-size: clamp(1rem, 2vw, 1.35rem);
   line-height: 1.16;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 3;
 }
 
 .project-card .project-record-art:not(.large),
@@ -1468,11 +1473,12 @@ main {
 
 .project-body,
 .note-body {
+  position: relative;
   display: flex;
   flex-direction: column;
   min-width: 0;
   min-height: 0;
-  padding: 16px;
+  padding: 18px;
 }
 
 
@@ -1503,6 +1509,9 @@ main {
 .project-card h2,
 .project-card h3,
 .note-card h3 {
+  overflow-wrap: anywhere;
+  word-break: normal;
+  hyphens: auto;
   -webkit-line-clamp: 2;
 }
 
@@ -2727,13 +2736,13 @@ main {
   .project-card a,
   .project-card.compact a,
   .note-card a {
-    grid-template-rows: 138px minmax(0, 1fr);
-    min-height: 320px;
+    grid-template-rows: 160px minmax(0, 1fr);
+    min-height: 376px;
   }
 
   .project-body,
   .note-body {
-    padding: 14px;
+    padding: 16px;
   }
 
   .project-filter {
