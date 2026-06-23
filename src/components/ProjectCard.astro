@@ -13,7 +13,6 @@ const { project, compact = false, headingLevel = 3, autoplayPreview = true } = A
 const href = project.externalUrl || `/projects/${project.slug}/`;
 const isExternal = Boolean(project.externalUrl);
 const Heading = headingLevel === 2 ? "h2" : "h3";
-const actionLabel = isExternal ? "Open project" : "View project";
 ---
 
 <article
@@ -33,7 +32,6 @@ const actionLabel = isExternal ? "Open project" : "View project";
       <div class="tag-row">
         {project.tools.slice(0, compact ? 3 : 6).map((tool) => <span>{tool}</span>)}
       </div>
-      <span class="card-action-pill">{actionLabel}</span>
     </div>
   </a>
 </article>

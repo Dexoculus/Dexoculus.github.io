@@ -24,7 +24,8 @@ const placeholderTools = isProject ? project.tools.slice(0, 3) : project.tags.sl
     mediaUrl ? (
       shouldRenderVideo ? (
         <video
-          src={mediaUrl}
+          src={large ? mediaUrl : undefined}
+          data-preview-src={!large ? mediaUrl : undefined}
           data-video-autoplay=""
           data-video-preview={!large ? "" : undefined}
           aria-label={`${mediaLabel} video preview`}
@@ -33,7 +34,7 @@ const placeholderTools = isProject ? project.tools.slice(0, 3) : project.tags.sl
           loop
           muted
           playsinline
-          preload="metadata"
+          preload={large ? "metadata" : "none"}
           poster={poster}
         />
       ) : isVideo && poster ? (
@@ -91,10 +92,14 @@ const placeholderTools = isProject ? project.tools.slice(0, 3) : project.tags.sl
     video.load();
   }
 
-  function prepareVideo(video: HTMLVideoElement) {
+  function configureVideo(video: HTMLVideoElement) {
     video.muted = true;
     video.defaultMuted = true;
     video.playsInline = true;
+  }
+
+  function prepareVideo(video: HTMLVideoElement) {
+    configureVideo(video);
     hydratePreview(video);
   }
 
@@ -164,7 +169,7 @@ const placeholderTools = isProject ? project.tools.slice(0, 3) : project.tags.sl
   function observeVideo(video: HTMLVideoElement) {
     if (video.dataset.autoplayBound === "true") return;
     video.dataset.autoplayBound = "true";
-    prepareVideo(video);
+    configureVideo(video);
 
     video.addEventListener("pointerenter", () => playVideo(video));
     video.addEventListener("click", () => playVideo(video));
@@ -190,7 +195,7 @@ const placeholderTools = isProject ? project.tools.slice(0, 3) : project.tags.sl
           if (!(fallback instanceof HTMLVideoElement)) return;
           image.hidden = true;
           fallback.hidden = false;
-          prepareVideo(fallback);
+          configureVideo(fallback);
           observeVideo(fallback);
           if (isInViewport(fallback)) {
             visibleVideos.add(fallback);

@@ -10,7 +10,6 @@ const { post } = Astro.props;
 const href = post.externalUrl || `/note/${post.slug}/`;
 const isExternal = Boolean(post.externalUrl);
 const metadata = `${post.readingMinutes} min read`;
-const actionLabel = isExternal ? "Open note" : "Read note";
 ---
 
 <article class="note-card" data-note-card data-tags={post.tags.map((tag) => tag.toLowerCase()).join("|")} data-search={`${post.title} ${post.description} ${post.tags.join(" ")}`.toLowerCase()}>
@@ -23,7 +22,6 @@ const actionLabel = isExternal ? "Open note" : "Read note";
       <div class="tag-row">
         {post.tags.map((tag) => <span>{tag}</span>)}
       </div>
-      <span class="card-action-pill">{actionLabel}</span>
     </div>
   </a>
 </article>
