@@ -1296,20 +1296,32 @@ main {
 
 
 .project-body::before,
-.note-body::before {
+.note-body::before,
+.project-body::after,
+.note-body::after {
   position: absolute;
   left: 18px;
-  top: 0;
   z-index: 3;
   right: 18px;
   height: 2px;
   pointer-events: none;
   content: "";
   background: var(--surface-accent);
-  opacity: 0.7;
-  transform: scaleX(0.045);
+  opacity: 0.62;
+  transform: scaleX(0.055);
+  transition: transform 520ms cubic-bezier(0.19, 1, 0.22, 1), opacity 220ms ease;
+}
+
+.project-body::before,
+.note-body::before {
+  top: 0;
   transform-origin: right center;
-  transition: transform 320ms cubic-bezier(0.16, 1, 0.3, 1), opacity 180ms ease;
+}
+
+.project-body::after,
+.note-body::after {
+  bottom: 16px;
+  transform-origin: left center;
 }
 
 @media (hover: hover) and (pointer: fine) {
@@ -1322,9 +1334,13 @@ main {
   }
 
   .project-card a:hover .project-body::before,
+  .project-card a:hover .project-body::after,
   .project-card a:focus-visible .project-body::before,
+  .project-card a:focus-visible .project-body::after,
   .note-card a:hover .note-body::before,
-  .note-card a:focus-visible .note-body::before {
+  .note-card a:hover .note-body::after,
+  .note-card a:focus-visible .note-body::before,
+  .note-card a:focus-visible .note-body::after {
     opacity: 1;
     transform: scaleX(1);
   }
@@ -1350,13 +1366,17 @@ main {
 
 @media (hover: none) {
   .project-body::before,
-  .note-body::before {
+  .project-body::after,
+  .note-body::before,
+  .note-body::after {
     opacity: 0.72;
     transform: scaleX(0.12);
   }
 
   .project-card a:active .project-body::before,
-  .note-card a:active .note-body::before {
+  .project-card a:active .project-body::after,
+  .note-card a:active .note-body::before,
+  .note-card a:active .note-body::after {
     opacity: 1;
     transform: scaleX(1);
   }
@@ -1478,7 +1498,7 @@ main {
   flex-direction: column;
   min-width: 0;
   min-height: 0;
-  padding: 18px;
+  padding: 18px 18px 30px;
 }
 
 
@@ -2742,7 +2762,7 @@ main {
 
   .project-body,
   .note-body {
-    padding: 16px;
+    padding: 16px 16px 28px;
   }
 
   .project-filter {
