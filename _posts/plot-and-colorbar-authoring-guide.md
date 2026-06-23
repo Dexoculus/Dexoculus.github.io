@@ -52,6 +52,7 @@ Global plot settings:
 | `plt.legend(false)` | Disable legend output. |
 | `plt.cmap(name)` / `plt.set_cmap(name)` | Set the default numeric color map. |
 | `plt.colorbar(options)` | Configure the colorbar for mapped values. |
+| `plt.heatmap(z, options)` / `plt.imshow(z, options)` | Render an image-like 2D scalar field. |
 
 ## Basic Line and Scatter
 
@@ -96,6 +97,120 @@ plt.ylabel("value")
 plt.plot([0.1, 0.4, 0.2, 0.7, 0.55])
 ```
 ````
+
+## Halo Signal Colorbar
+
+Use the `signal` map, also available through the `halo` alias, when the color represents a phase, latent state, communication quality, or other non-risk signal quantity. This is more appropriate than a bar plot when the value changes continuously along a trajectory.
+
+````md
+```plot
+const t = np.linspace(0, 12, 180)
+const response = t.map((v) => Math.sin(v * 1.35) * Math.exp(-v / 11) + 0.08 * Math.sin(v * 4.6))
+const phase = t.map((v) => 0.5 + 0.5 * Math.sin(v * 0.85 + 0.4))
+
+plt.title("Halo signal along trajectory")
+plt.xlabel("time (s)")
+plt.ylabel("normalized response")
+plt.cmap("signal")
+plt.plot(t, response, {
+  label: "response",
+  colorBy: phase,
+  cmap: "signal",
+  vmin: 0,
+  vmax: 1,
+  colorbar: { label: "halo signal", min: 0, max: 1, ticks: 6, cmap: "signal" }
+})
+```
+````
+
+Rendered:
+
+```plot
+const t = np.linspace(0, 12, 180)
+const response = t.map((v) => Math.sin(v * 1.35) * Math.exp(-v / 11) + 0.08 * Math.sin(v * 4.6))
+const phase = t.map((v) => 0.5 + 0.5 * Math.sin(v * 0.85 + 0.4))
+
+plt.title("Halo signal along trajectory")
+plt.xlabel("time (s)")
+plt.ylabel("normalized response")
+plt.cmap("signal")
+plt.plot(t, response, {
+  label: "response",
+  colorBy: phase,
+  cmap: "signal",
+  vmin: 0,
+  vmax: 1,
+  colorbar: { label: "halo signal", min: 0, max: 1, ticks: 6, cmap: "signal" }
+})
+```
+
+## Heatmaps / Image-Like Scalar Fields
+
+Use `plt.heatmap(z, options)` when the plot should read like an image: cost fields, response surfaces, attention maps, occupancy grids, calibration maps, and spatial risk maps. The `z` value is a 2D array. Optional `x` and `y` arrays label the cell centers.
+
+````md
+```plot
+const x = np.linspace(0, 4.2, 42)
+const y = np.linspace(1.1, 4.1, 42)
+const z = y.map((yy) => x.map((xx) => {
+  const peak = Math.exp(-((xx - 2.05) ** 2 / 0.62 + (yy - 2.25) ** 2 / 0.74))
+  const ridge = 0.48 * Math.exp(-((xx - 1.15) ** 2 / 0.18 + (yy - 3.35) ** 2 / 0.55))
+  const wave = 0.12 * Math.sin(xx * 2.4 + yy * 1.2)
+  return 0.10 + 0.24 * peak + 0.11 * ridge + 0.03 * wave
+}))
+
+plt.title("Workspace response field")
+plt.xlabel("x position")
+plt.ylabel("y position")
+plt.xlim(0, 4.2)
+plt.ylim(1.1, 4.1)
+plt.heatmap(z, {
+  x,
+  y,
+  cmap: "risk",
+  vmin: 0.10,
+  vmax: 0.36,
+  opacity: 0.92,
+  colorbar: { label: "response", min: 0.10, max: 0.36, ticks: 6, cmap: "risk" }
+})
+plt.plot([0.75, 3.25, 3.25, 0.75, 0.75], [1.55, 1.55, 3.45, 3.45, 1.55], {
+  label: "region of interest",
+  color: "#111111"
+})
+```
+````
+
+Rendered:
+
+```plot
+const x = np.linspace(0, 4.2, 42)
+const y = np.linspace(1.1, 4.1, 42)
+const z = y.map((yy) => x.map((xx) => {
+  const peak = Math.exp(-((xx - 2.05) ** 2 / 0.62 + (yy - 2.25) ** 2 / 0.74))
+  const ridge = 0.48 * Math.exp(-((xx - 1.15) ** 2 / 0.18 + (yy - 3.35) ** 2 / 0.55))
+  const wave = 0.12 * Math.sin(xx * 2.4 + yy * 1.2)
+  return 0.10 + 0.24 * peak + 0.11 * ridge + 0.03 * wave
+}))
+
+plt.title("Workspace response field")
+plt.xlabel("x position")
+plt.ylabel("y position")
+plt.xlim(0, 4.2)
+plt.ylim(1.1, 4.1)
+plt.heatmap(z, {
+  x,
+  y,
+  cmap: "risk",
+  vmin: 0.10,
+  vmax: 0.36,
+  opacity: 0.92,
+  colorbar: { label: "response", min: 0.10, max: 0.36, ticks: 6, cmap: "risk" }
+})
+plt.plot([0.75, 3.25, 3.25, 0.75, 0.75], [1.55, 1.55, 3.45, 3.45, 1.55], {
+  label: "region of interest",
+  color: "#111111"
+})
+```
 
 ## Bar Plots
 
@@ -605,6 +720,7 @@ Supported JSON `kind` values:
 - `scatter`
 - `box`
 - `function`
+- `heatmap`
 
 For new notes, prefer `plot` because it is more concise and easier to iterate on.
 
@@ -667,6 +783,7 @@ The lightweight plot renderer is intentionally small.
 - It renders SVG, not Canvas or WebGL.
 - It does not load Plotly, mathjs, Mermaid, or Three.js.
 - It is suitable for compact research-note figures, not very large datasets.
+- Heatmaps are SVG tiles, so keep image-like fields modest, usually under about 60 by 60 cells.
 - It does not implement full NumPy or matplotlib.
 - It does not support 3D plots; use a `three` block for simple 3D scenes.
 - It executes trusted JavaScript in the browser, so do not paste untrusted code into `plot` blocks.

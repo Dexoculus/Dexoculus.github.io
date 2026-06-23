@@ -337,6 +337,14 @@ const visualizationColorConfig = JSON.stringify({
           spec.traces.push({ type: "box", groups: normalized, ...config });
           return plt;
         },
+        heatmap(z, options = {}) {
+          const config = normalizeOptions(options);
+          spec.traces.push({ type: "heatmap", z: asArray(z), ...config });
+          return plt;
+        },
+        imshow(z, options = {}) {
+          return plt.heatmap(z, options);
+        },
         func(expression, options = {}) {
           const config = normalizeOptions(options);
           if (config.params && typeof config.params === "object") {
@@ -394,28 +402,53 @@ const visualizationColorConfig = JSON.stringify({
             ? "bar"
             : trace.type === "box" || trace.kind === "box"
               ? "box"
-              : mode.includes("markers") && !mode.includes("lines")
-                ? "scatter"
-                : "line";
+              : trace.type === "heatmap" || trace.kind === "heatmap" || trace.type === "imshow" || trace.kind === "imshow"
+                ? "heatmap"
+                : mode.includes("markers") && !mode.includes("lines")
+                  ? "scatter"
+                  : "line";
           return {
             type,
             x: asArray(trace.x),
             y: asArray(trace.y),
+            z: trace.z || trace.values,
+            extent: trace.extent,
             groups: trace.groups,
             label: trace.name || trace.label,
             color: trace.color || trace.marker?.color || trace.line?.color,
             cmap: trace.cmap || trace.colormap,
             colorBy: trace.colorBy,
-            colorValues: trace.colorValues || trace.values,
+            colorValues: trace.colorValues || (type === "heatmap" ? undefined : trace.values),
             vmin: trace.vmin,
             vmax: trace.vmax,
             reverse: trace.reverse,
+            opacity: trace.opacity,
             colorbar: trace.colorbar
           };
         });
         return spec;
       }
 
+      if (raw.kind === "heatmap" || raw.kind === "imshow") {
+        spec.traces.push({
+          type: "heatmap",
+          x: asArray(raw.x),
+          y: asArray(raw.y),
+          z: raw.z || raw.values,
+          extent: raw.extent,
+          label: raw.label || raw.title,
+          color: raw.color,
+          cmap: raw.cmap || raw.colormap,
+          colorBy: raw.colorBy,
+          colorValues: raw.colorValues,
+          vmin: raw.vmin,
+          vmax: raw.vmax,
+          reverse: raw.reverse,
+          opacity: raw.opacity,
+          colorbar: raw.colorbar
+        });
+        return spec;
+      }
       if (raw.kind === "function") {
         spec.traces.push({
           type: "function",
@@ -502,6 +535,9 @@ const visualizationColorConfig = JSON.stringify({
       if (trace.colorBy === "y") return asArray(trace.y);
       if (trace.colorBy === "group") {
         return asArray(trace.groups).map((_, index) => index);
+      }
+      if (trace.type === "heatmap") {
+        return heatmapRows(trace).flat();
       }
       return [];
     }
@@ -608,6 +644,57 @@ const visualizationColorConfig = JSON.stringify({
       const pad = (max - min) * 0.08;
       return [min - pad, max + pad];
     }
+    function heatmapRows(trace) {
+      const source = Array.isArray(trace.z) ? trace.z : trace.values;
+      return asArray(source)
+        .map((row) => asArray(row).map(Number))
+        .filter((row) => row.length > 0);
+    }
+
+    function linearEdges(min, max, count) {
+      const length = Math.max(1, Math.floor(Number(count) || 1));
+      let start = Number(min);
+      let end = Number(max);
+      if (!Number.isFinite(start)) start = 0;
+      if (!Number.isFinite(end)) end = length;
+      if (start === end) {
+        start -= 0.5;
+        end += 0.5;
+      }
+      return Array.from({ length: length + 1 }, (_, index) => start + ((end - start) * index) / length);
+    }
+
+    function centerEdges(centers, fallbackMin, fallbackMax, count) {
+      const numeric = asArray(centers).map(Number).filter(Number.isFinite);
+      const length = Math.max(1, Math.floor(Number(count) || numeric.length || 1));
+      if (numeric.length === length && numeric.length > 1) {
+        const edges = [];
+        edges.push(numeric[0] - (numeric[1] - numeric[0]) / 2);
+        for (let index = 1; index < numeric.length; index += 1) {
+          edges.push((numeric[index - 1] + numeric[index]) / 2);
+        }
+        edges.push(numeric[numeric.length - 1] + (numeric[numeric.length - 1] - numeric[numeric.length - 2]) / 2);
+        return edges;
+      }
+      if (numeric.length === 1) return [numeric[0] - 0.5, numeric[0] + 0.5];
+      return linearEdges(fallbackMin, fallbackMax, length);
+    }
+
+    function heatmapMeta(trace) {
+      const rows = heatmapRows(trace);
+      const rowCount = rows.length;
+      const columnCount = Math.max(0, ...rows.map((row) => row.length));
+      const extent = Array.isArray(trace.extent) && trace.extent.length === 4
+        ? trace.extent.map(Number)
+        : null;
+      const xEdges = extent
+        ? linearEdges(extent[0], extent[1], columnCount)
+        : centerEdges(trace.x, 0, columnCount, columnCount);
+      const yEdges = extent
+        ? linearEdges(extent[2], extent[3], rowCount)
+        : centerEdges(trace.y, 0, rowCount, rowCount);
+      return { rows, rowCount, columnCount, xEdges, yEdges };
+    }
 
     function quantile(sorted, q) {
       if (sorted.length === 0) return 0;
@@ -677,10 +764,13 @@ const visualizationColorConfig = JSON.stringify({
       plot.width = plot.right - plot.left;
       plot.height = plot.bottom - plot.top;
 
+      const heatmapTraces = traces.filter((trace) => trace.type === "heatmap");
       const hasCategories = traces.some((trace) =>
-        trace.type === "bar" ||
-        trace.type === "box" ||
-        asArray(trace.x).some((value) => asNumber(value) === null)
+        trace.type !== "heatmap" && (
+          trace.type === "bar" ||
+          trace.type === "box" ||
+          asArray(trace.x).some((value) => asNumber(value) === null)
+        )
       );
       const categories = [];
       const addCategory = (value) => {
@@ -689,9 +779,18 @@ const visualizationColorConfig = JSON.stringify({
       };
 
       const xValues = [];
-      const yValues = [0];
+      const yValues = traces.some((trace) => trace.type === "bar") ? [0] : [];
 
       for (const trace of traces) {
+        if (trace.type === "heatmap") {
+          const meta = heatmapMeta(trace);
+          if (meta.columnCount > 0 && meta.rowCount > 0) {
+            xValues.push(meta.xEdges[0], meta.xEdges[meta.xEdges.length - 1]);
+            yValues.push(meta.yEdges[0], meta.yEdges[meta.yEdges.length - 1]);
+          }
+          continue;
+        }
+
         if (trace.type === "box") {
           for (const group of asArray(trace.groups)) {
             addCategory(group.name);
@@ -739,6 +838,25 @@ const visualizationColorConfig = JSON.stringify({
         svg += `</linearGradient></defs>`;
       }
       svg += `<rect width="${width}" height="${height}" fill="${colors.surface}"/>`;
+
+      for (const trace of heatmapTraces) {
+        const meta = heatmapMeta(trace);
+        if (meta.rowCount === 0 || meta.columnCount === 0) continue;
+        const opacity = Number.isFinite(Number(trace.opacity)) ? clamp(Number(trace.opacity), 0, 1) : 0.88;
+        for (let rowIndex = 0; rowIndex < meta.rowCount; rowIndex += 1) {
+          const row = meta.rows[rowIndex];
+          for (let columnIndex = 0; columnIndex < meta.columnCount; columnIndex += 1) {
+            const value = Number(row[columnIndex]);
+            if (!Number.isFinite(value)) continue;
+            const x0 = xScale(meta.xEdges[columnIndex]);
+            const x1 = xScale(meta.xEdges[columnIndex + 1]);
+            const y0 = yScale(meta.yEdges[rowIndex]);
+            const y1 = yScale(meta.yEdges[rowIndex + 1]);
+            const fill = trace.mappedColors?.[rowIndex * meta.columnCount + columnIndex] || mapValueToColor(value, trace.colorMin ?? 0, trace.colorMax ?? 1, trace.cmap || spec.cmap, Boolean(trace.reverse));
+            svg += `<rect x="${Math.min(x0, x1).toFixed(2)}" y="${Math.min(y0, y1).toFixed(2)}" width="${Math.abs(x1 - x0).toFixed(2)}" height="${Math.abs(y1 - y0).toFixed(2)}" fill="${fill}" opacity="${opacity}"/>`;
+          }
+        }
+      }
 
       if (spec.title) {
         svg += `<text x="${width / 2}" y="28" text-anchor="middle" fill="${colors.text}" font-size="22" font-weight="800">${escapeText(spec.title)}</text>`;

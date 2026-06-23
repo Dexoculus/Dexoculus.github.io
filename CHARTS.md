@@ -22,6 +22,7 @@ plt.scatter([1, 3, 5, 7], [0.8, 0.42, 0.22, 0.12], { label: "checkpoints" })
 - `plt.bar(labels, values, options)`
 - `plt.hist(values, { bins, label })`
 - `plt.boxplot({ groupA: values, groupB: values })`
+- `plt.heatmap(z, options)` / `plt.imshow(z, options)` for compact image-like scalar fields
 - `plt.func(expression, options)` for lightweight function plots
 - `plt.param(name, { min, max, step, value })` for slider-driven functions
 - `plt.cmap(name)` or `plt.set_cmap(name)` to set the default numeric color map
@@ -103,4 +104,4 @@ plt.func("a * sin(b * x)", {
 ```
 ````
 
-Existing JSON `chart` blocks still work for simple `bar`, `line`, `scatter`, `box`, and `function` specs.
+Existing JSON `chart` blocks still work for simple `bar`, `line`, `scatter`, `box`, `function`, and `heatmap` specs.
