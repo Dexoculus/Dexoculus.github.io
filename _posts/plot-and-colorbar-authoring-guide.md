@@ -102,29 +102,34 @@ plt.plot([0.1, 0.4, 0.2, 0.7, 0.55])
 
 Use the `signal` map, also available through the `halo` alias, when the color represents a phase, latent state, communication quality, or other non-risk signal quantity. This is more appropriate than a bar plot when the value changes continuously along a trajectory.
 
-For line plots, map a stable scalar to color. A rapidly oscillating phase value can look like rendering noise because adjacent line segments keep changing color. A normalized halo strength, confidence, or time-aligned signal usually reads better.
+For line plots, map a stable scalar to color. A rapidly oscillating phase value can look like rendering noise because adjacent line segments keep changing color. If the x-axis is time and the mapped value is monotonic, the result will also read like a left-to-right time gradient. For trajectory examples, use spatial x/y coordinates and map the signal onto the path.
 
 ````md
 ```plot
-const t = np.linspace(0, 12, 220)
-const response = t.map((v) => 0.56 * Math.sin(v * 0.82) * Math.exp(-v / 16) + 0.18 * Math.sin(v * 1.9 + 0.45))
-const halo = t.map((v) => {
-  const ramp = v / 12
-  const pulse = 0.18 * Math.exp(-((v - 8.7) ** 2) / 2.2)
-  return Math.min(1, Math.max(0, 0.12 + 0.72 * ramp + pulse))
+const t = np.linspace(0, 1, 240)
+const x = t.map((v) => 4.8 * v + 0.18 * Math.sin(v * Math.PI * 6))
+const y = t.map((v) => 1.05 * Math.sin(v * Math.PI * 2.2) + 0.32 * Math.sin(v * Math.PI * 7.4))
+const halo = x.map((xx, index) => {
+  const yy = y[index]
+  const beacon = Math.exp(-((xx - 1.25) ** 2 / 0.28 + (yy - 0.72) ** 2 / 0.18))
+  const receiver = 0.82 * Math.exp(-((xx - 3.55) ** 2 / 0.42 + (yy + 0.38) ** 2 / 0.22))
+  const interference = 0.12 * Math.sin(xx * 2.6 - yy * 3.1)
+  return Math.min(1, Math.max(0, 0.08 + 0.62 * beacon + 0.48 * receiver + interference))
 })
 
 plt.title("Halo signal along trajectory")
-plt.xlabel("time (s)")
-plt.ylabel("normalized response")
+plt.xlabel("x position")
+plt.ylabel("y position")
+plt.xlim(-0.2, 5.0)
+plt.ylim(-1.6, 1.6)
 plt.cmap("signal")
-plt.plot(t, response, {
-  label: "trajectory response",
+plt.plot(x, y, {
+  label: "trajectory",
   colorBy: halo,
   cmap: "signal",
   vmin: 0,
   vmax: 1,
-  colorbar: { label: "halo signal", min: 0, max: 1, ticks: 6, cmap: "signal" }
+  colorbar: { label: "halo strength", min: 0, max: 1, ticks: 6, cmap: "signal" }
 })
 ```
 ````
@@ -132,25 +137,30 @@ plt.plot(t, response, {
 Rendered:
 
 ```plot
-const t = np.linspace(0, 12, 220)
-const response = t.map((v) => 0.56 * Math.sin(v * 0.82) * Math.exp(-v / 16) + 0.18 * Math.sin(v * 1.9 + 0.45))
-const halo = t.map((v) => {
-  const ramp = v / 12
-  const pulse = 0.18 * Math.exp(-((v - 8.7) ** 2) / 2.2)
-  return Math.min(1, Math.max(0, 0.12 + 0.72 * ramp + pulse))
+const t = np.linspace(0, 1, 240)
+const x = t.map((v) => 4.8 * v + 0.18 * Math.sin(v * Math.PI * 6))
+const y = t.map((v) => 1.05 * Math.sin(v * Math.PI * 2.2) + 0.32 * Math.sin(v * Math.PI * 7.4))
+const halo = x.map((xx, index) => {
+  const yy = y[index]
+  const beacon = Math.exp(-((xx - 1.25) ** 2 / 0.28 + (yy - 0.72) ** 2 / 0.18))
+  const receiver = 0.82 * Math.exp(-((xx - 3.55) ** 2 / 0.42 + (yy + 0.38) ** 2 / 0.22))
+  const interference = 0.12 * Math.sin(xx * 2.6 - yy * 3.1)
+  return Math.min(1, Math.max(0, 0.08 + 0.62 * beacon + 0.48 * receiver + interference))
 })
 
 plt.title("Halo signal along trajectory")
-plt.xlabel("time (s)")
-plt.ylabel("normalized response")
+plt.xlabel("x position")
+plt.ylabel("y position")
+plt.xlim(-0.2, 5.0)
+plt.ylim(-1.6, 1.6)
 plt.cmap("signal")
-plt.plot(t, response, {
-  label: "trajectory response",
+plt.plot(x, y, {
+  label: "trajectory",
   colorBy: halo,
   cmap: "signal",
   vmin: 0,
   vmax: 1,
-  colorbar: { label: "halo signal", min: 0, max: 1, ticks: 6, cmap: "signal" }
+  colorbar: { label: "halo strength", min: 0, max: 1, ticks: 6, cmap: "signal" }
 })
 ```
 
@@ -158,7 +168,7 @@ plt.plot(t, response, {
 
 Use `plt.heatmap(z, options)` when the plot should read like an image: cost fields, response surfaces, attention maps, occupancy grids, calibration maps, and spatial risk maps. The `z` value is a 2D array. Optional `x` and `y` arrays label the cell centers.
 
-Use `field` for neutral scalar fields and response surfaces. Use `risk` only when higher values explicitly mean danger, overload, or failure probability.
+Use `scalar` for neutral scalar fields and response surfaces. Use `risk` only when higher values explicitly mean danger, overload, or failure probability.
 
 ````md
 ```plot
@@ -182,11 +192,11 @@ plt.ylim(1.1, 4.1)
 plt.heatmap(z, {
   x,
   y,
-  cmap: "field",
+  cmap: "scalar",
   vmin: 0.10,
   vmax: 0.36,
   opacity: 0.96,
-  colorbar: { label: "response field", min: 0.10, max: 0.36, ticks: 6, cmap: "field" }
+  colorbar: { label: "response field", min: 0.10, max: 0.36, ticks: 6, cmap: "scalar" }
 })
 plt.plot([0.75, 3.25, 3.25, 0.75, 0.75], [1.55, 1.55, 3.45, 3.45, 1.55], {
   label: "region of interest",
@@ -218,11 +228,11 @@ plt.ylim(1.1, 4.1)
 plt.heatmap(z, {
   x,
   y,
-  cmap: "field",
+  cmap: "scalar",
   vmin: 0.10,
   vmax: 0.36,
   opacity: 0.96,
-  colorbar: { label: "response field", min: 0.10, max: 0.36, ticks: 6, cmap: "field" }
+  colorbar: { label: "response field", min: 0.10, max: 0.36, ticks: 6, cmap: "scalar" }
 })
 plt.plot([0.75, 3.25, 3.25, 0.75, 0.75], [1.55, 1.55, 3.45, 3.45, 1.55], {
   label: "region of interest",

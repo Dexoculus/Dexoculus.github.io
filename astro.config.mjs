@@ -24,24 +24,40 @@ const dexoculusShikiTheme = {
       settings: { foreground: "#ffef01" }
     },
     {
+      scope: ["keyword.operator", "storage.modifier", "punctuation.definition.template-expression"],
+      settings: { foreground: "#ff7000" }
+    },
+    {
       scope: ["entity.name.function", "support.function", "meta.function-call"],
       settings: { foreground: "#00d6fa" }
     },
     {
-      scope: ["variable", "variable.other", "entity.name.variable"],
+      scope: ["variable.parameter", "meta.function.parameters", "variable.other.readwrite"],
       settings: { foreground: "#fdfdfd" }
     },
     {
+      scope: ["variable.language", "support.variable", "variable.other.constant"],
+      settings: { foreground: "#9e8af9" }
+    },
+    {
       scope: ["string", "constant.other.symbol"],
-      settings: { foreground: "#f7f5ad" }
+      settings: { foreground: "#99f120" }
     },
     {
       scope: ["constant.numeric", "constant.language", "support.constant"],
-      settings: { foreground: "#7cd0ff" }
+      settings: { foreground: "#fabe34" }
+    },
+    {
+      scope: ["constant.language.boolean", "constant.language.null", "constant.language.undefined"],
+      settings: { foreground: "#9e8af9" }
     },
     {
       scope: ["entity.name.type", "support.type", "support.class"],
-      settings: { foreground: "#eec16c" }
+      settings: { foreground: "#ef8c38" }
+    },
+    {
+      scope: ["variable.other.property", "support.type.property-name", "entity.other.attribute-name", "meta.object-literal.key"],
+      settings: { foreground: "#ff95c8" }
     },
     {
       scope: ["punctuation", "meta.brace", "meta.delimiter"],

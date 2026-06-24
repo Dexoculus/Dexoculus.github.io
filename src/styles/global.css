@@ -2089,16 +2089,16 @@ main {
 
 .markdown-panel :not(pre) > code {
   padding: 0.14em 0.38em;
-  color: #0b4964;
-  background: rgba(0, 214, 250, 0.1);
-  border: 1px solid rgba(0, 214, 250, 0.22);
+  color: #71350f;
+  background: rgba(239, 140, 56, 0.12);
+  border: 1px solid rgba(239, 140, 56, 0.24);
   border-radius: 4px;
 }
 
 :root[data-theme="dark"] .markdown-panel :not(pre) > code {
-  color: var(--archive-blue-4);
-  background: rgba(0, 214, 250, 0.1);
-  border-color: rgba(0, 214, 250, 0.24);
+  color: var(--decagram-orange-2);
+  background: rgba(239, 140, 56, 0.12);
+  border-color: rgba(239, 140, 56, 0.28);
 }
 
 .markdown-panel .katex {
