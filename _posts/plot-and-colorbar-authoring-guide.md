@@ -106,22 +106,19 @@ For line plots, map a stable scalar to color. A rapidly oscillating phase value 
 
 ````md
 ```plot
-const t = np.linspace(0, 1, 240)
-const x = t.map((v) => 4.8 * v + 0.18 * Math.sin(v * Math.PI * 6))
-const y = t.map((v) => 1.05 * Math.sin(v * Math.PI * 2.2) + 0.32 * Math.sin(v * Math.PI * 7.4))
-const halo = x.map((xx, index) => {
-  const yy = y[index]
-  const beacon = Math.exp(-((xx - 1.25) ** 2 / 0.28 + (yy - 0.72) ** 2 / 0.18))
-  const receiver = 0.82 * Math.exp(-((xx - 3.55) ** 2 / 0.42 + (yy + 0.38) ** 2 / 0.22))
-  const interference = 0.12 * Math.sin(xx * 2.6 - yy * 3.1)
-  return Math.min(1, Math.max(0, 0.08 + 0.62 * beacon + 0.48 * receiver + interference))
-})
+const x = np.linspace(0, 6, 180)
+const y = x.map((v) => 0.42 * Math.sin(v * 1.4))
+const halo = x.map((v) => (
+  v < 2 ? 0.12 :
+  v < 4 ? 0.55 :
+  0.95
+))
 
 plt.title("Halo signal along trajectory")
 plt.xlabel("x position")
 plt.ylabel("y position")
-plt.xlim(-0.2, 5.0)
-plt.ylim(-1.6, 1.6)
+plt.xlim(0, 6)
+plt.ylim(-0.7, 0.7)
 plt.cmap("signal")
 plt.plot(x, y, {
   label: "trajectory",
@@ -137,22 +134,19 @@ plt.plot(x, y, {
 Rendered:
 
 ```plot
-const t = np.linspace(0, 1, 240)
-const x = t.map((v) => 4.8 * v + 0.18 * Math.sin(v * Math.PI * 6))
-const y = t.map((v) => 1.05 * Math.sin(v * Math.PI * 2.2) + 0.32 * Math.sin(v * Math.PI * 7.4))
-const halo = x.map((xx, index) => {
-  const yy = y[index]
-  const beacon = Math.exp(-((xx - 1.25) ** 2 / 0.28 + (yy - 0.72) ** 2 / 0.18))
-  const receiver = 0.82 * Math.exp(-((xx - 3.55) ** 2 / 0.42 + (yy + 0.38) ** 2 / 0.22))
-  const interference = 0.12 * Math.sin(xx * 2.6 - yy * 3.1)
-  return Math.min(1, Math.max(0, 0.08 + 0.62 * beacon + 0.48 * receiver + interference))
-})
+const x = np.linspace(0, 6, 180)
+const y = x.map((v) => 0.42 * Math.sin(v * 1.4))
+const halo = x.map((v) => (
+  v < 2 ? 0.12 :
+  v < 4 ? 0.55 :
+  0.95
+))
 
 plt.title("Halo signal along trajectory")
 plt.xlabel("x position")
 plt.ylabel("y position")
-plt.xlim(-0.2, 5.0)
-plt.ylim(-1.6, 1.6)
+plt.xlim(0, 6)
+plt.ylim(-0.7, 0.7)
 plt.cmap("signal")
 plt.plot(x, y, {
   label: "trajectory",
