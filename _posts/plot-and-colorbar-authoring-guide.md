@@ -102,19 +102,25 @@ plt.plot([0.1, 0.4, 0.2, 0.7, 0.55])
 
 Use the `signal` map, also available through the `halo` alias, when the color represents a phase, latent state, communication quality, or other non-risk signal quantity. This is more appropriate than a bar plot when the value changes continuously along a trajectory.
 
+For line plots, map a stable scalar to color. A rapidly oscillating phase value can look like rendering noise because adjacent line segments keep changing color. A normalized halo strength, confidence, or time-aligned signal usually reads better.
+
 ````md
 ```plot
-const t = np.linspace(0, 12, 180)
-const response = t.map((v) => Math.sin(v * 1.35) * Math.exp(-v / 11) + 0.08 * Math.sin(v * 4.6))
-const phase = t.map((v) => 0.5 + 0.5 * Math.sin(v * 0.85 + 0.4))
+const t = np.linspace(0, 12, 220)
+const response = t.map((v) => 0.56 * Math.sin(v * 0.82) * Math.exp(-v / 16) + 0.18 * Math.sin(v * 1.9 + 0.45))
+const halo = t.map((v) => {
+  const ramp = v / 12
+  const pulse = 0.18 * Math.exp(-((v - 8.7) ** 2) / 2.2)
+  return Math.min(1, Math.max(0, 0.12 + 0.72 * ramp + pulse))
+})
 
 plt.title("Halo signal along trajectory")
 plt.xlabel("time (s)")
 plt.ylabel("normalized response")
 plt.cmap("signal")
 plt.plot(t, response, {
-  label: "response",
-  colorBy: phase,
+  label: "trajectory response",
+  colorBy: halo,
   cmap: "signal",
   vmin: 0,
   vmax: 1,
@@ -126,17 +132,21 @@ plt.plot(t, response, {
 Rendered:
 
 ```plot
-const t = np.linspace(0, 12, 180)
-const response = t.map((v) => Math.sin(v * 1.35) * Math.exp(-v / 11) + 0.08 * Math.sin(v * 4.6))
-const phase = t.map((v) => 0.5 + 0.5 * Math.sin(v * 0.85 + 0.4))
+const t = np.linspace(0, 12, 220)
+const response = t.map((v) => 0.56 * Math.sin(v * 0.82) * Math.exp(-v / 16) + 0.18 * Math.sin(v * 1.9 + 0.45))
+const halo = t.map((v) => {
+  const ramp = v / 12
+  const pulse = 0.18 * Math.exp(-((v - 8.7) ** 2) / 2.2)
+  return Math.min(1, Math.max(0, 0.12 + 0.72 * ramp + pulse))
+})
 
 plt.title("Halo signal along trajectory")
 plt.xlabel("time (s)")
 plt.ylabel("normalized response")
 plt.cmap("signal")
 plt.plot(t, response, {
-  label: "response",
-  colorBy: phase,
+  label: "trajectory response",
+  colorBy: halo,
   cmap: "signal",
   vmin: 0,
   vmax: 1,
@@ -148,15 +158,20 @@ plt.plot(t, response, {
 
 Use `plt.heatmap(z, options)` when the plot should read like an image: cost fields, response surfaces, attention maps, occupancy grids, calibration maps, and spatial risk maps. The `z` value is a 2D array. Optional `x` and `y` arrays label the cell centers.
 
+Use `field` for neutral scalar fields and response surfaces. Use `risk` only when higher values explicitly mean danger, overload, or failure probability.
+
 ````md
 ```plot
-const x = np.linspace(0, 4.2, 42)
-const y = np.linspace(1.1, 4.1, 42)
+const x = np.linspace(0, 4.2, 56)
+const y = np.linspace(1.1, 4.1, 56)
 const z = y.map((yy) => x.map((xx) => {
-  const peak = Math.exp(-((xx - 2.05) ** 2 / 0.62 + (yy - 2.25) ** 2 / 0.74))
-  const ridge = 0.48 * Math.exp(-((xx - 1.15) ** 2 / 0.18 + (yy - 3.35) ** 2 / 0.55))
-  const wave = 0.12 * Math.sin(xx * 2.4 + yy * 1.2)
-  return 0.10 + 0.24 * peak + 0.11 * ridge + 0.03 * wave
+  const u = (xx - 2.15) * 0.86 + (yy - 2.35) * 0.34
+  const v = -(xx - 2.15) * 0.28 + (yy - 2.35) * 0.94
+  const main = Math.exp(-(u ** 2 / 0.72 + v ** 2 / 0.42))
+  const shoulder = 0.55 * Math.exp(-((xx - 1.2) ** 2 / 0.22 + (yy - 3.35) ** 2 / 0.58))
+  const valley = 0.35 * Math.exp(-((xx - 0.35) ** 2 / 0.16 + (yy - 3.15) ** 2 / 0.28))
+  const ripple = 0.08 * Math.sin(xx * 2.6 + yy * 1.4)
+  return 0.11 + 0.20 * main + 0.10 * shoulder - 0.05 * valley + 0.025 * ripple
 }))
 
 plt.title("Workspace response field")
@@ -167,11 +182,11 @@ plt.ylim(1.1, 4.1)
 plt.heatmap(z, {
   x,
   y,
-  cmap: "risk",
+  cmap: "field",
   vmin: 0.10,
   vmax: 0.36,
-  opacity: 0.92,
-  colorbar: { label: "response", min: 0.10, max: 0.36, ticks: 6, cmap: "risk" }
+  opacity: 0.96,
+  colorbar: { label: "response field", min: 0.10, max: 0.36, ticks: 6, cmap: "field" }
 })
 plt.plot([0.75, 3.25, 3.25, 0.75, 0.75], [1.55, 1.55, 3.45, 3.45, 1.55], {
   label: "region of interest",
@@ -183,13 +198,16 @@ plt.plot([0.75, 3.25, 3.25, 0.75, 0.75], [1.55, 1.55, 3.45, 3.45, 1.55], {
 Rendered:
 
 ```plot
-const x = np.linspace(0, 4.2, 42)
-const y = np.linspace(1.1, 4.1, 42)
+const x = np.linspace(0, 4.2, 56)
+const y = np.linspace(1.1, 4.1, 56)
 const z = y.map((yy) => x.map((xx) => {
-  const peak = Math.exp(-((xx - 2.05) ** 2 / 0.62 + (yy - 2.25) ** 2 / 0.74))
-  const ridge = 0.48 * Math.exp(-((xx - 1.15) ** 2 / 0.18 + (yy - 3.35) ** 2 / 0.55))
-  const wave = 0.12 * Math.sin(xx * 2.4 + yy * 1.2)
-  return 0.10 + 0.24 * peak + 0.11 * ridge + 0.03 * wave
+  const u = (xx - 2.15) * 0.86 + (yy - 2.35) * 0.34
+  const v = -(xx - 2.15) * 0.28 + (yy - 2.35) * 0.94
+  const main = Math.exp(-(u ** 2 / 0.72 + v ** 2 / 0.42))
+  const shoulder = 0.55 * Math.exp(-((xx - 1.2) ** 2 / 0.22 + (yy - 3.35) ** 2 / 0.58))
+  const valley = 0.35 * Math.exp(-((xx - 0.35) ** 2 / 0.16 + (yy - 3.15) ** 2 / 0.28))
+  const ripple = 0.08 * Math.sin(xx * 2.6 + yy * 1.4)
+  return 0.11 + 0.20 * main + 0.10 * shoulder - 0.05 * valley + 0.025 * ripple
 }))
 
 plt.title("Workspace response field")
@@ -200,11 +218,11 @@ plt.ylim(1.1, 4.1)
 plt.heatmap(z, {
   x,
   y,
-  cmap: "risk",
+  cmap: "field",
   vmin: 0.10,
   vmax: 0.36,
-  opacity: 0.92,
-  colorbar: { label: "response", min: 0.10, max: 0.36, ticks: 6, cmap: "risk" }
+  opacity: 0.96,
+  colorbar: { label: "response field", min: 0.10, max: 0.36, ticks: 6, cmap: "field" }
 })
 plt.plot([0.75, 3.25, 3.25, 0.75, 0.75], [1.55, 1.55, 3.45, 3.45, 1.55], {
   label: "region of interest",
@@ -404,6 +422,7 @@ The visualization system exposes the portfolio color system through built-in col
 | `scalar` | Sequential | Heat, density, confidence, score, cost, magnitude. |
 | `signed` | Diverging | Negative-to-positive deltas, residuals, errors, before/after difference. |
 | `risk` | Sequential | Load, warning, failure probability, operational severity. |
+| `field` | Sequential | Response surfaces, occupancy-like fields, attention maps, calibration maps. |
 | `signal` | Sequential | Phase, cluster, rarity, latent state, communication quality. |
 | `series` | Categorical | Distinct traces and manually assigned categories. |
 
@@ -414,6 +433,7 @@ Aliases:
 | `default`, `intensity`, `sequential` | `scalar` |
 | `delta`, `diverging` | `signed` |
 | `alert`, `warning` | `risk` |
+| `heat`, `response`, `surface` | `field` |
 | `halo`, `phase` | `signal` |
 | `categorical`, `category` | `series` |
 
@@ -581,6 +601,41 @@ plt.colorbar({
 
 ## Manual Colors
 
+Manual colors are fixed colors that are assigned directly to traces. Use them when color is acting as a label, not as a numeric measurement.
+
+Available manual color entry points:
+
+| API | Return Value | Use Case |
+| --- | --- | --- |
+| `color: "#00d6fa"` | A direct CSS color string. | One-off emphasis or an exact brand color. |
+| `plt.colors(name, count)` | An array of colors. | Multiple fixed traces or categories. |
+| `plt.color(value, options)` | One sampled color. | A fixed color derived from a numeric scale. |
+| `plt.get_cmap(name)` | A reusable function. | Repeated manual sampling from the same map. |
+| `plt.cmaps()` | Built-in map names. | Quick inspection while authoring a note. |
+
+Current `series` color order:
+
+| Index | Color | Role |
+| --- | --- | --- |
+| `0` | `#ffef01` | Endfield yellow / primary accent. |
+| `1` | `#1288f8` | Blue Archive blue / progress state. |
+| `2` | `#00d6fa` | Signal cyan / route or sensor state. |
+| `3` | `#99f120` | Endfield green / positive state. |
+| `4` | `#f765ba` | Archive pink / rare or special state. |
+| `5` | `#9e8af9` | Endfield purple / latent or auxiliary state. |
+| `6` | `#ff7000` | Endfield orange / power or load. |
+| `7` | `#e42525` | Endfield red / warning. |
+
+Built-in sampled map stops:
+
+| Map | Stops |
+| --- | --- |
+| `scalar` | `#08080a`, `#272727`, `#505050`, `#909090`, `#eec16c`, `#fabe34`, `#ffef01` |
+| `signed` | `#1288f8`, `#7cd0ff`, `#fefefe`, `#fbf273`, `#fabe34` |
+| `risk` | `#e1e2e4`, `#cdf67b`, `#fdf065`, `#ff7000`, `#e42525`, `#920008` |
+| `field` | `#1288f8`, `#00d6fa`, `#3fc948`, `#cdf67b`, `#fdf065`, `#ff7000`, `#e42525` |
+| `signal` | `#2a425b`, `#1288f8`, `#00d6fa`, `#9e8af9`, `#f765ba`, `#ff95c8` |
+
 Use `plt.colors(name, count)` when each trace should receive a distinct fixed color.
 
 ````md
@@ -618,6 +673,8 @@ const warning = plt.color(0.82, { cmap: "risk", min: 0, max: 1 })
 plt.plot(x, y, { color: warning, label: "warning zone" })
 ```
 
+This samples one fixed color. It does not create a colorbar by itself. Use this when the value is part of authoring logic but the rendered trace should still behave as a normal fixed-color trace.
+
 Use `plt.get_cmap(name)` when you want a reusable color function:
 
 ```js
@@ -626,6 +683,8 @@ const c0 = signal(0.0)
 const c1 = signal(0.5)
 const c2 = signal(1.0)
 ```
+
+The function expects a normalized value from `0` to `1`. Values outside that range are clamped.
 
 ## Box Plot Color Groups
 

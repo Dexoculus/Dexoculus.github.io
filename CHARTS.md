@@ -43,6 +43,7 @@ All maps use the portfolio color system. Aliases such as `intensity`, `delta`, `
 | `scalar` | Heat, density, confidence, score, cost, and other ordered values |
 | `signed` | Negative-to-positive deltas, residuals, and before/after differences |
 | `risk` | Load, warning, failure probability, and operational severity |
+| `field` | Response surfaces, occupancy-like fields, attention maps, and calibration maps |
 | `signal` | Phase, cluster, rarity, latent state, and communication quality |
 | `series` | Distinct categorical traces; this is also the default line color cycle |
 

@@ -2,6 +2,7 @@ export type VisualizationColorMapName =
   | "scalar"
   | "signed"
   | "risk"
+  | "field"
   | "signal"
   | "series";
 
@@ -27,6 +28,11 @@ export const visualizationColorMaps: Record<VisualizationColorMapName, Visualiza
     kind: "sequential",
     colors: ["#e1e2e4", "#cdf67b", "#fdf065", "#ff7000", "#e42525", "#920008"]
   },
+  field: {
+    label: "Field / Response Surface",
+    kind: "sequential",
+    colors: ["#1288f8", "#00d6fa", "#3fc948", "#cdf67b", "#fdf065", "#ff7000", "#e42525"]
+  },
   signal: {
     label: "Signal / Phase",
     kind: "sequential",
@@ -47,6 +53,9 @@ export const visualizationColorMapAliases: Record<string, VisualizationColorMapN
   diverging: "signed",
   alert: "risk",
   warning: "risk",
+  heat: "field",
+  response: "field",
+  surface: "field",
   halo: "signal",
   phase: "signal",
   categorical: "series",
