@@ -26,7 +26,7 @@ plt.scatter([1, 3, 5, 7], [0.8, 0.42, 0.22, 0.12], { label: "checkpoints" })
 - `plt.func(expression, options)` for lightweight function plots
 - `plt.param(name, { min, max, step, value })` for slider-driven functions
 - `plt.cmap(name)` or `plt.set_cmap(name)` to set the default numeric color map
-- `plt.colorbar(options)` to configure the SVG colorbar
+- `plt.colorbar(options)` to configure the SVG colorbar, including `orientation: "horizontal"` when a right-side colorbar would be easy to confuse with the y-axis
 - `plt.color(value, options)` to sample one color from a numeric range
 - `plt.colors(name, count)` to create a categorical or sampled color list
 - `plt.get_cmap(name)` to get a reusable `(position) => color` function

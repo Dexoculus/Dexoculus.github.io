@@ -732,6 +732,9 @@ const visualizationColorConfig = JSON.stringify({
         min: Number.isFinite(Number(config.min)) ? Number(config.min) : mappedTrace?.colorMin ?? 0,
         max: Number.isFinite(Number(config.max)) ? Number(config.max) : mappedTrace?.colorMax ?? 1,
         reverse: Boolean(config.reverse ?? mappedTrace?.reverse),
+        orientation: ["horizontal", "bottom"].includes(String(config.orientation || config.position || "").toLowerCase())
+          ? "horizontal"
+          : "vertical",
         ticks: Math.max(2, Math.min(8, Math.floor(Number(config.ticks) || 5)))
       };
     }
@@ -748,11 +751,13 @@ const visualizationColorConfig = JSON.stringify({
       const height = 500;
       const legendHeight = spec.legend === false ? 0 : 34;
       const colorbar = resolveColorbar(spec, traces);
+      const hasVerticalColorbar = Boolean(colorbar && colorbar.orientation !== "horizontal");
+      const hasHorizontalColorbar = Boolean(colorbar && colorbar.orientation === "horizontal");
       const colorbarGradientId = `plot-colorbar-gradient-${buildSvg.renderId = (buildSvg.renderId || 0) + 1}`;
       const margin = {
         top: spec.title ? 58 : 28,
-        right: colorbar ? 118 : 28,
-        bottom: spec.xLabel ? 82 : 62,
+        right: hasVerticalColorbar ? 118 : 28,
+        bottom: (spec.xLabel ? 82 : 62) + (hasHorizontalColorbar ? 58 : 0),
         left: 70
       };
       const plot = {
@@ -830,7 +835,10 @@ const visualizationColorConfig = JSON.stringify({
       if (colorbar) {
         const map = resolveColorMap(colorbar.cmap);
         const stops = colorbar.reverse ? [...map.colors].reverse() : map.colors;
-        svg += `<defs><linearGradient id="${colorbarGradientId}" x1="0" y1="1" x2="0" y2="0">`;
+        const gradientDirection = colorbar.orientation === "horizontal"
+          ? `x1="0" y1="0" x2="1" y2="0"`
+          : `x1="0" y1="1" x2="0" y2="0"`;
+        svg += `<defs><linearGradient id="${colorbarGradientId}" ${gradientDirection}>`;
         for (const [index, color] of stops.entries()) {
           const offset = stops.length === 1 ? 50 : (index / (stops.length - 1)) * 100;
           svg += `<stop offset="${offset}%" stop-color="${color}"/>`;
@@ -889,7 +897,8 @@ const visualizationColorConfig = JSON.stringify({
       }
 
       if (spec.xLabel) {
-        svg += `<text x="${plot.left + plot.width / 2}" y="${height - legendHeight - 24}" text-anchor="middle" fill="${colors.text}" font-size="13" font-weight="700">${escapeText(spec.xLabel)}</text>`;
+        const labelY = hasHorizontalColorbar ? plot.bottom + 52 : height - legendHeight - 24;
+        svg += `<text x="${plot.left + plot.width / 2}" y="${labelY}" text-anchor="middle" fill="${colors.text}" font-size="13" font-weight="700">${escapeText(spec.xLabel)}</text>`;
       }
       if (spec.yLabel) {
         svg += `<text transform="translate(20 ${plot.top + plot.height / 2}) rotate(-90)" text-anchor="middle" fill="${colors.text}" font-size="13" font-weight="700">${escapeText(spec.yLabel)}</text>`;
@@ -962,22 +971,41 @@ const visualizationColorConfig = JSON.stringify({
       }
 
       if (colorbar) {
-        const barX = plot.right + 26;
-        const barWidth = 14;
-        svg += `<rect x="${barX}" y="${plot.top}" width="${barWidth}" height="${plot.height}" rx="2" fill="url(#${colorbarGradientId})" stroke="${colors.axis}" stroke-opacity=".28"/>`;
         const ticks = niceTicks(colorbar.min, colorbar.max, colorbar.ticks);
-        for (const tick of ticks) {
-          const position = colorbar.max === colorbar.min
-            ? 0.5
-            : (tick - colorbar.min) / (colorbar.max - colorbar.min);
-          const y = plot.bottom - clamp(position) * plot.height;
-          svg += `<line x1="${barX + barWidth}" y1="${y}" x2="${barX + barWidth + 5}" y2="${y}" stroke="${colors.axis}" stroke-width="1"/>`;
-          svg += `<text x="${barX + barWidth + 9}" y="${y + 4}" fill="${colors.muted}" font-size="11">${escapeText(formatTick(tick))}</text>`;
-        }
-        if (colorbar.label) {
-          const labelX = width - 13;
-          const labelY = plot.top + plot.height / 2;
-          svg += `<text transform="translate(${labelX} ${labelY}) rotate(-90)" text-anchor="middle" fill="${colors.text}" font-size="12" font-weight="700">${escapeText(colorbar.label)}</text>`;
+        if (colorbar.orientation === "horizontal") {
+          const barX = plot.left + 10;
+          const barY = plot.bottom + (spec.xLabel ? 74 : 48);
+          const barWidth = plot.width - 20;
+          const barHeight = 12;
+          if (colorbar.label) {
+            svg += `<text x="${barX + barWidth / 2}" y="${barY - 8}" text-anchor="middle" fill="${colors.text}" font-size="12" font-weight="700">${escapeText(colorbar.label)}</text>`;
+          }
+          svg += `<rect x="${barX}" y="${barY}" width="${barWidth}" height="${barHeight}" rx="2" fill="url(#${colorbarGradientId})" stroke="${colors.axis}" stroke-opacity=".28"/>`;
+          for (const tick of ticks) {
+            const position = colorbar.max === colorbar.min
+              ? 0.5
+              : (tick - colorbar.min) / (colorbar.max - colorbar.min);
+            const x = barX + clamp(position) * barWidth;
+            svg += `<line x1="${x}" y1="${barY + barHeight}" x2="${x}" y2="${barY + barHeight + 5}" stroke="${colors.axis}" stroke-width="1"/>`;
+            svg += `<text x="${x}" y="${barY + barHeight + 19}" text-anchor="middle" fill="${colors.muted}" font-size="11">${escapeText(formatTick(tick))}</text>`;
+          }
+        } else {
+          const barX = plot.right + 26;
+          const barWidth = 14;
+          svg += `<rect x="${barX}" y="${plot.top}" width="${barWidth}" height="${plot.height}" rx="2" fill="url(#${colorbarGradientId})" stroke="${colors.axis}" stroke-opacity=".28"/>`;
+          for (const tick of ticks) {
+            const position = colorbar.max === colorbar.min
+              ? 0.5
+              : (tick - colorbar.min) / (colorbar.max - colorbar.min);
+            const y = plot.bottom - clamp(position) * plot.height;
+            svg += `<line x1="${barX + barWidth}" y1="${y}" x2="${barX + barWidth + 5}" y2="${y}" stroke="${colors.axis}" stroke-width="1"/>`;
+            svg += `<text x="${barX + barWidth + 9}" y="${y + 4}" fill="${colors.muted}" font-size="11">${escapeText(formatTick(tick))}</text>`;
+          }
+          if (colorbar.label) {
+            const labelX = width - 13;
+            const labelY = plot.top + plot.height / 2;
+            svg += `<text transform="translate(${labelX} ${labelY}) rotate(-90)" text-anchor="middle" fill="${colors.text}" font-size="12" font-weight="700">${escapeText(colorbar.label)}</text>`;
+          }
         }
       }
 

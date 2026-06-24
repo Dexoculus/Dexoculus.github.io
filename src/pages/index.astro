@@ -2,6 +2,7 @@
 import BaseLayout from "@/layouts/BaseLayout.astro";
 import PostCard from "@/components/PostCard.astro";
 import ProjectCard from "@/components/ProjectCard.astro";
+import { homeContent } from "@/data/home";
 import { posts, profile, projects } from "@/lib/content";
 
 const featuredProjects = projects
@@ -12,70 +13,60 @@ const featuredPosts = posts
   .sort((a, b) => a.featuredOrder - b.featuredOrder || a.title.localeCompare(b.title));
 ---
 
-<BaseLayout
-  title="Hyeonbin Han | Robotics, Vision, and Data"
-  description="Research projects, engineering work, and technical notes in robotics, computer vision, physical AI, and data science."
->
+<BaseLayout title={homeContent.meta.title} description={homeContent.meta.description}>
   <section class="hero site-hero shell">
     <div class="hero-copy site-intro">
-      <p class="section-kicker">RESEARCH / ENGINEERING / NOTES</p>
-      <h1 class="sr-only">Hyeonbin Han robotics, vision, and data science portfolio</h1>
+      <p class="section-kicker">{homeContent.hero.kicker}</p>
+      <h1 class="sr-only">{homeContent.hero.hiddenTitle}</h1>
       <figure class="hero-media-statement">
         <img
-          src="/assets/hero-robot-cool.webp"
-          alt="A dramatic robot cockpit scene used as the homepage visual statement."
+          src={homeContent.hero.image}
+          alt={homeContent.hero.imageAlt}
           loading="eager"
           decoding="async"
           fetchpriority="high"
         />
       </figure>
-      <p class="hero-role">Robotics, computer vision, physical AI, and data science.</p>
+      <p class="hero-role">{homeContent.hero.role}</p>
       <p class="hero-summary">
-        A working archive of selected systems, research output, implementation notes, and technical experiments maintained by {profile.name}.
+        {homeContent.hero.summaryPrefix} {profile.name}.
       </p>
       <div class="hero-actions">
-        <a class="button primary" href="/projects/">Explore projects</a>
-        <a class="button secondary" href="/note/">Read notes</a>
+        {homeContent.actions.map((action) => <a class={`button ${action.variant}`} href={action.href}>{action.label}</a>)}
       </div>
       <dl class="signal-grid">
         <div>
-          <dt>Projects</dt>
-          <dd>{projects.length} documented systems</dd>
+          <dt>{homeContent.stats.projectsLabel}</dt>
+          <dd>{projects.length} {homeContent.stats.projectsSuffix}</dd>
         </div>
         <div>
-          <dt>Notes</dt>
-          <dd>{posts.length} technical entries</dd>
+          <dt>{homeContent.stats.notesLabel}</dt>
+          <dd>{posts.length} {homeContent.stats.notesSuffix}</dd>
         </div>
         <div>
-          <dt>Profile</dt>
-          <dd><a class="inline-link" href="/about/">CV and research record</a></dd>
+          <dt>{homeContent.stats.profileLabel}</dt>
+          <dd><a class="inline-link" href={homeContent.stats.profileHref}>{homeContent.stats.profileText}</a></dd>
         </div>
       </dl>
     </div>
     <aside class="ops-panel site-directory">
       <div class="ops-header">
-        <span>SITE INDEX</span>
-        <strong>001</strong>
+        <span>{homeContent.directory.eyebrow}</span>
+        <strong>{homeContent.directory.code}</strong>
       </div>
       <nav class="directory-list" aria-label="Site sections">
-        <a href="/projects/">
-          <span>01</span>
-          <strong>Projects</strong>
-          <small>Robotics, vision, ML, and deployed systems</small>
-        </a>
-        <a href="/note/">
-          <span>02</span>
-          <strong>Notes</strong>
-          <small>Research logs, case reports, and implementation guides</small>
-        </a>
-        <a href="/about/">
-          <span>03</span>
-          <strong>CV</strong>
-          <small>Education, experience, publications, and awards</small>
-        </a>
+        {
+          homeContent.directory.items.map((item) => (
+            <a href={item.href}>
+              <span>{item.number}</span>
+              <strong>{item.label}</strong>
+              <small>{item.description}</small>
+            </a>
+          ))
+        }
       </nav>
       <div class="site-owner">
-        <span>Maintained by</span>
+        <span>{homeContent.directory.ownerLabel}</span>
         <strong>{profile.name}</strong>
         <small>{profile.location}</small>
       </div>
@@ -87,10 +78,10 @@ const featuredPosts = posts
       <section class="shell section-grid">
         <div class="section-head wide">
           <div>
-            <p class="section-kicker">PROJECTS</p>
-            <h2>Selected Projects</h2>
+            <p class="section-kicker">{homeContent.sections.projects.kicker}</p>
+            <h2>{homeContent.sections.projects.title}</h2>
           </div>
-          <a class="button text" href="/projects/">All projects</a>
+          <a class="button text" href={homeContent.sections.projects.actionHref}>{homeContent.sections.projects.actionLabel}</a>
         </div>
         <div class="project-grid home-feature-grid">
           {featuredProjects.map((project) => <ProjectCard project={project} compact />)}
@@ -104,10 +95,10 @@ const featuredPosts = posts
       <section class="shell section-grid">
         <div class="section-head wide">
           <div>
-            <p class="section-kicker">WRITING</p>
-            <h2>Notes</h2>
+            <p class="section-kicker">{homeContent.sections.notes.kicker}</p>
+            <h2>{homeContent.sections.notes.title}</h2>
           </div>
-          <a class="button text" href="/note/">All notes</a>
+          <a class="button text" href={homeContent.sections.notes.actionHref}>{homeContent.sections.notes.actionLabel}</a>
         </div>
         <div class="note-grid home-feature-grid">
           {featuredPosts.map((post) => <PostCard post={post} />)}

@@ -102,17 +102,15 @@ plt.plot([0.1, 0.4, 0.2, 0.7, 0.55])
 
 Use the `signal` map, also available through the `halo` alias, when the color represents a phase, latent state, communication quality, or other non-risk signal quantity. This is more appropriate than a bar plot when the value changes continuously along a trajectory.
 
-For line plots, map a stable scalar to color. A rapidly oscillating phase value can look like rendering noise because adjacent line segments keep changing color. If the x-axis is time and the mapped value is monotonic, the result will also read like a left-to-right time gradient. For trajectory examples, use spatial x/y coordinates and map the signal onto the path.
+For line plots, map a stable scalar to color. A rapidly oscillating phase value can look like rendering noise because adjacent line segments keep changing color. The colorbar represents the scalar passed through `colorBy`; it is not automatically tied to the y-axis. If the goal is to color by vertical position, pass `colorBy: "y"` or a normalized array derived from `y`. This example uses a horizontal colorbar so the scalar guide does not read like a second y-axis.
 
 ````md
 ```plot
 const x = np.linspace(0, 6, 180)
 const y = x.map((v) => 0.42 * Math.sin(v * 1.4))
-const halo = x.map((v) => (
-  v < 2 ? 0.12 :
-  v < 4 ? 0.55 :
-  0.95
-))
+const yMin = -0.42
+const yMax = 0.42
+const halo = y.map((value) => (value - yMin) / (yMax - yMin))
 
 plt.title("Halo signal along trajectory")
 plt.xlabel("x position")
@@ -126,7 +124,7 @@ plt.plot(x, y, {
   cmap: "signal",
   vmin: 0,
   vmax: 1,
-  colorbar: { label: "halo strength", min: 0, max: 1, ticks: 6, cmap: "signal" }
+  colorbar: { label: "normalized y", min: 0, max: 1, ticks: 6, cmap: "signal", orientation: "horizontal" }
 })
 ```
 ````
@@ -136,11 +134,9 @@ Rendered:
 ```plot
 const x = np.linspace(0, 6, 180)
 const y = x.map((v) => 0.42 * Math.sin(v * 1.4))
-const halo = x.map((v) => (
-  v < 2 ? 0.12 :
-  v < 4 ? 0.55 :
-  0.95
-))
+const yMin = -0.42
+const yMax = 0.42
+const halo = y.map((value) => (value - yMin) / (yMax - yMin))
 
 plt.title("Halo signal along trajectory")
 plt.xlabel("x position")
@@ -154,7 +150,7 @@ plt.plot(x, y, {
   cmap: "signal",
   vmin: 0,
   vmax: 1,
-  colorbar: { label: "halo strength", min: 0, max: 1, ticks: 6, cmap: "signal" }
+  colorbar: { label: "normalized y", min: 0, max: 1, ticks: 6, cmap: "signal", orientation: "horizontal" }
 })
 ```
 
@@ -553,7 +549,8 @@ plt.colorbar({
   max: 1,
   ticks: 6,
   cmap: "scalar",
-  reverse: false
+  reverse: false,
+  orientation: "vertical"
 })
 ```
 
@@ -566,6 +563,8 @@ Colorbar options:
 | `ticks` | Tick count, clamped internally. |
 | `cmap` | Color map used by the colorbar. |
 | `reverse` | Reverse color direction. |
+| `orientation` | Use `vertical` for the default right-side bar, or `horizontal` for a bottom bar. |
+| `position` | Alias for `orientation`; `bottom` resolves to `horizontal`. |
 | `show: false` | Hide a plot-level colorbar. |
 
 The recommended pattern is:
