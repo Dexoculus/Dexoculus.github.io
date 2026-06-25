@@ -14,24 +14,24 @@ const featuredPosts = posts
 ---
 
 <BaseLayout title={homeContent.meta.title} description={homeContent.meta.description}>
-  <section class="hero site-hero shell">
-    <div class="hero-copy site-intro">
-      <p class="section-kicker">{homeContent.hero.kicker}</p>
-      <h1 class="sr-only">{homeContent.hero.hiddenTitle}</h1>
-      <figure class="hero-media-statement">
+  <section class="front site-front shell">
+    <div class="front-copy site-intro">
+      <p class="section-kicker">{homeContent.front.kicker}</p>
+      <h1 class="sr-only">{homeContent.front.hiddenTitle}</h1>
+      <figure class="front-media-statement">
         <img
-          src={homeContent.hero.image}
-          alt={homeContent.hero.imageAlt}
+          src={homeContent.front.image}
+          alt={homeContent.front.imageAlt}
           loading="eager"
           decoding="async"
           fetchpriority="high"
         />
       </figure>
-      <p class="hero-role">{homeContent.hero.role}</p>
-      <p class="hero-summary">
-        {homeContent.hero.summaryPrefix} {profile.name}.
+      <p class="front-role">{homeContent.front.role}</p>
+      <p class="front-summary">
+        {homeContent.front.summaryPrefix} {profile.name}.
       </p>
-      <div class="hero-actions">
+      <div class="front-actions">
         {homeContent.actions.map((action) => <a class={`button ${action.variant}`} href={action.href}>{action.label}</a>)}
       </div>
       <dl class="signal-grid">

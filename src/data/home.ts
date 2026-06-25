@@ -1,15 +1,15 @@
 export const homeContent = {
   meta: {
-    title: "Hyeonbin Han | Robotics, Vision, and Data",
+    title: "HBH Portfolio",
     description:
-      "Research projects, engineering work, and technical notes in robotics, computer vision, physical AI, and data science."
+      "Research projects, engineering work, and technical notes."
   },
-  hero: {
+  front: {
     kicker: "RESEARCH / ENGINEERING / NOTES",
-    hiddenTitle: "Hyeonbin Han robotics, vision, and data science portfolio",
-    image: "/assets/hero-robot-cool.webp",
-    imageAlt: "A dramatic robot cockpit scene used as the homepage visual statement.",
-    role: "Robotics, computer vision, physical AI, and data science.",
+    hiddenTitle: "HBH robotics, vision, and data science portfolio",
+    image: "/assets/front.webp",
+    imageAlt: "A front image representing the homepage visual statement.",
+    role: "Physical AI, Robotics, Computer Vision, and Data Science.",
     summaryPrefix:
       "A working archive of selected systems, research output, implementation notes, and technical experiments maintained by"
   },

@@ -14,7 +14,7 @@ This note documents the editing surface of this portfolio site. The goal is to k
 | Content | Edit here |
 | --- | --- |
 | Name, role, summary, education, experience, awards, skills, links | `src/data/profile.ts` |
-| Home page hero text, buttons, site index labels | `src/data/home.ts` |
+| Home page front text, buttons, site index labels | `src/data/home.ts` |
 | Projects | `_projects/**/*.md` |
 | Notes | `_posts/**/*.md` |
 | Images, videos, PDFs, downloads | `public/assets/` |
@@ -50,8 +50,8 @@ The landing page copy is centralized in `src/data/home.ts`.
 Common edits:
 
 ```ts
-hero: {
-  image: "/assets/hero-robot-cool.webp",
+front: {
+  image: "/assets/front.webp",
   role: "Robotics, computer vision, physical AI, and data science.",
   summaryPrefix: "A working archive of selected systems..."
 }

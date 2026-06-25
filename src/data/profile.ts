@@ -9,24 +9,24 @@ export const profile = {
   avatar: "https://avatars.githubusercontent.com/u/34956179?v=4",
   summary:
     "Undergraduate researcher working across robot intelligence, computer vision, physical AI, distributed learning, and machine learning systems.",
-  focus: ["Computer Vision", "Robotics", "Data Science", "Imitation Learning", "Vision-Language-Action (VLA)"],
-  researchInterests: ["Computer Vision", "Robotics", "Data Science", "Imitation Learning", "Vision-Language-Action (VLA)", "Anomaly Detection"],
+  focus: ["Robotics", "Imitation Learning", "Vision-Language-Action (VLA)", "Computer Vision", "Data Science"],
+  researchInterests: ["Computer Vision", "Robotics",  "Imitation Learning", "Vision-Language-Action (VLA)", "Data Science"],
   skillGroups: [
     { label: "Languages", scope: "programming", items: ["Python", "C++", "SQL"] },
     {
       label: "AI / Machine Learning",
       scope: "research stack",
-      items: ["PyTorch", "Flower", "Hugging Face LeRobot"]
+      items: ["PyTorch", "Hugging Face LeRobot"]
     },
     {
       label: "Robotics / Hardware",
       scope: "physical systems",
-      items: ["Raspberry Pi", "RB-Y1", "UR5", "Robotis FFW-SG2"]
+      items: ["Raspberry Pi", "UR5", "Robotis FFW-SG2"]
     },
     {
       label: "Data / Applications",
       scope: "analysis",
-      items: ["NumPy", "Pandas", "Scikit-learn", "Matplotlib", "Streamlit"]
+      items: ["NumPy", "Pandas", "Scikit-learn", "Matplotlib"]
     },
     {
       label: "Infrastructure",
@@ -44,8 +44,7 @@ export const profile = {
     "C++",
     "SQL",
     "PyTorch",
-    "Flower",
-    "LeRobot",
+    "Hugging Face LeRobot",
     "NumPy",
     "Pandas",
     "Scikit-learn",

@@ -31,7 +31,7 @@ const projectJsonLd = {
 <BaseLayout title={`${project.name} | Hyeonbin Han`} description={project.description} type="article" image={project.image} jsonLd={projectJsonLd}>
   {MathStyles && <MathStyles slot="head" />}
   <article class="shell detail-layout">
-    <header class="detail-hero">
+    <header class="record-header">
       <div>
         <p class="section-kicker">PROJECT {String(project.sequence).padStart(2, "0")}</p>
         <h1>{project.name}</h1>
