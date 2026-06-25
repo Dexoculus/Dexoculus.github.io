@@ -1,8 +1,8 @@
 export const profile = {
-  siteTitle: "Hyeonbin Han",
+  siteTitle: "HBH Portfolio",
   name: "Hyeonbin Han",
-  handle: "Dexoculus",
-  brandLine: "dexoculus / robotics / vision / data",
+  handle: "Dexter Oculus",
+  brandLine: "Robotics / Physical AI / Data Science",
   role: "Undergraduate researcher in Mathematical Data Science",
   location: "Republic of Korea",
   email: "hyeonbin@hanyang.ac.kr",
@@ -10,7 +10,7 @@ export const profile = {
   summary:
     "Undergraduate researcher working across robot intelligence, computer vision, physical AI, distributed learning, and machine learning systems.",
   focus: ["Robotics", "Imitation Learning", "Vision-Language-Action (VLA)", "Computer Vision", "Data Science"],
-  researchInterests: ["Computer Vision", "Robotics",  "Imitation Learning", "Vision-Language-Action (VLA)", "Data Science"],
+  researchInterests: ["Robotics", "Imitation Learning", "Vision-Language-Action (VLA)", "Computer Vision", "Data Science"],
   skillGroups: [
     { label: "Languages", scope: "programming", items: ["Python", "C++", "SQL"] },
     {

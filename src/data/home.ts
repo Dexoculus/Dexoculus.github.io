@@ -6,7 +6,7 @@ export const homeContent = {
   },
   front: {
     kicker: "RESEARCH / ENGINEERING / NOTES",
-    hiddenTitle: "HBH robotics, vision, and data science portfolio",
+    hiddenTitle: "Robotics, vision, and data science portfolio",
     image: "/assets/front.webp",
     imageAlt: "A front image representing the homepage visual statement.",
     role: "Physical AI, Robotics, Computer Vision, and Data Science.",
