@@ -82,9 +82,8 @@ const placeholderTools = isProject ? project.tools.slice(0, 3) : project.tags.sl
 </div>
 
 <script>
-  const visibleVideos = new WeakSet<HTMLVideoElement>();
+  const visibleVideos = new Set<HTMLVideoElement>();
   let videoObserver: IntersectionObserver | undefined;
-  let videoSyncFrame = 0;
 
   function hydratePreview(video: HTMLVideoElement) {
     if (video.src || !video.dataset.previewSrc) return;
@@ -98,72 +97,36 @@ const placeholderTools = isProject ? project.tools.slice(0, 3) : project.tags.sl
     video.playsInline = true;
   }
 
-  function prepareVideo(video: HTMLVideoElement) {
+  function playPreview(video: HTMLVideoElement) {
+    if (video.hidden || document.hidden) return;
     configureVideo(video);
     hydratePreview(video);
-  }
-
-  function playVideo(video: HTMLVideoElement) {
-    if (video.hidden || document.hidden) return;
-    prepareVideo(video);
-    video.play()
-      .then(() => {
-        delete video.dataset.videoBlocked;
-      })
-      .catch(() => {
-        video.dataset.videoBlocked = "true";
-      });
-  }
-
-  function pauseVideo(video: HTMLVideoElement) {
-    video.pause();
-  }
-
-  function syncVisibleVideo(video: HTMLVideoElement) {
-    if (visibleVideos.has(video)) {
-      playVideo(video);
-    } else {
-      pauseVideo(video);
-    }
-  }
-
-  function isInViewport(video: HTMLVideoElement) {
-    const rect = video.getBoundingClientRect();
-    const viewportHeight = window.innerHeight || document.documentElement.clientHeight;
-    const viewportWidth = window.innerWidth || document.documentElement.clientWidth;
-    return rect.width > 0 && rect.height > 0 && rect.bottom > 0 && rect.right > 0 && rect.top < viewportHeight && rect.left < viewportWidth;
+    video.play().catch(() => {});
   }
 
   function getVideoObserver() {
     if (videoObserver) return videoObserver;
     videoObserver = new IntersectionObserver(
       (entries) => {
-        entries.forEach((entry) => {
+        for (const entry of entries) {
           const video = entry.target;
           if (!(video instanceof HTMLVideoElement)) return;
+
           if (entry.isIntersecting && entry.intersectionRatio > 0) {
             visibleVideos.add(video);
+            playPreview(video);
           } else {
             visibleVideos.delete(video);
+            video.pause();
           }
-          syncVisibleVideo(video);
-        });
+        }
       },
       {
         rootMargin: "80px 0px",
-        threshold: [0, 0.01, 0.18, 0.55],
+        threshold: 0.01,
       }
     );
     return videoObserver;
-  }
-
-  function syncInitialVisibility(video: HTMLVideoElement) {
-    if (isInViewport(video)) {
-      visibleVideos.add(video);
-    } else {
-      visibleVideos.delete(video);
-    }
-    syncVisibleVideo(video);
   }
 
   function observeVideo(video: HTMLVideoElement) {
@@ -171,18 +134,12 @@ const placeholderTools = isProject ? project.tools.slice(0, 3) : project.tags.sl
     video.dataset.autoplayBound = "true";
     configureVideo(video);
 
-    video.addEventListener("pointerenter", () => playVideo(video));
-    video.addEventListener("click", () => playVideo(video));
-    video.addEventListener("touchstart", () => playVideo(video), { passive: true });
-
     if (!("IntersectionObserver" in window)) {
-      playVideo(video);
+      playPreview(video);
       return;
     }
 
     getVideoObserver().observe(video);
-    requestAnimationFrame(() => syncInitialVisibility(video));
-    window.setTimeout(() => syncInitialVisibility(video), 160);
   }
 
   function bindProjectMediaFallbacks() {
@@ -195,12 +152,7 @@ const placeholderTools = isProject ? project.tools.slice(0, 3) : project.tags.sl
           if (!(fallback instanceof HTMLVideoElement)) return;
           image.hidden = true;
           fallback.hidden = false;
-          configureVideo(fallback);
           observeVideo(fallback);
-          if (isInViewport(fallback)) {
-            visibleVideos.add(fallback);
-          }
-          syncVisibleVideo(fallback);
         },
         { once: true }
       );
@@ -213,47 +165,24 @@ const placeholderTools = isProject ? project.tools.slice(0, 3) : project.tags.sl
     });
   }
 
-  function syncAllVisibleVideos() {
-    document.querySelectorAll<HTMLVideoElement>("video[data-video-autoplay]").forEach((video) => {
-      if (isInViewport(video)) {
-        visibleVideos.add(video);
-      } else {
-        visibleVideos.delete(video);
-      }
-      syncVisibleVideo(video);
-    });
-  }
-
-  function scheduleVideoSync() {
-    if (videoSyncFrame) return;
-    videoSyncFrame = window.requestAnimationFrame(() => {
-      videoSyncFrame = 0;
-      syncAllVisibleVideos();
-    });
-  }
-
   function bindProjectMedia() {
     bindProjectMediaFallbacks();
     bindVideoPreviews();
-    scheduleVideoSync();
   }
-
-  bindProjectMedia();
 
   if (document.readyState === "loading") {
     document.addEventListener("DOMContentLoaded", bindProjectMedia, { once: true });
   } else {
-    requestAnimationFrame(bindProjectMedia);
+    bindProjectMedia();
   }
 
-  window.addEventListener("load", bindProjectMedia, { once: true });
-  window.setTimeout(bindProjectMedia, 320);
-  window.setTimeout(bindProjectMedia, 1000);
-  window.addEventListener("scroll", scheduleVideoSync, { passive: true });
-  window.addEventListener("resize", scheduleVideoSync);
-
   document.addEventListener("visibilitychange", () => {
-    syncAllVisibleVideos();
+    if (document.hidden) {
+      visibleVideos.forEach((video) => video.pause());
+      return;
+    }
+
+    visibleVideos.forEach(playPreview);
   });
   document.addEventListener("astro:page-load", bindProjectMedia);
 </script>
