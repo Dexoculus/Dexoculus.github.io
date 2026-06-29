@@ -133,7 +133,6 @@ function isActive(href: string) {
       const themeToggle = document.querySelector(".theme-toggle");
       const themeToggleLabel = themeToggle?.querySelector("span");
       const themeStorageKey = "branding-theme";
-      const motionQuery = window.matchMedia ? window.matchMedia("(prefers-reduced-motion: reduce)") : null;
 
       function updateThemeToggle() {
         if (!themeToggle || !themeToggleLabel) return;
@@ -161,32 +160,6 @@ function isActive(href: string) {
       });
 
       updateThemeToggle();
-
-      document.querySelectorAll(".halo-orbit").forEach((orbit) => {
-        const resetOrbit = () => {
-          orbit.style.setProperty("--orbit-x", "0px");
-          orbit.style.setProperty("--orbit-y", "0px");
-          orbit.style.setProperty("--orbit-x-half", "0px");
-          orbit.style.setProperty("--orbit-y-half", "0px");
-        };
-
-        orbit.addEventListener("pointermove", (event) => {
-          if (motionQuery && motionQuery.matches) return;
-          const rect = orbit.getBoundingClientRect();
-          const normalizedX = (event.clientX - rect.left) / rect.width - 0.5;
-          const normalizedY = (event.clientY - rect.top) / rect.height - 0.5;
-          const x = Math.max(-8, Math.min(8, normalizedX * 16));
-          const y = Math.max(-6, Math.min(6, normalizedY * 12));
-
-          orbit.style.setProperty("--orbit-x", `${x.toFixed(2)}px`);
-          orbit.style.setProperty("--orbit-y", `${y.toFixed(2)}px`);
-          orbit.style.setProperty("--orbit-x-half", `${(x * 0.55).toFixed(2)}px`);
-          orbit.style.setProperty("--orbit-y-half", `${(y * 0.55).toFixed(2)}px`);
-        });
-
-        orbit.addEventListener("pointerleave", resetOrbit);
-        orbit.addEventListener("pointercancel", resetOrbit);
-      });
     </script>
   </body>
 </html>

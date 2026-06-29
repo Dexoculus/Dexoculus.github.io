@@ -15,8 +15,6 @@ if (!project) throw new Error(`Project not found: ${Astro.params.slug}`);
 const Content = project.Content;
 const MathStyles = project.richFeatures.math ? (await import("@/components/MathStyles.astro")).default : null;
 const ChartRuntime = project.richFeatures.chart ? (await import("@/components/ChartRuntime.astro")).default : null;
-const ThreeRuntime = project.richFeatures.three ? (await import("@/components/ThreeRuntime.astro")).default : null;
-const MermaidRuntime = project.richFeatures.mermaid ? (await import("@/components/MermaidRuntime.astro")).default : null;
 const hasToc = project.headings.length > 0;
 const projectJsonLd = {
   "@context": "https://schema.org",
@@ -51,7 +49,5 @@ const projectJsonLd = {
     </div>
   </article>
   {ChartRuntime && <ChartRuntime slot="runtimes" />}
-  {ThreeRuntime && <ThreeRuntime slot="runtimes" />}
-  {MermaidRuntime && <MermaidRuntime slot="runtimes" />}
   <CodeCopyRuntime slot="runtimes" />
 </BaseLayout>

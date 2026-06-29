@@ -30,7 +30,6 @@ plt.scatter([1, 3, 5, 7], [0.8, 0.42, 0.22, 0.12], { label: "checkpoints" })
 - `plt.color(value, options)` to sample one color from a numeric range
 - `plt.colors(name, count)` to create a categorical or sampled color list
 - `plt.get_cmap(name)` to get a reusable `(position) => color` function
-- `plt.cmaps()` to list the built-in color map names
 
 The `np` helper includes `linspace`, `arange`, `sin`, `cos`, `tan`, `exp`, `log`, `sqrt`, `pow`, `abs`, and simple element-wise arithmetic helpers.
 
