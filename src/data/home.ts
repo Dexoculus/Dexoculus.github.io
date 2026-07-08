@@ -9,7 +9,7 @@ export const homeContent = {
     hiddenTitle: "Robotics, vision, and data science portfolio",
     image: "/assets/front.jpg",
     imageAlt: "A front image representing the homepage visual statement.",
-    role: "Physical AI, Robotics, Computer Vision, and Data Science.",
+    role: "Hi, Im Hyeonbin Han.",
     summaryPrefix:
       "A working archive of selected systems, research output, implementation notes, and technical experiments maintained by"
   },

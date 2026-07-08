@@ -12,7 +12,7 @@ export const profile = {
   focus: ["Robotics", "Imitation Learning", "Vision-Language-Action (VLA)", "Computer Vision", "Data Science"],
   researchInterests: ["Robotics", "Imitation Learning", "Vision-Language-Action (VLA)", "Computer Vision", "Data Science"],
   skillGroups: [
-    { label: "Languages", scope: "programming", items: ["Python", "C++", "SQL"] },
+    { label: "Languages", scope: "programming", items: ["Python", "SQL"] },
     {
       label: "AI / Machine Learning",
       scope: "research stack",
