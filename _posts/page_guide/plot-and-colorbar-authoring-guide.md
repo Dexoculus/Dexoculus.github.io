@@ -614,7 +614,6 @@ Available manual color entry points:
 | `plt.colors(name, count)` | An array of colors. | Multiple fixed traces or categories. |
 | `plt.color(value, options)` | One sampled color. | A fixed color derived from a numeric scale. |
 | `plt.get_cmap(name)` | A reusable function. | Repeated manual sampling from the same map. |
-| `plt.cmaps()` | Built-in map names. | Quick inspection while authoring a note. |
 
 Current `series` color order:
 

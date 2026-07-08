@@ -254,9 +254,6 @@ const visualizationColorConfig = JSON.stringify({
           const config = normalizeOptions(options);
           return (value) => sampleColorMap(name, value, Boolean(config.reverse));
         },
-        cmaps() {
-          return Object.keys(colorMaps);
-        },
         param(name, first, max, step, value) {
           const id = String(name);
           const config = first && typeof first === "object"
