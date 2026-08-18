@@ -1,8 +1,7 @@
 ---
 name: GELLO WebUI for Robot Learning Workflows
 tools: [GELLO, UR5, FastAPI, Next.js, LeRobot, Python, TypeScript]
-featured: true
-featured_order: 3
+featured: false 
 description: A browser-based operational layer that unifies robot teleoperation, demonstration review, and learned-policy deployment.
 ---
 
