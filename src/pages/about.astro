@@ -26,7 +26,6 @@ import { profile } from "@/lib/content";
       <p>{profile.education.program}</p>
       <dl class="detail-list">
         <div><dt>Period</dt><dd>{profile.education.period}</dd></div>
-        <div><dt>Record</dt><dd>{profile.education.detail}</dd></div>
         <div><dt>Location</dt><dd>{profile.education.location}</dd></div>
       </dl>
     </article>
@@ -74,6 +73,15 @@ import { profile } from "@/lib/content";
         ))
       }
     </div>
+  </section>
+
+  <section class="shell cv-project-route">
+    <div>
+      <p class="section-kicker">SELECTED PROJECTS</p>
+      <h2>Real-world robotics and learning systems.</h2>
+      <p>Explore detailed records of manipulation, imitation learning, perception, and physical deployment work.</p>
+    </div>
+    <a class="button primary" href="/projects/">View selected projects</a>
   </section>
 
   <section class="shell cv-output-grid">
@@ -125,14 +133,5 @@ import { profile } from "@/lib/content";
         }
       </div>
     </div>
-  </section>
-
-  <section class="shell cv-project-route">
-    <div>
-      <p class="section-kicker">PROJECT RECORD</p>
-      <h2>Project work is maintained separately.</h2>
-      <p>Detailed systems, implementation notes, media, and deployment results are collected in the Projects archive.</p>
-    </div>
-    <a class="button primary" href="/projects/">Open projects</a>
   </section>
 </BaseLayout>

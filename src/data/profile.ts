@@ -2,36 +2,35 @@ export const profile = {
   siteTitle: "HBH Portfolio",
   name: "Hyeonbin Han",
   handle: "Dexter Oculus",
-  brandLine: "Robotics / Physical AI / Data Science",
-  role: "Undergraduate researcher in Mathematical Data Science",
+  brandLine: "Robot Learning / Physical AI",
+  role: "Undergraduate Researcher in Robot Learning and Physical AI",
   location: "Republic of Korea",
   email: "hyeonbin@hanyang.ac.kr",
   avatar: "https://avatars.githubusercontent.com/u/34956179?v=4",
   summary:
-    "Undergraduate researcher working across robot intelligence, computer vision, physical AI, distributed learning, and machine learning systems.",
-  focus: ["Robotics", "Imitation Learning", "Vision-Language-Action (VLA)", "Computer Vision", "Data Science"],
-  researchInterests: ["Robotics", "Imitation Learning", "Vision-Language-Action (VLA)", "Computer Vision", "Data Science"],
+    "Undergraduate researcher in robot learning and physical AI, with hands-on experience in real-world robot manipulation, imitation learning, teleoperation, and robotic learning systems.",
+  focus: ["Robot Learning", "Robot Manipulation", "Imitation Learning", "Reinforcement Learning", "Sim-to-Real"],
+  researchInterests: ["Robot Learning", "Robot Manipulation", "Imitation Learning", "Reinforcement Learning", "Sim-to-Real"],
   skillGroups: [
-    { label: "Languages", scope: "programming", items: ["Python", "SQL"] },
     {
-      label: "AI / Machine Learning",
-      scope: "research stack",
-      items: ["PyTorch", "Hugging Face LeRobot"]
+      label: "Robot Learning",
+      scope: "policy development",
+      items: ["PyTorch", "Hugging Face LeRobot", "ACT"]
     },
     {
-      label: "Robotics / Hardware",
-      scope: "physical systems",
-      items: ["Raspberry Pi", "UR5", "Robotis FFW-SG2"]
+      label: "Robotics",
+      scope: "real-world systems",
+      items: ["Teleoperation", "UR5", "ROBOTIS FFW-SG2", "RB-Y1"]
     },
     {
-      label: "Data / Applications",
-      scope: "analysis",
+      label: "Perception / Data",
+      scope: "experimentation",
       items: ["NumPy", "Pandas", "Scikit-learn", "Matplotlib"]
     },
     {
-      label: "Infrastructure",
-      scope: "deployment",
-      items: ["Linux (Ubuntu)", "Docker", "Git", "Cloudflare Tunnels"]
+      label: "Systems",
+      scope: "robotics infrastructure",
+      items: ["Python", "Linux (Ubuntu)", "Docker", "Git"]
     },
     {
       label: "Fabrication / 3D",
@@ -65,7 +64,6 @@ export const profile = {
     school: "Hanyang University ERICA",
     program: "B.S. in Mathematical Data Science",
     period: "Expected graduation: February 2027",
-    detail: "GPA 3.51 / 4.5",
     location: "Ansan, Korea"
   },
   experience: [
@@ -76,8 +74,10 @@ export const profile = {
       role: "Junior Research Assistant, Robot Intelligence Team (Humanoid TF)",
       period: "Mar 2026 - Aug 2026",
       bullets: [
-        "Architected a scalable data acquisition and curation platform for the RB-Y1 humanoid robot and standardized the teleoperation environment for high-fidelity data collection.",
-        "Deployed the Gello teleoperation framework for UR5 manipulators and streamlined the pipeline from data curation to ACT policy training and physical deployment."
+        "Built and standardized teleoperation and data-collection pipelines for real-world robot manipulation systems.",
+        "Architected a scalable data acquisition and curation platform for the RB-Y1 humanoid robot to support consistent, high-quality demonstrations.",
+        "Developed LeRobot-based imitation-learning workflows spanning demonstration curation, ACT policy training, and physical deployment.",
+        "Deployed the GELLO teleoperation framework on UR5 manipulators using containerized robotics software stacks."
       ]
     },
     {
