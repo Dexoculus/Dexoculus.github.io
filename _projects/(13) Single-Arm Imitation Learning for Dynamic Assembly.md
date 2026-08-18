@@ -3,7 +3,7 @@ name: Single-Arm Imitation Learning for Dynamic Assembly
 tools: [ACT, LeRobot, GELLO, UR5, ROS 2, Docker]
 featured: true
 featured_order: 2
-image: /assets/images/projects/single-arm-dynamic-assembly.png
+video: /assets/video/projects/single-arm-conveyor-improved.mp4
 description: Real-world ACT experiments for dynamic conveyor assembly, sequential manipulation, and task-specific generalization on a UR5.
 ---
 
@@ -30,6 +30,8 @@ The study expanded beyond a single deployment run. It examined how camera covera
 - **Primary task:** track a moving gear, grasp it from a conveyor, and insert it onto an axle
 - **Additional studies:** two-stage gear assembly and shoe-packing with different bundle types
 
+![Single-arm dynamic assembly setup](/assets/images/projects/single-arm-dynamic-assembly.png)
+
 ## Dynamic conveyor experiment
 
 The initial protocol divided the conveyor into three gear positions and collected 20 demonstrations per position, for 60 episodes. A second phase added two intermediate positions and expanded the dataset to 110 episodes.
@@ -43,6 +45,26 @@ The first deployments revealed that the issue was not simply dataset size:
 5. Additional demonstrations targeted center positions, conveyor-speed changes, recovery behavior, two gear colors, and multi-object edge cases.
 
 This progression treated data collection as an iterative systems experiment: diagnose a failure, identify whether it comes from sensing, timing, or data coverage, then change only the relevant part of the pipeline.
+
+## Experiment media
+
+### Initial position-dependent failure
+
+The initial deployment exposed delayed detection and grasp failure under incomplete camera coverage.
+
+<video src="/assets/video/projects/single-arm-conveyor-initial-failure.mp4" controls muted playsinline preload="metadata"></video>
+
+### Improved conveyor deployment
+
+After correcting the observation setup and recollecting demonstrations, the policy tracked and placed the moving gear more reliably.
+
+<video src="/assets/video/projects/single-arm-conveyor-improved.mp4" controls muted playsinline preload="metadata"></video>
+
+### Final edge-case test
+
+The final recorded test includes multi-gear and color-order variations used to inspect behavior outside the simplest collection condition.
+
+<video src="/assets/video/projects/single-arm-conveyor-edge-cases.mp4" controls muted playsinline preload="metadata"></video>
 
 ## Findings
 
@@ -75,6 +97,20 @@ A related packing experiment trained on 120 demonstrations of inserting a bundle
 | Training bundle | 9 / 10 | 90% |
 | Larger paper bundle | 8 / 10 | 80% |
 | Plastic shipping bundle | 5 / 10 | 50% |
+
+### Packing examples
+
+Training bundle:
+
+<video src="/assets/video/projects/single-arm-shoe-training-bundle.mp4" controls muted playsinline preload="metadata"></video>
+
+Larger paper bundle:
+
+<video src="/assets/video/projects/single-arm-shoe-paper-bundle.mp4" controls muted playsinline preload="metadata"></video>
+
+Plastic shipping bundle:
+
+<video src="/assets/video/projects/single-arm-shoe-plastic-bundle.mp4" controls muted playsinline preload="metadata"></video>
 
 Most failures occurred at contact: the bundle caught on the shoe opening, was grasped poorly, or was pulled back out before the gripper opened fully. The result illustrates that visual similarity alone does not guarantee transfer when object compliance and contact dynamics change.
 
