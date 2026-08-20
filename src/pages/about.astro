@@ -3,7 +3,7 @@ import BaseLayout from "@/layouts/BaseLayout.astro";
 import { profile } from "@/lib/content";
 ---
 
-<BaseLayout title="CV | Hyeonbin Han" description="Curriculum vitae and research profile for Hyeonbin Han.">
+<BaseLayout title="CV" description="Curriculum vitae and research profile for Hyeonbin Han.">
   <section class="page-intro cv-overview shell">
     <div class="cv-overview-content">
       <p class="section-kicker">CURRICULUM VITAE</p>
@@ -14,7 +14,7 @@ import { profile } from "@/lib/content";
       <div class="link-row">
         {profile.links.map((link) => <a href={link.href} target="_blank" rel="noreferrer">{link.label}</a>)}
         <a href={`mailto:${profile.email}`}>Email</a>
-        <a class="button secondary print-button" href="/assets/CV.pdf" download>Download CV</a>
+        <a class="button secondary print-button" href="/assets/CV.pdf" download>Download PDF</a>
       </div>
     </div>
   </section>
@@ -27,6 +27,7 @@ import { profile } from "@/lib/content";
       <dl class="detail-list">
         <div><dt>Period</dt><dd>{profile.education.period}</dd></div>
         <div><dt>Location</dt><dd>{profile.education.location}</dd></div>
+        <div><dt>GPA</dt><dd>{profile.education.gpa}</dd></div>
       </dl>
     </article>
 
@@ -78,7 +79,7 @@ import { profile } from "@/lib/content";
   <section class="shell cv-project-route">
     <div>
       <p class="section-kicker">SELECTED PROJECTS</p>
-      <h2>Real-world robotics and learning systems.</h2>
+      <h2>Robot learning experiments and deployment systems.</h2>
       <p>Explore detailed records of manipulation, imitation learning, perception, and physical deployment work.</p>
     </div>
     <a class="button primary" href="/projects/">View selected projects</a>

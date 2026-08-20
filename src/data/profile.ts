@@ -15,27 +15,27 @@ export const profile = {
     {
       label: "Robot Learning",
       scope: "policy development",
-      items: ["PyTorch", "Hugging Face LeRobot", "ACT"]
+      items: ["PyTorch", "Hugging Face LeRobot", "ACT", "Diffusion Policy", "SmolVLA"]
     },
     {
-      label: "Robotics",
-      scope: "real-world systems",
-      items: ["Teleoperation", "UR5", "ROBOTIS FFW-SG2", "RB-Y1"]
-    },
-    {
-      label: "Perception / Data",
-      scope: "experimentation",
-      items: ["NumPy", "Pandas", "Scikit-learn", "Matplotlib"]
+      label: "Robot Platforms & Teleoperation",
+      scope: "hands-on platforms",
+      items: ["GELLO", "UR5", "ROBOTIS FFW-SG2"]
     },
     {
       label: "Systems",
-      scope: "robotics infrastructure",
-      items: ["Python", "Linux (Ubuntu)", "Docker", "Git"]
+      scope: "development infrastructure",
+      items: ["Python", "Linux", "Docker", "Git"]
     },
     {
-      label: "Fabrication / 3D",
+      label: "Perception",
+      scope: "computer vision",
+      items: ["YOLOv8", "3D Vision", "NumPy"]
+    },
+    {
+      label: "3D Tools",
       scope: "prototyping",
-      items: ["Fusion 360", "FreeCAD", "Blender", "3D Printing"]
+      items: ["Fusion 360", "FreeCAD", "3D Printing"]
     }
   ],
   stack: [
@@ -64,7 +64,8 @@ export const profile = {
     school: "Hanyang University ERICA",
     program: "B.S. in Mathematical Data Science",
     period: "Expected graduation: February 2027",
-    location: "Ansan, Korea"
+    location: "Ansan, Korea",
+    gpa: "3.51 / 4.50"
   },
   experience: [
     {
@@ -74,10 +75,10 @@ export const profile = {
       role: "Junior Research Assistant, Robot Intelligence Team (Humanoid TF)",
       period: "Mar 2026 - Aug 2026",
       bullets: [
-        "Built and standardized teleoperation and data-collection pipelines for real-world robot manipulation systems.",
-        "Architected a scalable data acquisition and curation platform for the RB-Y1 humanoid robot to support consistent, high-quality demonstrations.",
-        "Developed LeRobot-based imitation-learning workflows spanning demonstration curation, ACT policy training, and physical deployment.",
-        "Deployed the GELLO teleoperation framework on UR5 manipulators using containerized robotics software stacks."
+        "Built and standardized teleoperation and data-to-deployment workflows for UR5 manipulation using GELLO, LeRobot, ACT, and containerized robot-learning software.",
+        "Developed a FastAPI and Next.js GELLO WebUI that unified robot connection, demonstration recording, dataset review, live camera monitoring, and learned-policy deployment.",
+        "Designed real-world ACT experiments for dynamic conveyor assembly, sequential manipulation, and contact-rich packing; diagnosed the effects of camera coverage, action horizons, demonstration composition, and checkpoint selection.",
+        "Built a Cyclo Lab and Zenoh simulation pipeline for residual RL, collected 30 demonstrations, trained an ACT base policy, and defined a controlled ACT-versus-ACT+PPO evaluation protocol; residual training remains in progress."
       ]
     },
     {
@@ -86,8 +87,8 @@ export const profile = {
       role: "Undergraduate Researcher",
       period: "Oct 2023 - Jan 2026",
       bullets: [
-        "Administered and optimized GPU training infrastructure, maintaining availability and efficient resource allocation for deep learning workloads.",
-        "Engineered robust preprocessing pipelines for heterogeneous healthcare datasets, including mobile addiction metrics, and converted raw signals into machine-learning-ready formats."
+        "Maintained GPU training infrastructure and resource allocation for deep-learning experiments.",
+        "Developed preprocessing pipelines for heterogeneous healthcare and mobile-addiction datasets."
       ]
     }
   ],
@@ -99,11 +100,9 @@ export const profile = {
     "\"Deep Learning-Based Algorithm for Analyzing EGG Signals to Predict Closed Quotient Rate,\" KIIS Spring Conference, 2024. Poster."
   ],
   awards: [
-    "Excellence Award, Hanyang University ERICA College of Computing Capstone Fair, Jun 2026. KRW 2,000,000 prize.",
+    "Excellence Award, Hanyang University ERICA College of Computing Capstone Fair, Jun 2026.",
     "Excellence Award, 2025 Intelligent Robot WE-Meet Project Integrated Competition, Jan 2026.",
-    "Participation Award, 2025 Shipbuilding & Maritime Big Data Utilization Idea Contest, Dec 2025.",
-    "Best Paper Award, 2025 KIICE Fall Conference, Oct 2025.",
     "Bronze Prize (Robot News President's Award), KIICE Physical AI Challenge, Oct 2025.",
-    "Excellence Award, 2024 Hanyang University SW/ICT/AI Integrated Conference, Dec 2024."
+    "Best Paper Award, KIICE Fall Conference, Oct 2025."
   ]
 };
